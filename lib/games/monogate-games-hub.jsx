@@ -41,68 +41,101 @@ const FEATURED = [
 ];
 
 const COMPACT = [
+  { id: "bifurcation", title: "Bifurcation Viewer", icon: "∿", color: "#0fd38d", tagline: "Where the multiplicative F16 ops fall into chaos." },
+  { id: "julia-gallery", title: "Julia Set Gallery", icon: "❈", color: "#7af0c8", tagline: "40 Julia sets. 4 exceptions." },
+  { id: "mandelbrot-grid", title: "Mandelbrot Grid", icon: "▣", color: "#5ec47a", tagline: "All 16 F16 sets, side by side." },
+  { id: "conjugacy", title: "Conjugacy Viewer", icon: "⇌", color: "#a18cd1", tagline: "Two cobwebs, one dynamics." },
+  { id: "em-cost", title: "EM Cost Calculator", icon: "∑", color: "#4facfe", tagline: "F16-node decomposition of EM formulas." },
   { id: "eml-builder", title: "EML Builder", icon: "⧈", color: "#06B6D4", tagline: "Snap. Compose. Create." },
   { id: "closure", title: "Closure", icon: "⊘", color: "#EF4444", tagline: "You can't escape. Unless…" },
   { id: "the-gap", title: "The Gap", icon: "∎", color: "#EF4444", tagline: "Real vs complex. Different depths." },
 ];
 
-function FractalHero({ visible }) {
+const HEROES = [
+  {
+    id: "fractal-studio",
+    title: "EML Fractal Studio",
+    icon: "◈",
+    color: "#e8a020",
+    tagline: "See it. Hear it. Play it.",
+    desc: "The complex-plane Mandelbrot set for 8 EML-family operators, playable. Visual mode is a classical fractal explorer — scroll to zoom, drag to pan, 4 palettes. Audio mode turns the fractal into an instrument: hover for pitch, click to lock a chord (up to 6 tones). Sequencer sweeps a scan line across the boundary or replays a real orbit; DEXL and DEXN carry period-3 Sharkovskii chaos. Morph mode cross-fades two operators in real time.",
+    kicker: "FLAGSHIP · FRACTAL · VISUAL / AUDIO / SEQUENCER / ORBIT / MORPH",
+  },
+  {
+    id: "zen-garden",
+    title: "EML Zen Garden",
+    icon: "❋",
+    color: "#a18cd1",
+    tagline: "Drag. Listen. Breathe.",
+    desc: "A living, interactive complex-plane garden. Drag floating leaf-nodes — each is a constant in a linear chain of F16 operators. Domain coloring, orbit field, or flow-field renders in real time. A continuous drone tracks the tree's output: Re(f) pitch, Im(f) pan, |f| volume. Mic or file FFT drives audio-reactive mode — bass drives depth, treble shifts hue. Presets: Pure Euler, Phantom Attractor, Chaos Lullaby, Golden Spiral, Breath.",
+    kicker: "FLAGSHIP · GARDEN · DOMAIN COLORING / AUDIO-REACTIVE",
+  },
+];
+
+function HeroCard({ game, visible, index }) {
   const nav = useNavigate();
   const [hovered, setHovered] = useState(false);
+  const color = game.color;
   return (
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => nav(`/${game.id}`)}
       style={{
-        opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)",
-        transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
-        marginBottom: 48,
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(20px)",
+        transition: `all 0.6s cubic-bezier(0.16,1,0.3,1) ${0.1 + index * 0.12}s`,
+        marginBottom: 20,
         background: hovered
-          ? "linear-gradient(135deg, rgba(232,160,32,0.1), rgba(232,160,32,0.03))"
-          : "linear-gradient(135deg, rgba(232,160,32,0.06), rgba(8,6,14,0))",
-        border: `1px solid ${hovered ? "rgba(232,160,32,0.4)" : "rgba(232,160,32,0.15)"}`,
-        borderRadius: 16, padding: "40px 40px 36px",
-        position: "relative", overflow: "hidden",
-        transition: "all 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)",
+          ? `linear-gradient(135deg, ${color}1a, ${color}05)`
+          : `linear-gradient(135deg, ${color}10, rgba(8,6,14,0))`,
+        border: `1px solid ${hovered ? color + "66" : color + "28"}`,
+        borderRadius: 16,
+        padding: "36px 36px 32px",
+        position: "relative",
+        overflow: "hidden",
+        cursor: "pointer",
+        boxShadow: hovered
+          ? `0 0 40px ${color}22, 0 8px 24px rgba(0,0,0,0.35)`
+          : "0 4px 16px rgba(0,0,0,0.25)",
       }}>
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, height: hovered ? 2 : 1,
-        background: "linear-gradient(90deg, transparent, #e8a020, transparent)",
+        background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
         transition: "height 0.3s",
       }} />
       <div style={{
         position: "absolute", top: -80, right: -80, width: 300, height: 300,
-        background: "radial-gradient(circle, rgba(232,160,32,0.04) 0%, transparent 70%)",
+        background: `radial-gradient(circle, ${color}14 0%, transparent 70%)`,
         pointerEvents: "none",
       }} />
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-        <span style={{ fontSize: 28, color: C.accent, lineHeight: 1 }}>◈</span>
-        <span style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: C.accent, fontFamily: C.mono }}>
-          FLAGSHIP · FRACTAL EXPLORER
-        </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+        <span style={{ fontSize: 26, color, lineHeight: 1,
+          filter: hovered ? `drop-shadow(0 0 6px ${color}90)` : "none",
+          transition: "filter 0.25s" }}>{game.icon}</span>
+        <span style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase",
+          color, fontFamily: C.mono }}>{game.kicker}</span>
       </div>
 
-      <h2 style={{ fontSize: 28, fontWeight: 700, color: "#F1F5F9", margin: "0 0 10px", letterSpacing: -0.5 }}>
-        Eight operators. Eight universes.
-      </h2>
-      <p style={{ fontSize: 14, color: "rgba(226,232,240,0.6)", margin: "0 0 24px", maxWidth: 520, lineHeight: 1.7 }}>
-        Real-plane escape-time fractals for all 8 EML-family operators: EML, DEML, EXL, EDL, EAL, EMN, EPL, LEAd.
-        The EML operator produces the Devaney exponential family — boundary dimension 1.716.
-        EAL, DEML, and EMN generate entirely different geometry.
-      </p>
+      <h2 style={{ fontSize: 26, fontWeight: 700, color: "#F1F5F9",
+        margin: "0 0 6px", letterSpacing: -0.5 }}>{game.title}</h2>
+      <div style={{ fontSize: 14, color, fontStyle: "italic",
+        marginBottom: 14, opacity: 0.9 }}>{game.tagline}</div>
+      <p style={{ fontSize: 13, color: "rgba(226,232,240,0.6)",
+        margin: "0 0 20px", maxWidth: 560, lineHeight: 1.7 }}>{game.desc}</p>
 
       <button
-        onClick={() => nav("/fractal-explorer")}
+        onClick={(e) => { e.stopPropagation(); nav(`/${game.id}`); }}
         style={{
           fontFamily: C.mono, fontSize: 12, padding: "10px 24px",
-          background: hovered ? C.accent : "rgba(232,160,32,0.12)",
-          border: `1px solid ${hovered ? C.accent : "rgba(232,160,32,0.3)"}`,
-          color: hovered ? "#08060E" : C.accent,
+          background: hovered ? color : `${color}22`,
+          border: `1px solid ${hovered ? color : color + "55"}`,
+          color: hovered ? "#08060E" : color,
           borderRadius: 6, cursor: "pointer", fontWeight: 700, letterSpacing: 1,
           transition: "all 0.2s", textTransform: "uppercase",
         }}>
-        ENTER EXPLORER →
+        ENTER →
       </button>
     </div>
   );
@@ -200,8 +233,10 @@ export default function Hub() {
           </p>
         </header>
 
-        {/* Fractal hero */}
-        <FractalHero visible={visible} />
+        {/* Two flagships (heroes) */}
+        <div style={{ marginBottom: 48 }}>
+          {HEROES.map((g, i) => <HeroCard key={g.id} game={g} visible={visible} index={i} />)}
+        </div>
 
         {/* Featured section */}
         <div style={{
@@ -225,7 +260,7 @@ export default function Hub() {
           textTransform: "uppercase", marginBottom: 16,
           display: "flex", alignItems: "center", gap: 12,
         }}>
-          <span>── ALL EXPERIMENTS</span>
+          <span>── MORE EXPERIMENTS</span>
           <div style={{ flex: 1, height: 1, background: C.border }} />
         </div>
 
@@ -239,9 +274,9 @@ export default function Hub() {
           fontSize: 11, fontFamily: C.mono, color: C.muted, lineHeight: 1.8,
           opacity: visible ? 1 : 0, transition: "opacity 0.5s 0.6s",
         }}>
-          Research by Arturo R. Almaguer ·{" "}
+          Monogate Research ·{" "}
           <a href="https://arxiv.org/abs/2603.21852" style={{ color: "#4facfe" }}>arXiv:2603.21852</a>
-          {" "}· 24 theorems · 315+ equations ·{" "}
+          {" "}· 30 theorems · 315+ equations ·{" "}
           <a href="https://monogate.org" style={{ color: "#4facfe" }}>monogate.org</a>
         </div>
 

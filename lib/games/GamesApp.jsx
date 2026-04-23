@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Hub from "./monogate-games-hub";
 import EmlBuilder from "./eml-builder";
 import Closure from "./closure";
@@ -8,8 +8,14 @@ import IdentityTheorem from "./identity-theorem";
 import NegativeExponent from "./negative-exponent";
 import WeierstrassMachine from "./weierstrass-machine";
 import BillionTrees from "./billion-trees";
-import EMLFractalExplorer from "./EMLFractalExplorer";
 import EMLSynthesizer from "./eml-synthesizer";
+import FractalStudio from "./fractal-studio";
+import ZenGarden from "./zen-garden";
+import BifurcationViewer from "./bifurcation-viewer";
+import JuliaGallery from "./julia-gallery";
+import MandelbrotGrid from "./mandelbrot-grid";
+import ConjugacyViewer from "./conjugacy-viewer";
+import EmCostCalculator from "./em-cost-calculator";
 
 function BackButton() {
   const nav = useNavigate();
@@ -47,7 +53,18 @@ export default function GamesApp() {
     <BrowserRouter basename="/lab">
       <Routes>
         <Route path="/" element={<Hub />} />
-        <Route path="/fractal-explorer" element={<Game><EMLFractalExplorer /></Game>} />
+        {/* Flagships */}
+        <Route path="/fractal-studio" element={<Game><FractalStudio /></Game>} />
+        <Route path="/zen-garden" element={<Game><ZenGarden /></Game>} />
+        {/* Backward-compat: old fractal-explorer redirects to fractal-studio */}
+        <Route path="/fractal-explorer" element={<Navigate to="/fractal-studio" replace />} />
+        {/* New experiences */}
+        <Route path="/bifurcation" element={<Game><BifurcationViewer /></Game>} />
+        <Route path="/julia-gallery" element={<Game><JuliaGallery /></Game>} />
+        <Route path="/mandelbrot-grid" element={<Game><MandelbrotGrid /></Game>} />
+        <Route path="/conjugacy" element={<Game><ConjugacyViewer /></Game>} />
+        <Route path="/em-cost" element={<Game><EmCostCalculator /></Game>} />
+        {/* Featured + compact (existing curation) */}
         <Route path="/eml-synthesizer" element={<Game><EMLSynthesizer /></Game>} />
         <Route path="/weierstrass-machine" element={<Game><WeierstrassMachine /></Game>} />
         <Route path="/phantom-attractor" element={<Game><PhantomAttractor /></Game>} />
