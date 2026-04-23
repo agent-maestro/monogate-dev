@@ -212,9 +212,17 @@ function createAudio() {
 
 // ─── Main component ──────────────────────────────────────────────────────────
 
-const CANVAS_LO = 200;   // while dragging
-const CANVAS_HI = 400;   // at rest
-const VIEW_R = 2.5;      // complex plane: [-VIEW_R, VIEW_R] on both axes
+// 16:9 canvas. Backing store swaps between HI (rest) and LO (drag) to
+// keep drag interactions responsive.
+const CANVAS_W_HI = 800;
+const CANVAS_H_HI = 450;
+const CANVAS_W_LO = 400;
+const CANVAS_H_LO = 225;
+// Imaginary axis range at zoom=1. Real axis range derives from aspect
+// so the fractal stays undistorted.
+const VIEW_R_Y = 1.8;
+const ASPECT   = CANVAS_W_HI / CANVAS_H_HI;   // 16/9
+const VIEW_R_X = VIEW_R_Y * ASPECT;           // ≈ 3.2
 const RENDER_MODES = ["domain", "orbit", "flow"];
 
 function defaultNodes() {
@@ -262,25 +270,27 @@ export default function ZenGarden() {
   const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const size = isDragging ? CANVAS_LO : CANVAS_HI;
-    if (canvas.width !== size) {
-      canvas.width = size;
-      canvas.height = size;
+    const W = isDragging ? CANVAS_W_LO : CANVAS_W_HI;
+    const H = isDragging ? CANVAS_H_LO : CANVAS_H_HI;
+    if (canvas.width !== W || canvas.height !== H) {
+      canvas.width = W;
+      canvas.height = H;
     }
     const ctx = canvas.getContext("2d");
     const tree = nodesRef.current;
-    const image = ctx.createImageData(size, size);
+    const image = ctx.createImageData(W, H);
     const data = image.data;
-    const r = VIEW_R / zoom;
+    const rx = VIEW_R_X / zoom;
+    const ry = VIEW_R_Y / zoom;
 
     if (renderMode === "domain") {
-      for (let py = 0; py < size; py++) {
-        const zi = -r + (py / size) * 2 * r;    // flip y so +Im goes up-screen
-        for (let px = 0; px < size; px++) {
-          const zr = -r + (px / size) * 2 * r;
+      for (let py = 0; py < H; py++) {
+        const zi = -ry + (py / H) * 2 * ry;    // flip y so +Im goes up-screen
+        for (let px = 0; px < W; px++) {
+          const zr = -rx + (px / W) * 2 * rx;
           const [fr, fi] = evalTree(tree, zr, zi);
           const [R, G, B] = domainColor(fr, fi, hueShift);
-          const idx = (py * size + px) * 4;
+          const idx = (py * W + px) * 4;
           data[idx] = R; data[idx + 1] = G; data[idx + 2] = B; data[idx + 3] = 255;
         }
       }
@@ -293,10 +303,10 @@ export default function ZenGarden() {
       const step = 16;
       ctx.strokeStyle = "rgba(161,140,209,0.55)";
       ctx.lineWidth = 1;
-      for (let py = step / 2; py < size; py += step) {
-        for (let px = step / 2; px < size; px += step) {
-          const zr = -r + (px / size) * 2 * r;
-          const zi = -r + (py / size) * 2 * r;
+      for (let py = step / 2; py < H; py += step) {
+        for (let px = step / 2; px < W; px += step) {
+          const zr = -rx + (px / W) * 2 * rx;
+          const zi = -ry + (py / H) * 2 * ry;
           const [fr, fi] = evalTree(tree, zr, zi);
           const dx = fr - zr;
           const dy = fi - zi;
@@ -321,17 +331,17 @@ export default function ZenGarden() {
       const seedStep = 24;
       const steps = 24;
       ctx.fillStyle = "rgba(96,230,161,0.18)";
-      for (let py = seedStep / 2; py < size; py += seedStep) {
-        for (let px = seedStep / 2; px < size; px += seedStep) {
-          let zr = -r + (px / size) * 2 * r;
-          let zi = -r + (py / size) * 2 * r;
+      for (let py = seedStep / 2; py < H; py += seedStep) {
+        for (let px = seedStep / 2; px < W; px += seedStep) {
+          let zr = -rx + (px / W) * 2 * rx;
+          let zi = -ry + (py / H) * 2 * ry;
           for (let s = 0; s < steps; s++) {
             const [fr, fi] = evalTree(tree, zr, zi);
             if (!isFinite(fr) || !isFinite(fi)) break;
             zr = fr; zi = fi;
-            const ox = ((zr + r) / (2 * r)) * size;
-            const oy = ((zi + r) / (2 * r)) * size;
-            if (ox < 0 || ox >= size || oy < 0 || oy >= size) break;
+            const ox = ((zr + rx) / (2 * rx)) * W;
+            const oy = ((zi + ry) / (2 * ry)) * H;
+            if (ox < 0 || ox >= W || oy < 0 || oy >= H) break;
             ctx.fillRect(ox, oy, 1, 1);
           }
         }
@@ -355,16 +365,18 @@ export default function ZenGarden() {
   // ── Coord helpers ────────────────────────────────────────────────────────
 
   function canvasPxToComplex(px, py, rect) {
-    const r = VIEW_R / zoom;
-    const zr = -r + (px / rect.width) * 2 * r;
-    const zi = -r + (py / rect.height) * 2 * r;
+    const rx = VIEW_R_X / zoom;
+    const ry = VIEW_R_Y / zoom;
+    const zr = -rx + (px / rect.width)  * 2 * rx;
+    const zi = -ry + (py / rect.height) * 2 * ry;
     return [zr, zi];
   }
 
   function complexToScreenPct(zr, zi) {
-    const r = VIEW_R / zoom;
-    const x = ((zr + r) / (2 * r)) * 100;
-    const y = ((zi + r) / (2 * r)) * 100;
+    const rx = VIEW_R_X / zoom;
+    const ry = VIEW_R_Y / zoom;
+    const x = ((zr + rx) / (2 * rx)) * 100;
+    const y = ((zi + ry) / (2 * ry)) * 100;
     return { x, y };
   }
 
@@ -739,8 +751,8 @@ export default function ZenGarden() {
         <div style={S.canvasWrap} onMouseDown={handlePointerDownCanvas}>
           <canvas
             ref={canvasRef}
-            width={CANVAS_HI}
-            height={CANVAS_HI}
+            width={CANVAS_W_HI}
+            height={CANVAS_H_HI}
             style={{
               width: "100%",
               height: "100%",
@@ -780,10 +792,10 @@ export default function ZenGarden() {
           })}
         </div>
 
-        {/* Node panel */}
+        {/* Node panel — horizontal strip under the canvas */}
         <aside style={S.panel}>
           <div style={S.panelHeader}>
-            <span style={S.panelTitle}>nodes</span>
+            <span style={S.panelTitle}>nodes · {nodes.length}/6</span>
             <button
               onClick={addNode}
               disabled={nodes.length >= 6}
@@ -793,72 +805,84 @@ export default function ZenGarden() {
             </button>
           </div>
 
-          {nodes.map((n, i) => {
-            const isSel = selectedIdx === i;
-            const color = OP_COLORS[n.op] || "#fff";
-            return (
-              <div
-                key={i}
-                onClick={() => setSelectedIdx(i)}
-                style={{
-                  ...S.nodeRow,
-                  borderColor: isSel ? color : "rgba(255,255,255,0.08)",
-                  background: isSel ? "rgba(255,255,255,0.04)" : "transparent",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ ...S.dot, background: color }} />
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>node {i}</span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); removeNode(i); }}
-                    style={S.xBtn}
-                  >×</button>
-                </div>
+          <div style={S.nodesStrip}>
+            {nodes.map((n, i) => {
+              const isSel = selectedIdx === i;
+              const color = OP_COLORS[n.op] || "#fff";
+              return (
+                <div
+                  key={i}
+                  onClick={() => setSelectedIdx(i)}
+                  style={{
+                    ...S.nodeRow,
+                    borderColor: isSel ? color : "rgba(255,255,255,0.08)",
+                    background: isSel ? "rgba(255,255,255,0.04)" : "transparent",
+                  }}
+                >
+                  <div style={S.nodeLabel}>
+                    <span style={{ ...S.dot, background: color }} />
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.7)" }}>n{i}</span>
+                  </div>
 
-                {isSel && (
                   <div style={S.nodeFields}>
-                    <div style={S.field}>
-                      <label style={S.lbl}>re {n.re.toFixed(2)}</label>
-                      <input
-                        type="range" min={-5} max={5} step={0.01}
-                        value={n.re}
-                        onChange={(e) => updateNode(i, { re: parseFloat(e.target.value) })}
-                        style={S.slider}
-                      />
-                    </div>
-                    <div style={S.field}>
-                      <label style={S.lbl}>im {n.im.toFixed(2)}</label>
-                      <input
-                        type="range" min={-5} max={5} step={0.01}
-                        value={n.im}
-                        onChange={(e) => updateNode(i, { im: parseFloat(e.target.value) })}
-                        style={S.slider}
-                      />
-                    </div>
-                    <div style={S.field}>
+                    <div style={S.fieldTight}>
                       <label style={S.lbl}>op</label>
                       <select
                         value={n.op}
+                        onClick={(e) => e.stopPropagation()}
                         onChange={(e) => updateNode(i, { op: e.target.value })}
-                        style={S.select}
+                        style={S.selectInline}
                       >
                         {Object.keys(OPS).map((k) => <option key={k} value={k}>{k}</option>)}
                       </select>
                     </div>
-                    <div style={S.field}>
-                      <label style={S.lbl}>depth {n.depth}</label>
+
+                    <div style={S.field} title="real part">
+                      <label style={S.lbl}>re</label>
+                      <input
+                        type="range" min={-5} max={5} step={0.01}
+                        value={n.re}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => updateNode(i, { re: parseFloat(e.target.value) })}
+                        style={S.slider}
+                      />
+                      <span style={S.lblValue}>{n.re.toFixed(2)}</span>
+                    </div>
+
+                    <div style={S.field} title="imaginary part">
+                      <label style={S.lbl}>im</label>
+                      <input
+                        type="range" min={-5} max={5} step={0.01}
+                        value={n.im}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => updateNode(i, { im: parseFloat(e.target.value) })}
+                        style={S.slider}
+                      />
+                      <span style={S.lblValue}>{n.im.toFixed(2)}</span>
+                    </div>
+
+                    <div style={S.fieldTight} title="tree depth">
+                      <label style={S.lbl}>d</label>
                       <input
                         type="range" min={1} max={4} step={1}
                         value={n.depth}
+                        onClick={(e) => e.stopPropagation()}
                         onChange={(e) => updateNode(i, { depth: parseInt(e.target.value, 10) })}
-                        style={S.slider}
+                        style={{ ...S.slider, flex: "0 0 40px", minWidth: 40 }}
                       />
+                      <span style={S.lblValue}>{n.depth}</span>
                     </div>
                   </div>
-                )}
-              </div>
-            );
-          })}
+
+                  <button
+                    onClick={(e) => { e.stopPropagation(); removeNode(i); }}
+                    style={S.xBtn}
+                    title="remove node"
+                  >×</button>
+                </div>
+              );
+            })}
+          </div>
         </aside>
       </div>
 
@@ -968,49 +992,70 @@ const S = {
   },
 
   mainWrap: {
-    flex: 1, display: "flex", gap: 12, padding: "0 24px 12px",
-    alignItems: "stretch", flexWrap: "wrap",
+    flex: 1, display: "flex", flexDirection: "column", gap: 10,
+    padding: "0 24px 12px", alignItems: "stretch",
   },
   canvasWrap: {
-    flex: "1 1 420px",
-    minWidth: 280,
-    maxWidth: 520,
-    aspectRatio: "1 / 1",
+    width: "100%",
+    aspectRatio: "16 / 9",
     position: "relative",
     borderRadius: 6, overflow: "hidden",
     border: "1px solid rgba(255,255,255,0.06)",
     background: "#04040a",
   },
   panel: {
-    flex: "1 1 220px",
-    minWidth: 220,
-    maxWidth: 320,
-    padding: "0 0 4px",
+    width: "100%",
+    padding: "4px 0",
     display: "flex", flexDirection: "column", gap: 6,
   },
   panelHeader: {
-    display: "flex", alignItems: "center", justifyContent: "space-between",
-    padding: "4px 0 2px",
+    display: "flex", alignItems: "center", gap: 10,
+    padding: "2px 0 4px",
   },
   panelTitle: {
     fontSize: 10, color: "rgba(255,255,255,0.4)",
     letterSpacing: "0.1em", textTransform: "uppercase",
   },
+  nodesStrip: {
+    display: "flex", gap: 8, flexWrap: "wrap",
+  },
 
   nodeRow: {
+    flex: "1 1 300px",
+    minWidth: 260,
+    maxWidth: 400,
     border: "1px solid",
     borderRadius: 5,
-    padding: "8px 10px",
+    padding: "6px 10px",
     cursor: "pointer",
     transition: "background 0.15s, border-color 0.15s",
+    display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
   },
-  nodeFields: { marginTop: 8, display: "flex", flexDirection: "column", gap: 6 },
-  field: { display: "flex", alignItems: "center", gap: 8 },
-  lbl: { fontSize: 10, color: "rgba(255,255,255,0.4)", width: 58 },
-  slider: { flex: 1, accentColor: "#a18cd1" },
+  nodeLabel: {
+    display: "flex", alignItems: "center", gap: 6, flexShrink: 0,
+  },
+  nodeFields: {
+    display: "flex", alignItems: "center", gap: 10, flex: "1 1 auto",
+    flexWrap: "wrap",
+  },
+  field: {
+    display: "flex", alignItems: "center", gap: 5, flex: "1 1 0",
+    minWidth: 92,
+  },
+  fieldTight: {
+    display: "flex", alignItems: "center", gap: 5, flexShrink: 0,
+  },
+  lbl: { fontSize: 10, color: "rgba(255,255,255,0.4)" },
+  lblValue: { fontSize: 10, color: "rgba(255,255,255,0.65)", minWidth: 32 },
+  slider: { flex: 1, accentColor: "#a18cd1", minWidth: 48 },
+  selectInline: {
+    background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)",
+    border: "1px solid rgba(255,255,255,0.08)", borderRadius: 3,
+    padding: "2px 6px", fontSize: 10, fontFamily: FONT, cursor: "pointer",
+  },
   dot: { width: 8, height: 8, borderRadius: "50%" },
   xBtn: {
-    marginLeft: "auto",
+    marginLeft: 4,
     background: "transparent", border: "1px solid rgba(255,255,255,0.08)",
     color: "rgba(255,255,255,0.4)", borderRadius: 3,
     width: 20, height: 20, fontSize: 14, lineHeight: "18px",
