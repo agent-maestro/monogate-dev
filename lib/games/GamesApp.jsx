@@ -19,6 +19,7 @@ import EmCostCalculator from "./em-cost-calculator";
 import EquationGenome from "./equation-genome";
 import PeriodMap from "./period-map";
 import MorphPlayer from "./morph-player";
+import LiveOptimizer from "./live-optimizer";
 
 function BackButton() {
   const nav = useNavigate();
@@ -71,6 +72,7 @@ export default function GamesApp() {
         <Route path="/equation-genome" element={<Game><EquationGenome /></Game>} />
         <Route path="/period-map" element={<Game><PeriodMap /></Game>} />
         <Route path="/morph" element={<Game><MorphPlayer /></Game>} />
+        <Route path="/optimizer" element={<Game><LiveOptimizer /></Game>} />
         {/* Featured + compact (existing curation) */}
         <Route path="/eml-synthesizer" element={<Game><EMLSynthesizer /></Game>} />
         <Route path="/weierstrass-machine" element={<Game><WeierstrassMachine /></Game>} />

@@ -9,6 +9,11 @@ const C = {
 
 const FEATURED = [
   {
+    id: "optimizer", title: "Live Optimizer", icon: "⚡", color: "#e8a020",
+    tagline: "Type any equation. Watch it shrink.",
+    desc: "Real-time EML node-cost analyzer in the browser. Every mathematical expression gets naïve-vs-SuperBEST costs, operator breakdown, savings bar, and an ELC-class badge. Parser is a 200-line recursive descent — the optimizer that ships as a Python CLI, now running on paste-and-type.",
+  },
+  {
     id: "equation-genome", title: "Equation Genome", icon: "✱", color: "#60a5fa",
     tagline: "Equations cluster by math, not by field.",
     desc: "265 scientific equations projected to 2-D by structural fingerprint and partitioned by k-means (K = 5). Toggle between domain colouring and cluster colouring — the punchline is in the switch. Pair-purity 0.181 vs random baseline 0.155; excess +0.026.",
