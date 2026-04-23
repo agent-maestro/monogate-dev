@@ -9,6 +9,21 @@ const C = {
 
 const FEATURED = [
   {
+    id: "equation-genome", title: "Equation Genome", icon: "✱", color: "#60a5fa",
+    tagline: "Equations cluster by math, not by field.",
+    desc: "265 scientific equations projected to 2-D by structural fingerprint and partitioned by k-means (K = 5). Toggle between domain colouring and cluster colouring — the punchline is in the switch. Pair-purity 0.181 vs random baseline 0.155; excess +0.026.",
+  },
+  {
+    id: "period-map", title: "Period Map", icon: "▣", color: "#f87171",
+    tagline: "Where chaos lives — 40 % of the EXL c-plane is period 3.",
+    desc: "Client-side heat-map of the complex c-plane coloured by orbit period under EXL, EML, or EDL. Red is period-3 Sharkovskii chaos; blue is fixed-point stability. Click to trace an orbit. Deep-session measured area ratios 4.60 / 4.44 / 4.45 — within 3.7 % of classical Feigenbaum δ ≈ 4.669.",
+  },
+  {
+    id: "morph", title: "Operator Morph", icon: "↝", color: "#c084fc",
+    tagline: "Watch one Mandelbrot set become another.",
+    desc: "Scrub z ← (1 − t)·op₁(z,c) + t·op₂(z,c) across 51 frames between four EML-family pairs. The bounded-set area dips non-monotonically near t ≈ 0.4 for three of four pairs — the fractal nearly collapses at the midpoint, then rebuilds.",
+  },
+  {
     id: "eml-synthesizer", title: "EML Synthesizer", icon: "♫", color: "#5ec47a",
     tagline: "Timbre is node count.",
     desc: "Fourier synthesis where each harmonic is one complex EML node: Im(eml(i·2πft,1)) = sin(2πft). A sine wave costs 1 node. A violin costs 12.",

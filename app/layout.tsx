@@ -26,12 +26,27 @@ export const metadata: Metadata = {
     description:
       "Open problems in the EML operator: construct sin, cos, π, i from eml(x,y) = exp(x) − ln(y). Submit a construction. Get credited permanently.",
     url: siteUrl,
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Monogate — One Operator for All Elementary Functions",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "monogate.dev — The EML Challenge Board",
     description:
       "Open problems in eml(x,y) = exp(x) − ln(y). Construct sin, cos, π, or i from a single binary operator. arXiv:2603.21852",
+    images: ["/og-image.jpg"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
   },
   robots: { index: true, follow: true },
 };

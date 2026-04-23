@@ -16,6 +16,9 @@ import JuliaGallery from "./julia-gallery";
 import MandelbrotGrid from "./mandelbrot-grid";
 import ConjugacyViewer from "./conjugacy-viewer";
 import EmCostCalculator from "./em-cost-calculator";
+import EquationGenome from "./equation-genome";
+import PeriodMap from "./period-map";
+import MorphPlayer from "./morph-player";
 
 function BackButton() {
   const nav = useNavigate();
@@ -64,6 +67,10 @@ export default function GamesApp() {
         <Route path="/mandelbrot-grid" element={<Game><MandelbrotGrid /></Game>} />
         <Route path="/conjugacy" element={<Game><ConjugacyViewer /></Game>} />
         <Route path="/em-cost" element={<Game><EmCostCalculator /></Game>} />
+        {/* Phase-2 deep-session experiences */}
+        <Route path="/equation-genome" element={<Game><EquationGenome /></Game>} />
+        <Route path="/period-map" element={<Game><PeriodMap /></Game>} />
+        <Route path="/morph" element={<Game><MorphPlayer /></Game>} />
         {/* Featured + compact (existing curation) */}
         <Route path="/eml-synthesizer" element={<Game><EMLSynthesizer /></Game>} />
         <Route path="/weierstrass-machine" element={<Game><WeierstrassMachine /></Game>} />
