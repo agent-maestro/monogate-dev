@@ -265,7 +265,7 @@ export default function SuperBESTPage() {
         <div style={{ marginTop: 48, padding: 24, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8 }}>
           <h2 style={{ fontSize: "1rem", fontWeight: 600, color: C.text, marginBottom: 12 }}>Key results</h2>
           <ul style={{ paddingLeft: 20, color: C.muted, fontSize: 13, lineHeight: 1.9 }}>
-            <li><strong style={{ color: C.text }}>Core table locked:</strong> 15n / 79.5% savings — canonical, unaffected by extended operators</li>
+            <li><strong style={{ color: C.text }}>Core table locked:</strong> 14n / 80.8% savings — canonical, unaffected by extended operators</li>
             <li><strong style={{ color: C.text }}>LSE corrected:</strong> ln(e^x+e^y) = 4n in F16 (was 5n); 2n in 23-op via EEA+ln</li>
             <li><strong style={{ color: C.text }}>Taxonomy closed:</strong> exactly 23 operators exist; CONJ_NO_OP_24 is a proved theorem</li>
             <li><strong style={{ color: C.text }}>softplus = 2n</strong> in both layers via EML(x,1/e)+ln (Category B: genuine F16)</li>
