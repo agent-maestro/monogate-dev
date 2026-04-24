@@ -58,9 +58,9 @@ function Footer() {
       fontFamily: "monospace", fontSize: 11, color: "#4e5168",
       maxWidth: 900, margin: "0 auto",
     }}>
-      Research by Arturo R. Almaguer ·{" "}
+      Monogate Research ·{" "}
       <a href="https://arxiv.org/abs/2603.21852" style={{ color: "#4facfe" }}>arXiv:2603.21852</a>
-      {" "}· 18 theorems · 315+ equations · 4 patents filed ·{" "}
+      {" "}· 11 Lean proofs · 265 equations ·{" "}
       <a href="https://monogate.org" style={{ color: "#4facfe" }}>monogate.org</a> ·{" "}
       <a href="https://monogate.dev" style={{ color: "#4facfe" }}>monogate.dev</a> ·{" "}
       <a href="https://github.com/almaguer1986/monogate" style={{ color: "#4facfe" }}>GitHub</a> ·{" "}
