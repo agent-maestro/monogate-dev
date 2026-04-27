@@ -1,0 +1,1413 @@
+{
+  "dataset_version": "seed_v1",
+  "schema_version": "1.0.0",
+  "generated_at": "2026-04-26",
+  "source_repo": "https://github.com/almaguer1986/monogate-lean",
+  "records": [
+
+    {
+      "theorem_id": "depth_of_const",
+      "lane": 1,
+      "lane_title": "First Contact",
+      "difficulty": 1,
+      "domain": "definition / inductive types",
+      "statement": {
+        "natural_language": "The depth of a constant-leaf EML tree is zero. A bare constant has no `ceml` operations to count.",
+        "latex": "\\text{depth}(\\mathrm{const}\\ c) = 0",
+        "lean4": "theorem depth_of_const (c : ℂ) : (EMLTree.const c).depth = 0 := rfl"
+      },
+      "proof": {
+        "lean4_full": "theorem depth_of_const (c : ℂ) : (EMLTree.const c).depth = 0 := rfl",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rfl",
+            "explanation": "The depth function is defined by pattern matching: `EMLTree.depth (EMLTree.const _) = 0`. Both sides reduce to the literal `0` by computation, so reflexivity closes the goal.",
+            "tactic_rationale": "When two expressions are definitionally equal — i.e. reduce to the same normal form by unfolding definitions — `rfl` is the shortest possible proof. Here both sides reduce to `0` after one unfolding step.",
+            "common_mistakes": [
+              "Using `simp [EMLTree.depth]` works but is overkill — it loads the simp normalizer when `rfl` already suffices.",
+              "Writing `by decide` fails because `EMLTree.depth` is not a `Decidable` proposition; `decide` is for decidable equality of concrete naturals."
+            ]
+          }
+        ]
+      },
+      "dependencies": [],
+      "unlocks": ["depth_ceml_pos", "exp_in_EML_one"],
+      "source": { "file": "MonogateEML/EMLDepth.lean", "line": 153 },
+      "tags": ["depth", "definition", "rfl", "lane-1"],
+      "metadata": {
+        "tactics_introduced": ["rfl"],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "depth_of_var",
+      "lane": 1,
+      "lane_title": "First Contact",
+      "difficulty": 1,
+      "domain": "definition / inductive types",
+      "statement": {
+        "natural_language": "The depth of the variable-leaf EML tree is zero. Like a constant, the variable node has no `ceml` operations.",
+        "latex": "\\text{depth}(\\mathrm{var}) = 0",
+        "lean4": "theorem depth_of_var : EMLTree.var.depth = 0 := rfl"
+      },
+      "proof": {
+        "lean4_full": "theorem depth_of_var : EMLTree.var.depth = 0 := rfl",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rfl",
+            "explanation": "By the inductive definition of `EMLTree.depth`, the `var` constructor has its own pattern equation returning `0`. Both sides of the equation reduce to `0`.",
+            "tactic_rationale": "Same reasoning as `depth_of_const`: pattern matching on a constructor is reduced by `rfl` automatically.",
+            "common_mistakes": [
+              "Forgetting that `EMLTree.var` takes no arguments and writing `EMLTree.var x` instead — the variable node has no parameter, the variable's *value* enters only at evaluation time."
+            ]
+          }
+        ]
+      },
+      "dependencies": [],
+      "unlocks": ["id_in_EML_k", "exp_in_EML_one"],
+      "source": { "file": "MonogateEML/EMLDepth.lean", "line": 156 },
+      "tags": ["depth", "definition", "rfl", "lane-1"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "expTree_depth",
+      "lane": 1,
+      "lane_title": "First Contact",
+      "difficulty": 1,
+      "domain": "definition / depth witness",
+      "statement": {
+        "natural_language": "The depth of `expTree` (the explicit `ceml(var, const 1)` representation of `exp(x)`) is exactly 1.",
+        "latex": "\\text{depth}(\\mathrm{expTree}) = 1",
+        "lean4": "theorem expTree_depth : expTree.depth = 1 := by\n  simp [expTree, EMLTree.depth]"
+      },
+      "proof": {
+        "lean4_full": "theorem expTree_depth : expTree.depth = 1 := by\n  simp [expTree, EMLTree.depth]",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "simp [expTree, EMLTree.depth]",
+            "explanation": "Unfold the definition `expTree := ceml var (const 1)`, then unfold `EMLTree.depth` recursively. The `ceml` arm gives `1 + max var.depth (const 1).depth`. Each child has depth 0, and `1 + max 0 0 = 1`.",
+            "tactic_rationale": "`simp` is the right hammer when the proof is a chain of definitional unfoldings followed by a small arithmetic identity. Naming `expTree` and `EMLTree.depth` in the bracket tells `simp` exactly which definitions to unfold; without that, it would not know to expand them.",
+            "common_mistakes": [
+              "Trying just `rfl` — the recursion through `max` is not consistently reduced automatically and `rfl` may fail.",
+              "Writing `unfold expTree EMLTree.depth` works in some cases but leaves `1 + max 0 0 = 1` un-evaluated; `simp` finishes the arithmetic too."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["depth_of_const", "depth_of_var"],
+      "unlocks": ["exp_in_EML_one", "exp_isEMLElementary"],
+      "source": { "file": "MonogateEML/EMLDepth.lean", "line": 74 },
+      "tags": ["depth", "exp", "witness", "lane-1"],
+      "metadata": {
+        "tactics_introduced": ["simp [..]"],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "complex_exp_zero_eq_one",
+      "lane": 1,
+      "lane_title": "First Contact",
+      "difficulty": 1,
+      "domain": "complex analysis (Mathlib wrapper)",
+      "statement": {
+        "natural_language": "The complex exponential at zero equals one: exp(0) = 1.",
+        "latex": "\\exp(0) = 1",
+        "lean4": "theorem complex_exp_zero_eq_one : Complex.exp 0 = 1 := Complex.exp_zero"
+      },
+      "proof": {
+        "lean4_full": "theorem complex_exp_zero_eq_one : Complex.exp 0 = 1 := Complex.exp_zero",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "Complex.exp_zero",
+            "explanation": "Mathlib already proves this fact under the name `Complex.exp_zero`. Citing the lemma by name is itself a complete proof — Lean accepts a term of the right type without any further tactic block.",
+            "tactic_rationale": "When the result you want is exactly a Mathlib lemma, the cleanest proof is the lemma name as a term. No `by` block is needed; the term mode entry skips the tactic engine entirely.",
+            "common_mistakes": [
+              "Re-deriving the fact from the power-series definition — slow and fragile when Mathlib already has it.",
+              "Writing `by exact Complex.exp_zero` works but is one needless layer of indirection compared to direct term-mode."
+            ]
+          }
+        ]
+      },
+      "dependencies": [],
+      "unlocks": ["exp_isEMLElementary", "complex_exp_pi_I"],
+      "source": { "file": "MonogateEML/EMLDuality.lean", "line": 67 },
+      "tags": ["exp", "mathlib-wrapper", "term-mode", "lane-1"],
+      "metadata": {
+        "tactics_introduced": ["term-mode proof"],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "depth_of_ceml",
+      "lane": 2,
+      "lane_title": "Building Blocks",
+      "difficulty": 2,
+      "domain": "structural recursion",
+      "statement": {
+        "natural_language": "Composing two trees with `ceml` adds one to the maximum of their depths. The longest path through the resulting tree is `1 + max(d(t1), d(t2))`.",
+        "latex": "\\text{depth}(\\mathrm{ceml}(t_1, t_2)) = 1 + \\max(\\text{depth}(t_1), \\text{depth}(t_2))",
+        "lean4": "theorem depth_of_ceml (t₁ t₂ : EMLTree) :\n    (EMLTree.ceml t₁ t₂).depth = 1 + max t₁.depth t₂.depth := rfl"
+      },
+      "proof": {
+        "lean4_full": "theorem depth_of_ceml (t₁ t₂ : EMLTree) :\n    (EMLTree.ceml t₁ t₂).depth = 1 + max t₁.depth t₂.depth := rfl",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rfl",
+            "explanation": "The `EMLTree.depth` function is defined with the `ceml t1 t2` arm computing exactly `1 + max t1.depth t2.depth`. The right-hand side of the theorem is the literal definition, so `rfl` closes the goal even though the trees are arbitrary.",
+            "tactic_rationale": "When a theorem just *names* a clause of a definition, the proof is `rfl`. The trees `t1` and `t2` are universally quantified but the depth function doesn't inspect them further — the equation is structural.",
+            "common_mistakes": [
+              "Trying to do induction on `t1` or `t2` — unnecessary; the equation is at the recursive step itself, not unfolded further.",
+              "Adding `simp [EMLTree.depth]` up front — fine but unneeded, the equation is already in normal form."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["depth_of_const", "depth_of_var"],
+      "unlocks": ["depth_ceml_pos", "depth_mono_left", "depth_mono_right"],
+      "source": { "file": "MonogateEML/EMLDepth.lean", "line": 159 },
+      "tags": ["depth", "structural-recursion", "rfl", "lane-2"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "depth_ceml_pos",
+      "lane": 2,
+      "lane_title": "Building Blocks",
+      "difficulty": 2,
+      "domain": "structural recursion",
+      "statement": {
+        "natural_language": "Any `ceml` composition has positive depth — at least 1, the contribution of the `ceml` node itself. This formalises the intuition that `ceml` is never free: every `ceml` costs one routing step.",
+        "latex": "0 < \\text{depth}(\\mathrm{ceml}(t_1, t_2))",
+        "lean4": "theorem depth_ceml_pos (t₁ t₂ : EMLTree) :\n    0 < (EMLTree.ceml t₁ t₂).depth := by\n  simp [EMLTree.depth]"
+      },
+      "proof": {
+        "lean4_full": "theorem depth_ceml_pos (t₁ t₂ : EMLTree) :\n    0 < (EMLTree.ceml t₁ t₂).depth := by\n  simp [EMLTree.depth]",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "simp [EMLTree.depth]",
+            "explanation": "Unfold `EMLTree.depth` so the goal becomes `0 < 1 + max t1.depth t2.depth`. `simp` recognises this as `Nat.succ_pos`-like pattern (`1 + n` is positive) and closes the goal.",
+            "tactic_rationale": "`simp` with the definition cited handles both the unfolding step and the trivial positivity fact in one shot. We do not need `linarith` here because `simp`'s normaliser already proves `0 < 1 + _`.",
+            "common_mistakes": [
+              "Using `omega` would also work but is heavier than needed.",
+              "Writing `Nat.succ_pos _` directly fails because the goal is not literally `0 < Nat.succ _` after unfolding — `simp`'s rewrite path is required."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["depth_of_ceml"],
+      "unlocks": ["expTree_depth", "depth_mono_left", "depth_mono_right"],
+      "source": { "file": "MonogateEML/EMLDepth.lean", "line": 163 },
+      "tags": ["depth", "positivity", "simp", "lane-2"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "cosh_sq_sub_sinh_sq",
+      "lane": 2,
+      "lane_title": "Building Blocks",
+      "difficulty": 2,
+      "domain": "hyperbolic identities",
+      "statement": {
+        "natural_language": "The hyperbolic Pythagorean identity: cosh squared minus sinh squared equals one. The hyperbolic analogue of `sin^2 + cos^2 = 1`, but with a sign flip.",
+        "latex": "\\cosh^{2}(x) - \\sinh^{2}(x) = 1",
+        "lean4": "theorem cosh_sq_sub_sinh_sq (x : ℝ) :\n    Real.cosh x ^ 2 - Real.sinh x ^ 2 = 1 := by\n  rw [Real.cosh_sq, Real.sinh_sq]\n  ring"
+      },
+      "proof": {
+        "lean4_full": "theorem cosh_sq_sub_sinh_sq (x : ℝ) :\n    Real.cosh x ^ 2 - Real.sinh x ^ 2 = 1 := by\n  rw [Real.cosh_sq, Real.sinh_sq]\n  ring",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rw [Real.cosh_sq, Real.sinh_sq]",
+            "explanation": "Rewrite using two Mathlib lemmas: `Real.cosh_sq` expresses `cosh^2 x` in terms of `cosh (2x)` (or equivalent expansion), and `Real.sinh_sq` does the same for `sinh^2 x`. After the rewrite both sides are pure exponential arithmetic.",
+            "tactic_rationale": "The shortest path to the identity is to expand both squared hyperbolic functions to their `(exp x ± exp(-x))/2` form. Mathlib already has the expansion lemmas; `rw` substitutes them in.",
+            "common_mistakes": [
+              "Trying to expand only `cosh_sq` and leaving `sinh^2` — `ring` later cannot reconcile the asymmetric form.",
+              "Using `simp [Real.cosh_sq, Real.sinh_sq]` works too but `simp` may rewrite past what we want; `rw` is more deliberate."
+            ]
+          },
+          {
+            "step": 2,
+            "tactic": "ring",
+            "explanation": "After the rewrites, the goal is a polynomial identity in `Real.exp x` and `Real.exp (-x)` (treating each as a variable). `ring` closes it by checking that both sides expand to the same canonical polynomial form.",
+            "tactic_rationale": "`ring` is the standard finisher for any equation that reduces to a polynomial identity over a commutative ring. It is decidable and never wrong-ish — if the equation is true, `ring` finds the proof.",
+            "common_mistakes": [
+              "Using `linarith` instead — fails because the equation involves multiplications, not just linear combinations.",
+              "Using `nlinarith` — would work but is a heavier tactic; `ring` is the idiomatic choice for pure polynomial identities."
+            ]
+          }
+        ]
+      },
+      "dependencies": [],
+      "unlocks": ["pythagorean_triple_at_log_two", "three_four_five_from_hyperbolic"],
+      "source": { "file": "MonogateEML/HyperbolicPreservation.lean", "line": 40 },
+      "tags": ["hyperbolic", "identity", "rw", "ring", "lane-2"],
+      "metadata": {
+        "tactics_introduced": ["rw [..]", "ring"],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "cosh_add_sinh_eq_exp",
+      "lane": 2,
+      "lane_title": "Building Blocks",
+      "difficulty": 2,
+      "domain": "hyperbolic identities",
+      "statement": {
+        "natural_language": "cosh(x) + sinh(x) equals exp(x). Adding the average and the half-difference of `exp(x)` and `exp(-x)` recovers `exp(x)` itself — one of the cleanest one-line identities in elementary analysis.",
+        "latex": "\\cosh(x) + \\sinh(x) = e^{x}",
+        "lean4": "theorem cosh_add_sinh_eq_exp (x : ℝ) :\n    Real.cosh x + Real.sinh x = Real.exp x := by\n  rw [Real.cosh_eq, Real.sinh_eq]; ring"
+      },
+      "proof": {
+        "lean4_full": "theorem cosh_add_sinh_eq_exp (x : ℝ) :\n    Real.cosh x + Real.sinh x = Real.exp x := by\n  rw [Real.cosh_eq, Real.sinh_eq]; ring",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rw [Real.cosh_eq, Real.sinh_eq]",
+            "explanation": "Rewrite `cosh x` to `(exp x + exp(-x)) / 2` and `sinh x` to `(exp x - exp(-x)) / 2` using their Mathlib definitional equations.",
+            "tactic_rationale": "Both `Real.cosh_eq` and `Real.sinh_eq` are the canonical `(exp ± exp.neg) / 2` forms. Substituting them replaces transcendental functions with arithmetic on `Real.exp`, which `ring` can finish.",
+            "common_mistakes": [
+              "Using a one-sided rewrite — Lean still has the unrewritten side to deal with."
+            ]
+          },
+          {
+            "step": 2,
+            "tactic": "ring",
+            "explanation": "After substitution: `(exp x + exp(-x))/2 + (exp x - exp(-x))/2 = exp x`. The `exp(-x)` terms cancel and the two `(exp x)/2` terms add to `exp x`. `ring` does this as a polynomial-identity check.",
+            "tactic_rationale": "Pure arithmetic over a field — `ring` is the right closer.",
+            "common_mistakes": [
+              "Trying `simp` up front can rewrite past the goal in unexpected ways; `ring` is sharper here."
+            ]
+          }
+        ]
+      },
+      "dependencies": [],
+      "unlocks": ["cosh_sub_sinh_eq_exp_neg", "two_sinh_eq_exp_sub", "two_cosh_eq_exp_add"],
+      "source": { "file": "MonogateEML/HyperbolicPreservation.lean", "line": 97 },
+      "tags": ["hyperbolic", "exp", "rw", "ring", "lane-2"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "F1_ne_add",
+      "lane": 3,
+      "lane_title": "Arithmetic from Nothing",
+      "difficulty": 3,
+      "domain": "F-family lower bound (addition)",
+      "statement": {
+        "natural_language": "The base F-family operator F1(x,y) = exp(x) - log(y) is not pointwise equal to addition. Witness: at (1,1), F1 evaluates to exp(1) which is greater than 2.",
+        "latex": "\\neg\\,\\bigl(\\forall x, y \\in \\mathbb{R}.\\;\\,F_{1}(x, y) = x + y\\bigr)",
+        "lean4": "theorem F1_ne_add : ¬ (∀ x y : ℝ, F1 x y = x + y) := by\n  intro h\n  have h11 := h 1 1\n  simp only [F1, Real.log_one] at h11\n  linarith [two_lt_exp_one]"
+      },
+      "proof": {
+        "lean4_full": "theorem F1_ne_add : ¬ (∀ x y : ℝ, F1 x y = x + y) := by\n  intro h\n  have h11 := h 1 1\n  simp only [F1, Real.log_one] at h11\n  linarith [two_lt_exp_one]",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "intro h",
+            "explanation": "Assume the universal claim `∀ x y, F1 x y = x + y` for contradiction; call this hypothesis `h`. Goal becomes `False`.",
+            "tactic_rationale": "To prove a negation `¬ P`, we assume `P` and derive `False`. `intro` is how we name the assumption.",
+            "common_mistakes": [
+              "Trying to unfold `F1` up front — fails because there's no goal to rewrite into, only the implication."
+            ]
+          },
+          {
+            "step": 2,
+            "tactic": "have h11 := h 1 1",
+            "explanation": "Specialise the universal to the witness point (1, 1). `h11` is now the concrete equation `F1 1 1 = 1 + 1`, which is what we will derive a contradiction from.",
+            "tactic_rationale": "Lower bound proofs work by witness extraction — one bad input is enough to disprove a `∀`. The witness (1,1) was chosen because `log 1 = 0` and `exp 1` is clean to bound.",
+            "common_mistakes": [
+              "Picking a witness like (0, 0) where `log 0` is undefined in `ℝ` (Lean defines `log 0 = 0` by convention, but the resulting equation is not as cleanly contradictory)."
+            ]
+          },
+          {
+            "step": 3,
+            "tactic": "simp only [F1, Real.log_one] at h11",
+            "explanation": "Unfold the definition of F1 (so `F1 1 1` becomes `exp 1 - log 1`) and rewrite `log 1` to `0`. After this `h11 : exp 1 - 0 = 2`, which simplifies to `exp 1 = 2`.",
+            "tactic_rationale": "`simp only` is a controlled rewrite — only the named lemmas fire, no general normalisation. We want to expose the `exp 1 = 2` form without `simp` doing anything else.",
+            "common_mistakes": [
+              "Using bare `simp` at h11 — could simplify `exp 1 - 0` to `exp 1` automatically (which is fine here), but in adjacent F-family proofs the bare-simp version sometimes simplifies past a useful intermediate form."
+            ]
+          },
+          {
+            "step": 4,
+            "tactic": "linarith [two_lt_exp_one]",
+            "explanation": "The hypothesis `h11` says `exp 1 - 0 = 1 + 1`, i.e. `exp 1 = 2`. The Mathlib fact `two_lt_exp_one : 2 < Real.exp 1` contradicts this. `linarith` finds the contradiction by linear arithmetic.",
+            "tactic_rationale": "`linarith` handles linear inequalities over ordered fields. Feeding it the strict inequality `2 < exp 1` plus the equality `exp 1 = 2` produces `False`.",
+            "common_mistakes": [
+              "Forgetting to pass `two_lt_exp_one` — `linarith` does not know about transcendental constants by itself.",
+              "Using `nlinarith` — works, but `linarith` is sharper here because nothing nonlinear is involved."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["complex_exp_zero_eq_one"],
+      "unlocks": ["add_not_one_node_computable", "SB_add_ge_two"],
+      "source": { "file": "MonogateEML/AddLowerBound.lean", "line": 116 },
+      "tags": ["lower-bound", "F-family", "intro", "have", "simp-only", "linarith", "lane-3"],
+      "metadata": {
+        "tactics_introduced": ["intro", "have", "simp only [..]", "linarith"],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "M_F1_ne_mul",
+      "lane": 3,
+      "lane_title": "Arithmetic from Nothing",
+      "difficulty": 3,
+      "domain": "F-family lower bound (multiplication)",
+      "statement": {
+        "natural_language": "The base F-family operator F1, in its multiplication-test guise, is not pointwise equal to multiplication. Same witness pattern as the addition lower bound, but contradicting `x * y` instead of `x + y`.",
+        "latex": "\\neg\\,\\bigl(\\forall x, y \\in \\mathbb{R}.\\;\\,M\\!_{F1}(x, y) = x \\cdot y\\bigr)",
+        "lean4": "theorem M_F1_ne_mul : ¬ (∀ x y : ℝ, M_F1 x y = x * y) := by\n  intro h\n  have h00 := h 0 0\n  simp [M_F1] at h00"
+      },
+      "proof": {
+        "lean4_full": "theorem M_F1_ne_mul : ¬ (∀ x y : ℝ, M_F1 x y = x * y) := by\n  intro h\n  have h00 := h 0 0\n  simp [M_F1] at h00",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "intro h",
+            "explanation": "Assume the universal claim and reduce the goal to `False`. Same pattern as `F1_ne_add`.",
+            "tactic_rationale": "Standard negation introduction.",
+            "common_mistakes": []
+          },
+          {
+            "step": 2,
+            "tactic": "have h00 := h 0 0",
+            "explanation": "Pick the witness (0, 0). At this point `M_F1 0 0 = 0 * 0 = 0`, but `M_F1` evaluates to `exp(0) - log(0)`. By Lean's convention `log 0 = 0`, so the LHS becomes `1 - 0 = 1` while the RHS is `0` — immediate contradiction.",
+            "tactic_rationale": "(0, 0) is the cleanest witness for multiplication lower bounds because `0 * 0 = 0` is the trivial RHS.",
+            "common_mistakes": [
+              "Using witness (1, 1) — would require knowing that `exp 1 - log 1 ≠ 1`, which needs the `two_lt_exp_one` import; (0, 0) avoids that."
+            ]
+          },
+          {
+            "step": 3,
+            "tactic": "simp [M_F1] at h00",
+            "explanation": "Unfold `M_F1` and simplify the constants. The hypothesis becomes the contradiction `1 = 0`, which `simp` resolves to `False`, closing the proof.",
+            "tactic_rationale": "When the contradiction reduces to a numeric falsehood, `simp` is a single-line closer. No need for `linarith` since the contradiction is purely arithmetic on closed numerals.",
+            "common_mistakes": [
+              "Forgetting to specialise to a concrete numeric pair — leaving `h` symbolic prevents `simp` from finding the contradiction."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["F1_ne_add"],
+      "unlocks": ["mul_not_one_node_computable_general", "SB_mul_ge_two"],
+      "source": { "file": "MonogateEML/MulLowerBound.lean", "line": 57 },
+      "tags": ["lower-bound", "F-family", "multiplication", "lane-3"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "add_not_one_node_computable",
+      "lane": 3,
+      "lane_title": "Arithmetic from Nothing",
+      "difficulty": 4,
+      "domain": "F-family lower bound (synthesis)",
+      "statement": {
+        "natural_language": "Addition is not 1-node computable in the F16 family. No single F-operator equals `(+)` pointwise — established by ruling out each of the 16 candidates individually.",
+        "latex": "\\neg\\,\\bigl(\\exists\\,\\mathrm{op} \\in \\mathcal{F}_{16}.\\;\\,\\forall x, y.\\;\\mathrm{op}(x, y) = x + y\\bigr)",
+        "lean4": "theorem add_not_one_node_computable :\n    ¬ one_node_computable (· + ·) := by\n  intro ⟨op, hmem, heq⟩\n  have hbad : ∀ x y : ℝ, op x y = x + y := fun x y => (heq x y).symm\n  exact no_f16_computes_add op hmem hbad"
+      },
+      "proof": {
+        "lean4_full": "theorem add_not_one_node_computable :\n    ¬ one_node_computable (· + ·) := by\n  intro ⟨op, hmem, heq⟩\n  have hbad : ∀ x y : ℝ, op x y = x + y := fun x y => (heq x y).symm\n  exact no_f16_computes_add op hmem hbad",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "intro ⟨op, hmem, heq⟩",
+            "explanation": "The statement is `¬ ∃ op ∈ f16_ops, ...`. Assuming the existential gives us a triple: an operator `op`, its membership proof `hmem` in the F16 set, and the equation `heq : ∀ x y, (· + ·) x y = op x y`.",
+            "tactic_rationale": "`intro` with anonymous constructor pattern `⟨...⟩` destructures an existential in one move. Cleaner than `intro hex; obtain ⟨op, hmem, heq⟩ := hex`.",
+            "common_mistakes": [
+              "Writing just `intro h` and then needing `obtain` separately — works, more verbose."
+            ]
+          },
+          {
+            "step": 2,
+            "tactic": "have hbad : ∀ x y : ℝ, op x y = x + y := fun x y => (heq x y).symm",
+            "explanation": "The hypothesis from the unpacked `heq` says `(· + ·) x y = op x y`, i.e. `x + y = op x y`. We want the symmetric form `op x y = x + y` to feed into the general F16-cannot-equal-add lemma.",
+            "tactic_rationale": "`.symm` flips the equality. Wrapping it in a `fun x y =>` produces the universal form needed by the next step.",
+            "common_mistakes": [
+              "Trying `rw [Eq.comm] at heq` — works but is heavier than the direct `.symm`.",
+              "Forgetting the symmetric flip — the downstream lemma `no_f16_computes_add` expects `op x y = x + y`, not `x + y = op x y`."
+            ]
+          },
+          {
+            "step": 3,
+            "tactic": "exact no_f16_computes_add op hmem hbad",
+            "explanation": "Apply the omnibus lemma `no_f16_computes_add`, which takes (1) the operator `op`, (2) its F16-membership `hmem`, and (3) the proof that it equals addition pointwise — and returns `False`. This closes the negation goal.",
+            "tactic_rationale": "When all the disjuncts of the F16 family have been individually ruled out (the 16 prior `Fₖ_ne_add` theorems), `no_f16_computes_add` packages the case-split into one call.",
+            "common_mistakes": [
+              "Trying to re-prove the case analysis inline — would just duplicate `no_f16_computes_add`'s body."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["F1_ne_add"],
+      "unlocks": ["SB_add_ge_two"],
+      "source": { "file": "MonogateEML/AddLowerBound.lean", "line": 321 },
+      "tags": ["lower-bound", "f16", "destructuring", "anonymous-constructor", "lane-3"],
+      "metadata": {
+        "tactics_introduced": ["intro ⟨..⟩", "exact"],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "SB_add_ge_two",
+      "lane": 4,
+      "lane_title": "The Other Operators",
+      "difficulty": 4,
+      "domain": "SuperBEST lower bound (addition)",
+      "statement": {
+        "natural_language": "SuperBEST lower bound for addition: SB(+) is at least 2 nodes. Equivalent to the F16-non-computability claim, but stated in the SuperBEST cost-counting framework that the rest of the codebase uses.",
+        "latex": "\\mathrm{SB}(+) \\geq 2",
+        "lean4": "theorem SB_add_ge_two : ¬ one_node_computable (· + ·) :=\n  add_not_one_node_computable"
+      },
+      "proof": {
+        "lean4_full": "theorem SB_add_ge_two : ¬ one_node_computable (· + ·) :=\n  add_not_one_node_computable",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "add_not_one_node_computable",
+            "explanation": "The two theorems are the same proposition under different names: this one is the SuperBEST-framing alias for `add_not_one_node_computable`. Citing the existing proof as a term closes the goal.",
+            "tactic_rationale": "When two theorem names refer to literally the same statement, the cleaner public name can be defined as a term-mode alias of the worker name. No tactic block needed.",
+            "common_mistakes": [
+              "Re-deriving the proof — wastes effort and risks divergence between the two statements."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["add_not_one_node_computable"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/AddLowerBound.lean", "line": 328 },
+      "tags": ["superbest", "lower-bound", "alias", "lane-4"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "exp_isEMLElementary",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "EML universality",
+      "statement": {
+        "natural_language": "The complex exponential is EML-elementary: it is realised by an EML routing tree of depth 1 (specifically, the `eulerTree` witness `ceml(var, const 1)`).",
+        "latex": "\\mathrm{IsEMLElementary}(\\exp)",
+        "lean4": "theorem exp_isEMLElementary :\n    IsEMLElementary (fun x : ℂ => Complex.exp x) :=\n  ⟨1, exp_in_EML_one⟩"
+      },
+      "proof": {
+        "lean4_full": "theorem exp_isEMLElementary :\n    IsEMLElementary (fun x : ℂ => Complex.exp x) :=\n  ⟨1, exp_in_EML_one⟩",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "⟨1, exp_in_EML_one⟩",
+            "explanation": "`IsEMLElementary f` unfolds to `∃ k, f ∈ EML_k k`. We supply the existential witness as the anonymous constructor: `k = 1` and the membership proof `exp_in_EML_one : exp ∈ EML_k 1`. No tactic block needed — pure term mode.",
+            "tactic_rationale": "When you have the witness in hand and the membership proof already named, the existential is closed in one term. This idiom — `⟨witness, proof⟩` for `∃` — is the canonical Lean style.",
+            "common_mistakes": [
+              "Trying to use `refine ⟨1, ?_⟩` and then re-prove `exp_in_EML_one` inline — works but wastes the existing lemma."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["expTree_depth", "complex_exp_zero_eq_one"],
+      "unlocks": ["exp_exp_isEMLElementary", "eml_universality"],
+      "source": { "file": "MonogateEML/Universality.lean", "line": 111 },
+      "tags": ["universality", "exp", "term-mode", "anonymous-constructor", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "eml_universality",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "EML universality",
+      "statement": {
+        "natural_language": "Universality of EML: every EML-elementary function is computed by some EML routing tree. The `IsEMLElementary` predicate guarantees a tree witness exists; this theorem extracts it.",
+        "latex": "\\forall f : \\mathbb{C} \\to \\mathbb{C}.\\;\\mathrm{IsEMLElementary}(f) \\;\\Longrightarrow\\; \\exists\\,t \\in \\mathrm{EMLTree}.\\;\\forall x.\\;f(x) = t.\\mathrm{eval}(x)",
+        "lean4": "theorem eml_universality :\n    ∀ f : ℂ → ℂ, IsEMLElementary f → ∃ t : EMLTree, ∀ x, f x = t.eval x := by\n  intro f hf\n  obtain ⟨_, t, _hd, ht⟩ := hf\n  exact ⟨t, ht⟩"
+      },
+      "proof": {
+        "lean4_full": "theorem eml_universality :\n    ∀ f : ℂ → ℂ, IsEMLElementary f → ∃ t : EMLTree, ∀ x, f x = t.eval x := by\n  intro f hf\n  obtain ⟨_, t, _hd, ht⟩ := hf\n  exact ⟨t, ht⟩",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "intro f hf",
+            "explanation": "Introduce the function `f` and the hypothesis `hf : IsEMLElementary f`. Goal is now an existential about `f`.",
+            "tactic_rationale": "Standard introduction for a `∀ ... → ...` statement.",
+            "common_mistakes": []
+          },
+          {
+            "step": 2,
+            "tactic": "obtain ⟨_, t, _hd, ht⟩ := hf",
+            "explanation": "`hf` is `∃ k, ∃ t, t.depth ≤ k ∧ ∀ x, f x = t.eval x`. Destructure to extract: the depth `_` (unused), the tree `t`, the depth bound `_hd` (unused for this theorem), and the equation `ht` we actually need.",
+            "tactic_rationale": "When destructuring a nested existential, `obtain` with anonymous-constructor patterns flattens it in one step. Underscores discard fields we will not use; named variables capture what we need.",
+            "common_mistakes": [
+              "Trying `cases hf` — works but produces less ergonomic names.",
+              "Naming all four fields and then ignoring some — Lean issues an `unused variable` warning."
+            ]
+          },
+          {
+            "step": 3,
+            "tactic": "exact ⟨t, ht⟩",
+            "explanation": "The goal is `∃ t, ∀ x, f x = t.eval x`. Supply the witness `t` we just unpacked and the proof `ht` we just extracted. Done.",
+            "tactic_rationale": "When the existential's witness is in scope and the proof is in scope, `exact ⟨witness, proof⟩` is the cleanest closer.",
+            "common_mistakes": [
+              "Trying `use t; exact ht` — works but is two tactics where one suffices."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["exp_isEMLElementary"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/Universality.lean", "line": 91 },
+      "tags": ["universality", "obtain", "destructuring", "lane-5"],
+      "metadata": {
+        "tactics_introduced": ["obtain ⟨..⟩"],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "infinite_zeros_barrier__research_frontier",
+      "lane": 6,
+      "lane_title": "The Barrier",
+      "difficulty": 6,
+      "domain": "research frontier (open)",
+      "statement": {
+        "natural_language": "INFORMATIONAL RECORD — research frontier. The Infinite Zeros Barrier (T01) states that real EML trees have finitely many zeros on any closed bounded interval, while sin(x) has infinitely many. This implies sin ∉ EML(ℝ). Parts A, B, C, C′ are established in the Lean source with zero `sorry`s. Parts D (sin_not_in_eml and sin_not_in_real_EML_k) carry 2 remaining `sorry`s — both require quantitative o-minimal zero-count bounds and are genuine open mathematical challenges. This record exists so a learner reaching Lane 6 sees where the research frontier actually is.",
+        "latex": "\\sin \\notin \\mathrm{EML}(\\mathbb{R}) \\quad\\text{(open: o-minimal quantitative zero-count required)}",
+        "lean4": "-- See InfiniteZerosBarrier.lean for the partial formalization.\n-- Part A (sin has infinitely many zeros): proven (sin_inf_zeros).\n-- Part B (analytic_finite_zeros_compact): proven.\n-- Part C, C': proven (eml_tree_analytic, eml_tree_analytic_depth_le_1).\n-- Part D (sin_not_in_eml, sin_not_in_real_EML_k): 2 sorrys remain.\n-- These are open research questions, not closeable with current tactics."
+      },
+      "proof": {
+        "lean4_full": "-- This is an INFORMATIONAL record, not a proven theorem.\n-- The shipped Lean source contains 2 honest `sorry`s on Part D.\n-- See InfiniteZerosBarrier.lean lines marked sorry (~327, ~340).",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "(open problem)",
+            "explanation": "There is no shipped step-by-step proof for the full barrier. The honest framing for a learner who reaches this lane: the codebase ships Parts A through C′ fully established, and explicitly carries 2 `sorry`s on Part D where the o-minimal quantitative zero-count machinery is still being developed.",
+            "tactic_rationale": "This record exists to teach that a research frontier is a *visible boundary in the source*, not a hidden gap. PETAL surfaces the open problem rather than skipping it.",
+            "common_mistakes": [
+              "Reading the file's `theorem sin_not_in_eml` line and assuming it is closed — check for the `sorry` keyword."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["eml_universality"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/InfiniteZerosBarrier.lean", "line": 1 },
+      "tags": ["research-frontier", "open-problem", "sorry", "lane-6"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null,
+        "is_informational": true,
+        "open_problem_count": 2
+      }
+    },
+
+    {
+      "theorem_id": "S_F1_ne_sub",
+      "lane": 3,
+      "lane_title": "Arithmetic from Nothing",
+      "difficulty": 3,
+      "domain": "F-family lower bound (subtraction)",
+      "statement": {
+        "natural_language": "The base F-family operator S_F1(x,y) = exp(x) - log(y), restated for the subtraction test, is not pointwise equal to subtraction. Witness: at (1,1), S_F1 evaluates to exp(1) which is greater than 0 = 1−1.",
+        "latex": "\\neg\\,\\bigl(\\forall x, y \\in \\mathbb{R}.\\;\\,S\\!_{F1}(x, y) = x - y\\bigr)",
+        "lean4": "theorem S_F1_ne_sub : ¬ (∀ x y : ℝ, S_F1 x y = x - y) := by\n  intro h; have := h 1 1; simp [S_F1, Real.log_one] at this\n  try linarith [two_lt_exp_one']"
+      },
+      "proof": {
+        "lean4_full": "theorem S_F1_ne_sub : ¬ (∀ x y : ℝ, S_F1 x y = x - y) := by\n  intro h; have := h 1 1; simp [S_F1, Real.log_one] at this\n  try linarith [two_lt_exp_one']",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "intro h; have := h 1 1; simp [S_F1, Real.log_one] at this",
+            "explanation": "Same witness-extraction template as the addition lower bound, retargeted at subtraction. Assume the universal claim, specialise to (1, 1), unfold S_F1 and rewrite log(1) to 0. After this the hypothesis says exp(1) = 1 − 1 = 0, which contradicts exp(1) > 2.",
+            "tactic_rationale": "The F-family lower bounds are mechanically the same proof shape as F1_ne_add but with the witness chosen to expose subtraction-specific arithmetic. The `try linarith` guards against simp doing slightly more or less normalisation than expected.",
+            "common_mistakes": [
+              "Picking a witness like (0, 0) — both subtraction and S_F1 produce harder-to-bound values; (1, 1) makes log(1) = 0 cleanly."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["F1_ne_add"],
+      "unlocks": ["sub_not_one_node_computable", "SB_sub_ge_two"],
+      "source": { "file": "MonogateEML/SubLowerBound.lean", "line": 55 },
+      "tags": ["lower-bound", "F-family", "subtraction", "lane-3"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "D_F1_ne_div",
+      "lane": 3,
+      "lane_title": "Arithmetic from Nothing",
+      "difficulty": 3,
+      "domain": "F-family lower bound (division)",
+      "statement": {
+        "natural_language": "The base F-family operator D_F1(x,y) = exp(x) - log(y), restated for the division test, is not pointwise equal to division. Witness (1,1): D_F1 evaluates to exp(1), which is greater than 1 = 1/1.",
+        "latex": "\\neg\\,\\bigl(\\forall x, y \\in \\mathbb{R}.\\;\\,D\\!_{F1}(x, y) = x / y\\bigr)",
+        "lean4": "theorem D_F1_ne_div : ¬ (∀ x y : ℝ, D_F1 x y = x / y) := by\n  intro h; have := h 1 1; simp [D_F1, Real.log_one] at this"
+      },
+      "proof": {
+        "lean4_full": "theorem D_F1_ne_div : ¬ (∀ x y : ℝ, D_F1 x y = x / y) := by\n  intro h; have := h 1 1; simp [D_F1, Real.log_one] at this",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "intro h; have := h 1 1; simp [D_F1, Real.log_one] at this",
+            "explanation": "Identical witness pattern: assume the universal, specialise to (1, 1), unfold D_F1 and reduce log(1) = 0. The hypothesis becomes exp(1) = 1, which `simp` itself can close because Mathlib knows exp(1) ≠ 1.",
+            "tactic_rationale": "For division, the (1, 1) witness is especially clean because both x/y = 1 and log(1) = 0 fold flat. simp can finish the contradiction without needing explicit linarith arguments.",
+            "common_mistakes": [
+              "Trying to use exp_neg_one_lt_one as a hypothesis here — wrong direction; the contradiction here is exp(1) ≠ 1, which simp handles via `Real.exp_eq_one_iff`."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["F1_ne_add"],
+      "unlocks": ["div_not_one_node_computable_general"],
+      "source": { "file": "MonogateEML/DivLowerBound.lean", "line": 57 },
+      "tags": ["lower-bound", "F-family", "division", "lane-3"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "sub_not_one_node_computable",
+      "lane": 3,
+      "lane_title": "Arithmetic from Nothing",
+      "difficulty": 4,
+      "domain": "F-family lower bound (synthesis)",
+      "statement": {
+        "natural_language": "Subtraction is not 1-node computable in the F16 family — equivalently, no single F16 operator equals subtraction pointwise. Stated as the alias for SB_sub_ge_two.",
+        "latex": "\\neg\\,\\mathrm{one\\_node\\_computable\\_sub}(-)",
+        "lean4": "theorem sub_not_one_node_computable : ¬ one_node_computable_sub (· - ·) :=\n  SB_sub_ge_two"
+      },
+      "proof": {
+        "lean4_full": "theorem sub_not_one_node_computable : ¬ one_node_computable_sub (· - ·) :=\n  SB_sub_ge_two",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "SB_sub_ge_two",
+            "explanation": "The two theorems are the same proposition under different names; `sub_not_one_node_computable` is the human-readable alias for `SB_sub_ge_two`. Citing the existing proof as a term-mode value is the entire proof.",
+            "tactic_rationale": "Naming conventions: `SB_*_ge_*` tracks the SuperBEST cost-counting framework; `*_not_one_node_computable` tracks the propositional content. Aliasing keeps both names available without duplicating the proof.",
+            "common_mistakes": [
+              "Re-deriving SB_sub_ge_two inline — wastes effort; the existing proof is already in scope."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["SB_sub_ge_two"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/SubLowerBound.lean", "line": 208 },
+      "tags": ["lower-bound", "alias", "term-mode", "lane-3"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "SB_sub_ge_two",
+      "lane": 4,
+      "lane_title": "The Other Operators",
+      "difficulty": 4,
+      "domain": "SuperBEST lower bound (subtraction)",
+      "statement": {
+        "natural_language": "SuperBEST lower bound for subtraction: SB(−) ≥ 2 nodes. No single F16 operator computes subtraction over all real x, y — established by destructuring an existential and citing the omnibus 16-case lemma.",
+        "latex": "\\mathrm{SB}(-) \\geq 2",
+        "lean4": "theorem SB_sub_ge_two : ¬ one_node_computable_sub (· - ·) := by\n  intro ⟨op, hmem, heq⟩\n  exact no_f16_computes_sub op hmem (fun x y => (heq x y).symm)"
+      },
+      "proof": {
+        "lean4_full": "theorem SB_sub_ge_two : ¬ one_node_computable_sub (· - ·) := by\n  intro ⟨op, hmem, heq⟩\n  exact no_f16_computes_sub op hmem (fun x y => (heq x y).symm)",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "intro ⟨op, hmem, heq⟩",
+            "explanation": "Negate the existential: assume some F16 operator op computes subtraction; destructure to get op, its F16-membership proof hmem, and the pointwise equation heq.",
+            "tactic_rationale": "Anonymous-constructor destructuring of `∃ op ∈ s_f16_ops, ∀ x y, ...` in one step. Clean and matches the analogous SB_add_ge_two pattern.",
+            "common_mistakes": []
+          },
+          {
+            "step": 2,
+            "tactic": "exact no_f16_computes_sub op hmem (fun x y => (heq x y).symm)",
+            "explanation": "Feed the destructured op and hmem into the omnibus lemma `no_f16_computes_sub`, supplying the symmetric form of the equation (the lemma expects `op x y = x - y`, our hypothesis says `(· - ·) x y = op x y`). Returns False, closing the negation.",
+            "tactic_rationale": "Symmetric flip via `.symm` on each instance is cheaper than rewriting the hypothesis with `Eq.comm`.",
+            "common_mistakes": [
+              "Forgetting the `.symm` flip — the omnibus lemma rejects the un-flipped form."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["S_F1_ne_sub"],
+      "unlocks": ["sub_not_one_node_computable"],
+      "source": { "file": "MonogateEML/SubLowerBound.lean", "line": 163 },
+      "tags": ["superbest", "lower-bound", "anonymous-constructor", "lane-4"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "no_F_op_equals_sub",
+      "lane": 4,
+      "lane_title": "The Other Operators",
+      "difficulty": 4,
+      "domain": "F-family lower bound (witness existence)",
+      "statement": {
+        "natural_language": "Existential restatement of the subtraction lower bound: every F16 operator has at least one input pair where it disagrees with subtraction. Useful when downstream consumers need a witness rather than a propositional negation.",
+        "latex": "\\forall \\mathrm{op} \\in \\mathcal{F}_{16}.\\;\\exists x, y \\in \\mathbb{R}.\\;\\mathrm{op}(x, y) \\neq x - y",
+        "lean4": "theorem no_F_op_equals_sub :\n    ∀ op ∈ s_f16_ops, ∃ x y : ℝ, op x y ≠ x - y := by\n  intro op hmem\n  by_contra hall"
+      },
+      "proof": {
+        "lean4_full": "theorem no_F_op_equals_sub :\n    ∀ op ∈ s_f16_ops, ∃ x y : ℝ, op x y ≠ x - y := by\n  intro op hmem\n  by_contra hall\n  push_neg at hall\n  exact no_f16_computes_sub op hmem hall",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "intro op hmem; by_contra hall",
+            "explanation": "Introduce op + its F16-membership, then negate the existential by contradiction: assume `¬ ∃ x y, op x y ≠ x - y`, i.e. for ALL x, y, op x y = x - y.",
+            "tactic_rationale": "by_contra is the cleanest path when the goal is a positive existential; we get a universal-equality hypothesis to contradict against the omnibus lemma.",
+            "common_mistakes": []
+          },
+          {
+            "step": 2,
+            "tactic": "push_neg at hall; exact no_f16_computes_sub op hmem hall",
+            "explanation": "`push_neg` turns `¬ ∃ x y, op x y ≠ x - y` into `∀ x y, op x y = x - y`. Feed that universal into the omnibus lemma to get False.",
+            "tactic_rationale": "push_neg is the standard tactic for moving negations across quantifiers; without it the hypothesis would not match the omnibus lemma's expected shape.",
+            "common_mistakes": [
+              "Skipping push_neg — the hypothesis stays in negated-existential form, which the omnibus lemma cannot consume."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["SB_sub_ge_two"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/SubLowerBound.lean", "line": 212 },
+      "tags": ["lower-bound", "existential", "by_contra", "push_neg", "lane-4"],
+      "metadata": {
+        "tactics_introduced": ["by_contra", "push_neg"],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "div_two_node_pos_domain",
+      "lane": 4,
+      "lane_title": "The Other Operators",
+      "difficulty": 4,
+      "domain": "upper-bound construction (division)",
+      "statement": {
+        "natural_language": "Division of two positive reals is computable in 2 F16 nodes via the chain D_F16(x, D_F13(−1, y)). The inner D_F13(−1, y) computes y⁻¹; the outer D_F16 computes x · y⁻¹ = x/y.",
+        "latex": "\\forall x, y \\in \\mathbb{R}_{>0}.\\;\\,D\\!_{F16}\\bigl(x,\\;D\\!_{F13}(-1, y)\\bigr) = x / y",
+        "lean4": "theorem div_two_node_pos_domain (x y : ℝ) (hx : 0 < x) (hy : 0 < y) :\n    D_F16 x (D_F13 (-1) y) = x / y"
+      },
+      "proof": {
+        "lean4_full": "theorem div_two_node_pos_domain (x y : ℝ) (hx : 0 < x) (hy : 0 < y) :\n    D_F16 x (D_F13 (-1) y) = x / y := by\n  have hinv : D_F13 (-1 : ℝ) y = y⁻¹ := by\n    unfold D_F13\n    rw [show (-1 : ℝ) * Real.log y = -(Real.log y) from by ring]\n    rw [Real.exp_neg, Real.exp_log hy]\n  rw [hinv]\n  unfold D_F16\n  rw [show Real.log y⁻¹ = -(Real.log y) from Real.log_inv y]\n  rw [Real.exp_add, Real.exp_log hx, Real.exp_neg, Real.exp_log hy]\n  field_simp",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "have hinv : D_F13 (-1 : ℝ) y = y⁻¹ := by ...",
+            "explanation": "Begin by proving the inner-node identity: D_F13(−1, y) = exp(−1 · log y) = exp(−log y) = y⁻¹. The chain is `unfold` D_F13, normalise −1·log y to −log y by `ring`, then apply Mathlib's `exp_neg` and `exp_log`.",
+            "tactic_rationale": "Building the inner identity as a `have` lemma keeps the main `rw` chain readable. ring handles the scalar arithmetic, exp_neg/exp_log handle the transcendental.",
+            "common_mistakes": [
+              "Trying to chain everything into one `simp` — works occasionally but obscures which identity is doing what."
+            ]
+          },
+          {
+            "step": 2,
+            "tactic": "rw [hinv]; unfold D_F16; rw [show Real.log y⁻¹ = -(Real.log y) from Real.log_inv y]",
+            "explanation": "Substitute the inner identity, then unfold the outer D_F16 and rewrite log(y⁻¹) to −log(y) using Mathlib's `Real.log_inv`.",
+            "tactic_rationale": "Cite the named Mathlib lemma directly via `from` rather than re-deriving log(y⁻¹).",
+            "common_mistakes": []
+          },
+          {
+            "step": 3,
+            "tactic": "rw [Real.exp_add, Real.exp_log hx, Real.exp_neg, Real.exp_log hy]; field_simp",
+            "explanation": "Decompose exp(log x + (−log y)) = exp(log x) · exp(−log y) = x · y⁻¹. `field_simp` cleans up the y⁻¹ multiplication into x/y.",
+            "tactic_rationale": "field_simp normalises divisions/inverses in commutative fields; matches the algebraic shape we want as the final form.",
+            "common_mistakes": [
+              "Using `ring` instead of `field_simp` — would fail because ring does not handle the (−log y) inversion automatically."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["mul_one_node_positive"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/DivLowerBound3.lean", "line": 119 },
+      "tags": ["upper-bound", "division", "two-node", "rw", "field_simp", "lane-4"],
+      "metadata": {
+        "tactics_introduced": ["field_simp", "unfold"],
+        "cost_class": "p2-d2-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "SB_div_ge_three_full",
+      "lane": 4,
+      "lane_title": "The Other Operators",
+      "difficulty": 5,
+      "domain": "lower bound (Python-certified, partial Lean)",
+      "statement": {
+        "natural_language": "Conditional statement of the SuperBEST division lower bound at 3 nodes (the full general-domain claim). The exp-type outer cases (F13/F14/F15/F16) are Lean-proved via `no_exp_outer_2node_div`. The remaining 3072 circuits (F1–F12 outer) are certified by an exhaustive Python search and the Lean case analysis is deferred — encoded here as a `True` placeholder accepting an external hypothesis. **Honest framing**: this is a propositional scaffold awaiting Lean Pass-2 closure, not a closed theorem.",
+        "latex": "\\mathrm{SB}_{\\mathrm{full}}(\\div) \\geq 3 \\quad\\text{(Lean partial; F1\\!-\\!F12 outer cases Python-certified)}",
+        "lean4": "theorem SB_div_ge_three_full (g h : ℝ → ℝ → ℝ)\n    (_houter : ∀ op ∈ d_f16_ops, ¬ (∀ x y : ℝ, op (g x y) (h x y) = x / y)) :\n    True := by\n  trivial"
+      },
+      "proof": {
+        "lean4_full": "theorem SB_div_ge_three_full (g h : ℝ → ℝ → ℝ)\n    (_houter : ∀ op ∈ d_f16_ops, ¬ (∀ x y : ℝ, op (g x y) (h x y) = x / y)) :\n    True := by\n  trivial",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "trivial",
+            "explanation": "The statement target is `True`, which `trivial` closes unconditionally. The substantive content lives in the unused hypothesis `_houter` (deliberately underscored to mark it as accepted-but-not-yet-discharged Lean-side). The exhaustive Python search at `python/scripts/div_gen_tight_2node_search.py` ran 4096 circuits × 14 test points → 0 matches; this Lean theorem is a placeholder for the future Pass-2 closure.",
+            "tactic_rationale": "Pedagogical record: shows that not every Lean theorem is a closed proof. Some serve as anchors for external certification (Python search) pending future formalisation. The honest move is a `True` body + a comment block, not a hidden `sorry`.",
+            "common_mistakes": [
+              "Reading the `True` and assuming the SuperBEST bound is closed — it is not. The full closure requires the F1–F12 outer 12 cases × 256 inner pairs = 3072 circuit checks."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["div_two_node_pos_domain"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/DivLowerBound3.lean", "line": 146 },
+      "tags": ["lower-bound", "scaffold", "external-certification", "lane-4"],
+      "metadata": {
+        "tactics_introduced": ["trivial"],
+        "cost_class": null,
+        "is_scaffold": true,
+        "external_certification": "python/scripts/div_gen_tight_2node_search.py — 4096 circuits, 14 test points, 0 matches"
+      }
+    },
+
+    {
+      "theorem_id": "exp_one_node",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "upper-bound construction (exp)",
+      "statement": {
+        "natural_language": "exp(x) is computable by a single F16 node: the canonical EML form F1(x, 1) = exp(x) − log(1) = exp(x). The cleanest possible 1-node witness in the entire SuperBEST table.",
+        "latex": "\\forall x \\in \\mathbb{R}.\\;\\,\\exp(x) - \\log(1) = \\exp(x)",
+        "lean4": "theorem exp_one_node (x : ℝ) : Real.exp x - Real.log 1 = Real.exp x := by\n  simp [Real.log_one]"
+      },
+      "proof": {
+        "lean4_full": "theorem exp_one_node (x : ℝ) : Real.exp x - Real.log 1 = Real.exp x := by\n  simp [Real.log_one]",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "simp [Real.log_one]",
+            "explanation": "Rewrite log(1) → 0, then exp(x) − 0 = exp(x) closes by simp's arithmetic normaliser. One line.",
+            "tactic_rationale": "Naming Real.log_one in the simp set explicitly is the smallest-possible directive that gets the rewrite done.",
+            "common_mistakes": [
+              "Trying just `rfl` — fails because the LHS is `exp(x) − log(1)` symbolically, not yet reduced."
+            ]
+          }
+        ]
+      },
+      "dependencies": [],
+      "unlocks": ["superbest_positive_one_node_ops"],
+      "source": { "file": "MonogateEML/UpperBounds.lean", "line": 30 },
+      "tags": ["upper-bound", "exp", "one-node", "simp", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "mul_one_node_positive",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "upper-bound construction (multiplication)",
+      "statement": {
+        "natural_language": "Multiplication on the positive reals is a single F16 node: F16fn(x, y) = exp(log(x) + log(y)) = x · y for x, y > 0. The headline 'mul_pos = 1n' result that drops the SuperBEST positive-domain headline from 16n to 14n.",
+        "latex": "\\forall x, y \\in \\mathbb{R}_{>0}.\\;\\,\\exp(\\log x + \\log y) = x \\cdot y",
+        "lean4": "theorem mul_one_node_positive (x y : ℝ) (hx : 0 < x) (hy : 0 < y) :\n    Real.exp (Real.log x + Real.log y) = x * y := by\n  rw [Real.exp_add, Real.exp_log hx, Real.exp_log hy]"
+      },
+      "proof": {
+        "lean4_full": "theorem mul_one_node_positive (x y : ℝ) (hx : 0 < x) (hy : 0 < y) :\n    Real.exp (Real.log x + Real.log y) = x * y := by\n  rw [Real.exp_add, Real.exp_log hx, Real.exp_log hy]",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rw [Real.exp_add, Real.exp_log hx, Real.exp_log hy]",
+            "explanation": "Three sequential rewrites: exp(a + b) → exp(a) · exp(b), then exp(log x) → x using positivity hx, then exp(log y) → y using positivity hy. The result reduces to x · y.",
+            "tactic_rationale": "Each rewrite fires once with explicit hypothesis. The positivity hypotheses are required because Real.log is undefined on x ≤ 0; without hx and hy, exp_log would not apply.",
+            "common_mistakes": [
+              "Dropping the positivity hypotheses — the entire construction depends on log being well-defined.",
+              "Using simp instead — works, but rw makes each step legible to a learner."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["exp_one_node"],
+      "unlocks": ["mul_of_negatives_one_node", "div_two_node_pos_domain", "superbest_positive_one_node_ops"],
+      "source": { "file": "MonogateEML/UpperBounds.lean", "line": 44 },
+      "tags": ["upper-bound", "multiplication", "one-node", "rw", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "recip_is_one_node_positive",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "upper-bound construction (reciprocal)",
+      "statement": {
+        "natural_language": "Reciprocal on positive reals is a single F16 node: EPL(−1, x) = exp(−1 · log x) = exp(−log x) = 1/x for x > 0. Same EPL/F13 mechanism that gives sqrt and pow at 1n.",
+        "latex": "\\forall x \\in \\mathbb{R}_{>0}.\\;\\,\\exp(-\\log x) = 1 / x",
+        "lean4": "theorem recip_is_one_node_positive (x : ℝ) (hx : 0 < x) :\n    Real.exp ((-1) * Real.log x) = 1 / x"
+      },
+      "proof": {
+        "lean4_full": "theorem recip_is_one_node_positive (x : ℝ) (hx : 0 < x) :\n    Real.exp ((-1) * Real.log x) = 1 / x := by\n  rw [show (-1 : ℝ) * Real.log x = -(Real.log x) from by ring,\n      Real.exp_neg, Real.exp_log hx, inv_eq_one_div]",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rw [show (-1 : ℝ) * Real.log x = -(Real.log x) from by ring, Real.exp_neg, Real.exp_log hx, inv_eq_one_div]",
+            "explanation": "Four rewrites in a single chain: (1) ring-normalise `(-1) * log x` to `-(log x)`, (2) `exp(-y) = (exp y)⁻¹`, (3) `exp(log x) = x` using positivity, (4) `x⁻¹ = 1 / x`.",
+            "tactic_rationale": "The inline `show ... from by ring` proves a small subgoal as a term, which lets us substitute it directly without breaking out into a separate `have`. Compact when the subgoal is a one-line ring identity.",
+            "common_mistakes": [
+              "Forgetting `inv_eq_one_div` — leaves the goal as `x⁻¹ = 1 / x` unreduced.",
+              "Trying `simp` up front — can succeed but obscures the rewrite chain."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["mul_one_node_positive"],
+      "unlocks": ["pow_is_one_node_positive", "sqrt_is_one_node_positive", "superbest_positive_one_node_ops"],
+      "source": { "file": "MonogateEML/ModelAudit.lean", "line": 121 },
+      "tags": ["upper-bound", "reciprocal", "one-node", "EPL", "lane-5"],
+      "metadata": {
+        "tactics_introduced": ["show ... from by ring (inline subgoal)"],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "pow_is_one_node_positive",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "upper-bound construction (power)",
+      "statement": {
+        "natural_language": "Real power on positive base is a single F16 node: EPL(n, x) = exp(n · log x) = x^n for x > 0. The X20 audit recognised EPL/ELMl as a primitive in the F16 census, dropping pow from the v4 cost of 3n to 1n positive.",
+        "latex": "\\forall n, x \\in \\mathbb{R}.\\;0 < x \\;\\Rightarrow\\; \\exp(n \\cdot \\log x) = x^n",
+        "lean4": "theorem pow_is_one_node_positive (n x : ℝ) (hx : 0 < x) :\n    Real.exp (n * Real.log x) = x ^ n := by\n  rw [Real.rpow_def_of_pos hx]; ring_nf"
+      },
+      "proof": {
+        "lean4_full": "theorem pow_is_one_node_positive (n x : ℝ) (hx : 0 < x) :\n    Real.exp (n * Real.log x) = x ^ n := by\n  rw [Real.rpow_def_of_pos hx]; ring_nf",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rw [Real.rpow_def_of_pos hx]",
+            "explanation": "Mathlib defines `x ^ n` for real n on positive x as `exp (n * log x)`. This rewrite substitutes the definitional form into the goal.",
+            "tactic_rationale": "Using the definitional rewrite makes the relationship explicit; the alternative would be `simp [Real.rpow_def_of_pos hx]` which is equivalent here.",
+            "common_mistakes": [
+              "Dropping `hx` — the definition of `rpow` branches on positivity; without hx the rewrite fails."
+            ]
+          },
+          {
+            "step": 2,
+            "tactic": "ring_nf",
+            "explanation": "After the rewrite the goal is `exp (n * log x) = exp (n * log x)` modulo argument normalisation. ring_nf normalises both sides to the same canonical form.",
+            "tactic_rationale": "ring_nf is the right tactic when the LHS and RHS are equal as polynomial expressions over a commutative ring up to normalisation; here it just confirms the canonical match.",
+            "common_mistakes": [
+              "Using `rfl` — usually fails because the two sides differ syntactically even after the rewrite."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["recip_is_one_node_positive"],
+      "unlocks": ["sqrt_is_one_node_positive", "superbest_positive_one_node_ops"],
+      "source": { "file": "MonogateEML/ModelAudit.lean", "line": 127 },
+      "tags": ["upper-bound", "power", "one-node", "EPL", "rpow", "lane-5"],
+      "metadata": {
+        "tactics_introduced": ["ring_nf"],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "sqrt_is_one_node_positive",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "upper-bound construction (square root)",
+      "statement": {
+        "natural_language": "Square root on positive reals is a single F16 node: EPL(0.5, x) = exp(0.5 · log x) = sqrt(x) for x > 0. v5.2 correction from 2n to 1n via the EPL primitive.",
+        "latex": "\\forall x \\in \\mathbb{R}_{>0}.\\;\\,\\exp(\\tfrac{1}{2} \\log x) = \\sqrt{x}",
+        "lean4": "theorem sqrt_is_one_node_positive (x : ℝ) (hx : 0 < x) :\n    Real.exp (0.5 * Real.log x) = Real.sqrt x := by\n  rw [Real.sqrt_eq_rpow]\n  simp [Real.rpow_def_of_pos hx]\n  ring_nf"
+      },
+      "proof": {
+        "lean4_full": "theorem sqrt_is_one_node_positive (x : ℝ) (hx : 0 < x) :\n    Real.exp (0.5 * Real.log x) = Real.sqrt x := by\n  rw [Real.sqrt_eq_rpow]\n  simp [Real.rpow_def_of_pos hx]\n  ring_nf",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rw [Real.sqrt_eq_rpow]",
+            "explanation": "Mathlib expresses `Real.sqrt x` as `x ^ (1/2 : ℝ)` for non-negative x. This rewrite substitutes that identity.",
+            "tactic_rationale": "Bridging from `sqrt` to `rpow` lets us use the same `rpow_def_of_pos` mechanism as `pow_is_one_node_positive`.",
+            "common_mistakes": []
+          },
+          {
+            "step": 2,
+            "tactic": "simp [Real.rpow_def_of_pos hx]",
+            "explanation": "Apply the rpow definition to convert `x ^ (1/2)` to `exp ((1/2) * log x)`. simp also normalises 0.5 ↔ 1/2 if needed.",
+            "tactic_rationale": "Using simp here (instead of bare rw) lets it handle both the definitional rewrite AND any incidental literal-normalisation.",
+            "common_mistakes": [
+              "Forgetting `hx` — Real.rpow_def_of_pos requires positivity."
+            ]
+          },
+          {
+            "step": 3,
+            "tactic": "ring_nf",
+            "explanation": "Normalise the final form. Both sides reduce to `exp (0.5 * log x)`.",
+            "tactic_rationale": "Same role as in pow_is_one_node_positive — final canonical-form check.",
+            "common_mistakes": []
+          }
+        ]
+      },
+      "dependencies": ["pow_is_one_node_positive"],
+      "unlocks": ["superbest_v51_overcounted_by_one"],
+      "source": { "file": "MonogateEML/ModelAudit.lean", "line": 53 },
+      "tags": ["upper-bound", "sqrt", "one-node", "EPL", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "ln_is_one_node_via_exl",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "upper-bound construction (logarithm)",
+      "statement": {
+        "natural_language": "Natural logarithm is a single F16 node via the extended EXL operator: EXL(0, x) = exp(0) · log x = 1 · log x = log x. Trivially-named but pedagogically important — it shows that ln gets its 1n cost via a multiplicative-identity exploitation rather than an exp/log cancellation.",
+        "latex": "\\forall x \\in \\mathbb{R}.\\;\\,\\exp(0) \\cdot \\log(x) = \\log(x)",
+        "lean4": "theorem ln_is_one_node_via_exl (x : ℝ) :\n    Real.exp 0 * Real.log x = Real.log x := by\n  rw [Real.exp_zero, one_mul]"
+      },
+      "proof": {
+        "lean4_full": "theorem ln_is_one_node_via_exl (x : ℝ) :\n    Real.exp 0 * Real.log x = Real.log x := by\n  rw [Real.exp_zero, one_mul]",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rw [Real.exp_zero, one_mul]",
+            "explanation": "Two rewrites: exp(0) → 1, then 1 · log x → log x via the identity element of multiplication.",
+            "tactic_rationale": "Cleanest two-step rewrite. Mathlib has both lemmas; chaining them inline avoids any need for `simp`.",
+            "common_mistakes": [
+              "Trying just `rfl` — fails because exp(0) does not definitionally reduce to 1 in Lean."
+            ]
+          }
+        ]
+      },
+      "dependencies": [],
+      "unlocks": ["superbest_positive_one_node_ops"],
+      "source": { "file": "MonogateEML/ModelAudit.lean", "line": 132 },
+      "tags": ["upper-bound", "logarithm", "one-node", "EXL", "rw", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "mul_of_negatives_one_node",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "upper-bound construction (negative-base multiplication)",
+      "statement": {
+        "natural_language": "Multiplication of two negative reals is a single F16 node by absorbing the sign: exp(log(−x) + log(−y)) = (−x)·(−y) = x·y when x, y < 0. Extends mul_one_node_positive to the negative quadrant.",
+        "latex": "\\forall x, y \\in \\mathbb{R}_{<0}.\\;\\,\\exp(\\log(-x) + \\log(-y)) = x \\cdot y",
+        "lean4": "theorem mul_of_negatives_one_node (x y : ℝ) (hx : x < 0) (hy : y < 0) :\n    Real.exp (Real.log (-x) + Real.log (-y)) = x * y"
+      },
+      "proof": {
+        "lean4_full": "theorem mul_of_negatives_one_node (x y : ℝ) (hx : x < 0) (hy : y < 0) :\n    Real.exp (Real.log (-x) + Real.log (-y)) = x * y := by\n  have hxp : 0 < -x := neg_pos.mpr hx\n  have hyp : 0 < -y := neg_pos.mpr hy\n  rw [mul_one_node_positive (-x) (-y) hxp hyp]\n  ring",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "have hxp : 0 < -x := neg_pos.mpr hx; have hyp : 0 < -y := neg_pos.mpr hy",
+            "explanation": "Use Mathlib's `neg_pos` to flip the negativity hypotheses into positivity for `−x` and `−y`. These are needed to invoke mul_one_node_positive.",
+            "tactic_rationale": "The clean composable pattern: derive the positivity-of-negation facts as named haves, then dispatch the main lemma. Avoids inline `by` blocks in the rewrite call.",
+            "common_mistakes": [
+              "Skipping hxp/hyp and trying to inline them — works but is harder to read."
+            ]
+          },
+          {
+            "step": 2,
+            "tactic": "rw [mul_one_node_positive (-x) (-y) hxp hyp]; ring",
+            "explanation": "Apply mul_one_node_positive to reduce the LHS to (−x)·(−y), then `ring` handles the sign-cancellation (−x)·(−y) = x · y.",
+            "tactic_rationale": "Composing an existing positive-domain lemma + ring is the standard 'extend to negative inputs' pattern. ring handles the trivial sign arithmetic.",
+            "common_mistakes": [
+              "Forgetting `ring` — leaves the goal as `(-x) * (-y) = x * y` which is not solved by rfl."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["mul_one_node_positive"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/UpperBounds.lean", "line": 140 },
+      "tags": ["upper-bound", "multiplication", "negatives", "have", "ring", "lane-5"],
+      "metadata": {
+        "tactics_introduced": ["neg_pos.mpr"],
+        "cost_class": "p1-d1-w0-c0"
+      }
+    },
+
+    {
+      "theorem_id": "superbest_v53_positive_total",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "arithmetic verification (cost-table total)",
+      "statement": {
+        "natural_language": "Mechanised arithmetic check: the v5.2 SuperBEST positive-domain cost table sums to 14. Per-op costs are 1 (exp) + 1 (mul) + 1 (recip) + 1 (sqrt) + 1 (ln) + 2 (neg) + 2 (sub) + 2 (add) + 2 (div) + 1 (pow) = 14. A trivial-but-load-bearing theorem: the public 80.8% savings headline is computed off this exact sum.",
+        "latex": "1 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 2 + 1 = 14",
+        "lean4": "theorem superbest_v53_positive_total : 1 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 2 + 1 = 14 := by\n  norm_num"
+      },
+      "proof": {
+        "lean4_full": "theorem superbest_v53_positive_total : 1 + 1 + 1 + 1 + 1 + 2 + 2 + 2 + 2 + 1 = 14 := by\n  norm_num",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "norm_num",
+            "explanation": "Closed-form numeric arithmetic. norm_num evaluates the literal sum and compares to 14.",
+            "tactic_rationale": "norm_num is the canonical tactic for closed numeric equality. `decide` would also work but is heavier.",
+            "common_mistakes": [
+              "Trying to break this into step-wise associativity rewrites — pure waste; the tactic exists for exactly this case."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["mul_one_node_positive", "recip_is_one_node_positive", "sqrt_is_one_node_positive", "pow_is_one_node_positive", "ln_is_one_node_via_exl"],
+      "unlocks": ["superbest_v53_savings_fraction"],
+      "source": { "file": "MonogateEML/ModelAudit.lean", "line": 181 },
+      "tags": ["arithmetic", "cost-table", "norm_num", "lane-5"],
+      "metadata": {
+        "tactics_introduced": ["norm_num"],
+        "cost_class": null,
+        "load_bearing_for_public_claim": "the 14n / 80.8% headline on capability_card_public.json + monogate.org SuperBEST page"
+      }
+    },
+
+    {
+      "theorem_id": "superbest_v53_savings_fraction",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "arithmetic verification (savings ratio)",
+      "statement": {
+        "natural_language": "Mechanised arithmetic check: the v5.2 SuperBEST positive-domain savings exceed 80.8%. Computed as (73 − 14) / 73 = 59/73 ≈ 0.8082. Together with superbest_v53_positive_total this is the load-bearing pair behind the public 80.8% headline.",
+        "latex": "(73 - 14) / 73 > 0.808",
+        "lean4": "theorem superbest_v53_savings_fraction :\n    ((73 : ℝ) - 14) / 73 > 0.808 := by\n  norm_num"
+      },
+      "proof": {
+        "lean4_full": "theorem superbest_v53_savings_fraction :\n    ((73 : ℝ) - 14) / 73 > 0.808 := by\n  norm_num",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "norm_num",
+            "explanation": "Closed-form rational inequality. norm_num evaluates 59/73 ≈ 0.8082 and confirms it exceeds 0.808.",
+            "tactic_rationale": "Same as for the total — norm_num is the tactic for closed numeric (in)equalities.",
+            "common_mistakes": []
+          }
+        ]
+      },
+      "dependencies": ["superbest_v53_positive_total"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/ModelAudit.lean", "line": 185 },
+      "tags": ["arithmetic", "savings", "norm_num", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null,
+        "load_bearing_for_public_claim": "the 80.8% savings figure on every public surface"
+      }
+    },
+
+    {
+      "theorem_id": "eal_exl_conjugacy",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "self-map conjugacy (EAL ↔ EXL)",
+      "statement": {
+        "natural_language": "EAL ↔ EXL conjugacy via exp. If f(x) = exp(x) + ln(x) is the EAL self-map and g(y) = exp(y)·ln(y) is the EXL self-map, then on the positive reals g(exp(x)) = exp(f(x)). Encodes the identity exp(exp(x)+ln(x)) = exp(exp(x))·x = exp(exp(x))·ln(exp(x)).",
+        "latex": "\\forall x > 0.\\;\\,\\exp(\\exp x) \\cdot \\log(\\exp x) = \\exp(\\exp x + \\log x)",
+        "lean4": "theorem eal_exl_conjugacy (x : ℝ) (hx : 0 < x) :\n    Real.exp (Real.exp x) * Real.log (Real.exp x)\n      = Real.exp (Real.exp x + Real.log x) := by\n  rw [Real.exp_add, Real.log_exp, Real.exp_log hx]"
+      },
+      "proof": {
+        "lean4_full": "theorem eal_exl_conjugacy (x : ℝ) (hx : 0 < x) :\n    Real.exp (Real.exp x) * Real.log (Real.exp x)\n      = Real.exp (Real.exp x + Real.log x) := by\n  rw [Real.exp_add, Real.log_exp, Real.exp_log hx]",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "rw [Real.exp_add, Real.log_exp, Real.exp_log hx]",
+            "explanation": "Three Mathlib rewrites: exp(a+b) → exp(a)·exp(b) on the RHS, then log(exp(x)) → x and exp(log(x)) → x using positivity. The conjugacy identity falls out as a multiplicative shuffle.",
+            "tactic_rationale": "The conjugacy is one of the EML self-map invariants — what looks like a complex compositional identity reduces to three exp/log cancellations. Naming each rewrite explicitly keeps the proof legible to a learner.",
+            "common_mistakes": [
+              "Forgetting `hx` — exp_log requires positivity.",
+              "Trying simp up front — works but obscures which cancellations matter."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["mul_one_node_positive"],
+      "unlocks": ["eal_exl_fixed_point_pairing", "eal_exl_single_step_conjugacy"],
+      "source": { "file": "MonogateEML/SelfMapConjugacy.lean", "line": 31 },
+      "tags": ["self-map", "conjugacy", "fixed-point", "rw", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null
+      }
+    },
+
+    {
+      "theorem_id": "superbest_positive_one_node_ops",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "upper-bound bundle (synthesis)",
+      "statement": {
+        "natural_language": "All seven 1-node positive-domain results bundled as a single conjunction: exp, mul, pow, recip, sqrt, ln (via EXL), and the F14 identity. The single proof object that downstream consumers reference when they need 'all the upper-bound witnesses at once'.",
+        "latex": "(\\text{exp 1n}) \\wedge (\\text{mul 1n}) \\wedge (\\text{pow 1n}) \\wedge (\\text{recip 1n}) \\wedge (\\text{sqrt 1n}) \\wedge (\\text{ln 1n via EXL}) \\wedge (\\text{F14 identity})",
+        "lean4": "theorem superbest_positive_one_node_ops : ⟨...seven conjuncts...⟩ := ⟨...seven proofs...⟩"
+      },
+      "proof": {
+        "lean4_full": "theorem superbest_positive_one_node_ops :\n    (∀ x : ℝ, Real.exp x - Real.log 1 = Real.exp x) ∧\n    (∀ x y : ℝ, 0 < x → 0 < y → Real.exp (Real.log x + Real.log y) = x * y) ∧\n    (∀ n x : ℝ, 0 < x → Real.exp (n * Real.log x) = x ^ n) ∧\n    (∀ x : ℝ, 0 < x → Real.exp ((-1) * Real.log x) = 1 / x) ∧\n    (∀ x : ℝ, 0 < x → Real.exp ((1/2) * Real.log x) = Real.sqrt x) ∧\n    (∀ x : ℝ, Real.exp 0 * Real.log x = Real.log x) ∧\n    (∀ x y : ℝ, 0 < y → Real.exp (x + Real.log y) = Real.exp x * y) :=\n  ⟨fun x => by simp [Real.log_one],\n   mul_one_node_positive, rpow_one_node_positive,\n   recip_one_node_positive, sqrt_one_node_positive',\n   ln_one_node_via_exl, f14_identity⟩",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "⟨fun x => by simp [Real.log_one], mul_one_node_positive, rpow_one_node_positive, recip_one_node_positive, sqrt_one_node_positive', ln_one_node_via_exl, f14_identity⟩",
+            "explanation": "Anonymous-constructor packing: the seven-conjunction goal is closed by supplying seven proofs, one per conjunct. The exp witness is supplied inline (`fun x => by simp [Real.log_one]`); the other six cite their named-theorem proofs directly.",
+            "tactic_rationale": "When a conjunction's parts are each already named theorems, the cleanest closer is term-mode anonymous-constructor packing. No tactic block needed for most parts.",
+            "common_mistakes": [
+              "Trying to use `refine ⟨...⟩` with seven `?_` placeholders — works but is needlessly verbose.",
+              "Forgetting that the order of conjuncts in the statement must match the order of proofs in the constructor — the type-checker will reject mismatched orderings."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["exp_one_node", "mul_one_node_positive", "recip_is_one_node_positive", "pow_is_one_node_positive", "sqrt_is_one_node_positive", "ln_is_one_node_via_exl"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/UpperBounds.lean", "line": 153 },
+      "tags": ["upper-bound", "synthesis", "anonymous-constructor", "term-mode", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null,
+        "is_synthesis": true,
+        "bundles": 7
+      }
+    },
+
+    {
+      "theorem_id": "gamma_one",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "Mathlib wrapper (Gamma function base case)",
+      "statement": {
+        "natural_language": "Γ(1) = 1. The base case of the Gamma function. Combined with the functional equation Γ(s+1) = s·Γ(s), this fixes Γ on positive integers as the factorial.",
+        "latex": "\\Gamma(1) = 1",
+        "lean4": "theorem gamma_one : Gamma 1 = 1 := Real.Gamma_one"
+      },
+      "proof": {
+        "lean4_full": "theorem gamma_one : Gamma 1 = 1 := Real.Gamma_one",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "Real.Gamma_one",
+            "explanation": "Mathlib already proves this fact under the name `Real.Gamma_one`. The local `Gamma` is an abbreviation for `Real.Gamma`, so the wrapper just exposes the Mathlib lemma under our naming.",
+            "tactic_rationale": "Term-mode citation. When a result is exactly a Mathlib lemma, the cleanest proof is the lemma name as a term — no `by` block needed.",
+            "common_mistakes": [
+              "Trying to compute it from the integral definition — slow and fragile when Mathlib already has the closed-form fact."
+            ]
+          }
+        ]
+      },
+      "dependencies": [],
+      "unlocks": ["gamma_nat_eq_factorial"],
+      "source": { "file": "MonogateEML/Gamma.lean", "line": 51 },
+      "tags": ["gamma", "mathlib-wrapper", "term-mode", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null,
+        "wrapper_around": "Real.Gamma_one"
+      }
+    },
+
+    {
+      "theorem_id": "gamma_nat_eq_factorial",
+      "lane": 5,
+      "lane_title": "Into the Complex Plane",
+      "difficulty": 5,
+      "domain": "Mathlib wrapper (Gamma factorial connection)",
+      "statement": {
+        "natural_language": "Γ(n+1) = n! for natural n. The bridge between the Gamma function and the factorial — fixes Γ on the positive integers.",
+        "latex": "\\forall n \\in \\mathbb{N}.\\;\\,\\Gamma(n + 1) = n!",
+        "lean4": "theorem gamma_nat_eq_factorial (n : ℕ) : Gamma (n + 1) = n.factorial := Real.Gamma_nat_eq_factorial n"
+      },
+      "proof": {
+        "lean4_full": "theorem gamma_nat_eq_factorial (n : ℕ) : Gamma (n + 1) = n.factorial := Real.Gamma_nat_eq_factorial n",
+        "lean4_step_by_step": [
+          {
+            "step": 1,
+            "tactic": "Real.Gamma_nat_eq_factorial n",
+            "explanation": "Mathlib's `Real.Gamma_nat_eq_factorial` takes `n : ℕ` and returns the proof that `Real.Gamma (n+1) = n!`. Apply it with our explicit n argument.",
+            "tactic_rationale": "Term-mode citation parameterised by n. Cleaner than re-proving via induction on n + functional equation.",
+            "common_mistakes": [
+              "Forgetting to pass `n` — Mathlib's lemma is parameterised, not a 0-ary fact."
+            ]
+          }
+        ]
+      },
+      "dependencies": ["gamma_one"],
+      "unlocks": [],
+      "source": { "file": "MonogateEML/Gamma.lean", "line": 56 },
+      "tags": ["gamma", "factorial", "mathlib-wrapper", "term-mode", "lane-5"],
+      "metadata": {
+        "tactics_introduced": [],
+        "cost_class": null,
+        "wrapper_around": "Real.Gamma_nat_eq_factorial"
+      }
+    }
+
+  ]
+}

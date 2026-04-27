@@ -6,6 +6,7 @@ const LINKS = [
   { href: "/explorer",          label: "Explorer" },
   { href: "/challenge",         label: "Challenge" },
   { href: "/lab",               label: "Lab" },
+  { href: "/learn",             label: "Learn" },
   { href: "/docs",              label: "Docs" },
   { href: "https://monogate.org", label: "Research ↗", external: true },
 ];
