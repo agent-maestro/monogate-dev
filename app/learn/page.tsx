@@ -24,6 +24,15 @@ const LANE_ACCENT: Record<number, string> = {
   6: ACCENT_GOLD,
 };
 
+const LANE_LONG_DESCRIPTION: Record<number, string> = {
+  1: "Inductive types, depth, rfl, and the complex-exp identity. The smallest possible Lean proofs.",
+  2: "How simp, rewrites, and hypothesis-driven tactics chain definitions into composite results.",
+  3: "Witness extraction, F-family lower bounds, and proof-by-contradiction over EML trees.",
+  4: "The SuperBEST framework: multi-operator lower bounds and the synthesis lemmas they unlock.",
+  5: "Universality, EML-elementary, self-map conjugacies, and how Mathlib wrappers connect to the master result.",
+  6: "The research frontier — the InfiniteZerosBarrier and the open lemmas that gate sin/cos/π/i.",
+};
+
 export default function LearnIndexPage() {
   // Group records by lane for the count badges.
   const byLane: Record<number, number> = {};
@@ -32,8 +41,14 @@ export default function LearnIndexPage() {
   }
 
   return (
-    <main style={{ maxWidth: 880, margin: "0 auto", padding: "60px 24px 120px" }}>
-      <header style={{ marginBottom: 48 }}>
+    <main
+      style={{
+        maxWidth: 880,
+        margin: "0 auto",
+        padding: "clamp(32px, 6vw, 60px) clamp(16px, 4vw, 24px) 120px",
+      }}
+    >
+      <header style={{ marginBottom: 40 }}>
         <div
           style={{
             fontSize: 11,
@@ -48,7 +63,7 @@ export default function LearnIndexPage() {
         </div>
         <h1
           style={{
-            fontSize: "2.4rem",
+            fontSize: "clamp(1.8rem, 6vw, 2.4rem)",
             fontWeight: 700,
             color: "#fff",
             marginBottom: 16,
@@ -57,13 +72,26 @@ export default function LearnIndexPage() {
         >
           Learn Lean by Proving EML
         </h1>
-        <p style={{ fontSize: "1.05rem", color: "#aaa", lineHeight: 1.6 }}>
+        <p
+          style={{
+            fontSize: "clamp(0.95rem, 2.4vw, 1.05rem)",
+            color: "#aaa",
+            lineHeight: 1.6,
+          }}
+        >
           {dataset.records.length} hand-audited Lean&nbsp;4 theorems from the Monogate
           formalization, structured as a 6-lane interactive curriculum. Every
           proof step has a natural-language explanation, the rationale for the
           tactic chosen, and common mistakes a beginner typically makes.
         </p>
-        <p style={{ fontSize: "0.85rem", color: "#666", marginTop: 16, fontFamily: "monospace" }}>
+        <p
+          style={{
+            fontSize: "0.85rem",
+            color: "#666",
+            marginTop: 16,
+            fontFamily: "monospace",
+          }}
+        >
           Dataset {dataset.dataset_version} · schema {dataset.schema_version} ·{" "}
           <a
             href="https://github.com/agent-maestro/monogate-lean"
@@ -73,31 +101,28 @@ export default function LearnIndexPage() {
           </a>{" "}
           · CC BY 4.0
         </p>
-        <div style={{
-          marginTop: 24, display: "flex", gap: 12, flexWrap: "wrap",
-          fontFamily: "monospace", fontSize: 12,
-        }}>
+        <div
+          style={{
+            marginTop: 24,
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            fontFamily: "monospace",
+            fontSize: 12,
+          }}
+        >
           <a
             href="/learn/leaderboard"
             style={{
-              color: ACCENT_GOLD, textDecoration: "none",
+              color: ACCENT_GOLD,
+              textDecoration: "none",
               border: `1px solid ${ACCENT_GOLD}40`,
-              padding: "6px 14px", borderRadius: 6,
+              padding: "6px 14px",
+              borderRadius: 6,
               background: `${ACCENT_GOLD}08`,
             }}
           >
             🏆 Leaderboard
-          </a>
-          <a
-            href="https://github.com/agent-maestro/monogate-research/tree/master/petal"
-            style={{
-              color: ACCENT_PURPLE, textDecoration: "none",
-              border: `1px solid ${ACCENT_PURPLE}40`,
-              padding: "6px 14px", borderRadius: 6,
-              background: `${ACCENT_PURPLE}08`,
-            }}
-          >
-            🤖 PETAL API for agents ↗
           </a>
         </div>
       </header>
@@ -117,32 +142,57 @@ export default function LearnIndexPage() {
           {[1, 2, 3, 4, 5, 6].map((lane) => {
             const accent = LANE_ACCENT[lane];
             const lc = LANE_DESCRIPTIONS[lane];
+            const longDesc = LANE_LONG_DESCRIPTION[lane];
             const count = byLane[lane] ?? 0;
-            const isLane1 = lane === 1;
+            const isUnlocked = lane === 1;
+            const lockedHint =
+              lane === 2 ? "Complete Lane 1 to unlock Building Blocks" : null;
+
+            const Wrapper = isUnlocked
+              ? ({ children }: { children: React.ReactNode }) => (
+                  <a
+                    href="/learn/lane-1"
+                    style={{
+                      display: "block",
+                      padding: "clamp(16px, 3vw, 22px) clamp(18px, 3.5vw, 26px)",
+                      border: `1px solid ${accent}30`,
+                      borderRadius: 10,
+                      background: `${accent}08`,
+                      textDecoration: "none",
+                      color: "inherit",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {children}
+                  </a>
+                )
+              : ({ children }: { children: React.ReactNode }) => (
+                  <div
+                    aria-disabled
+                    style={{
+                      position: "relative",
+                      padding: "clamp(16px, 3vw, 22px) clamp(18px, 3.5vw, 26px)",
+                      border: `1px dashed ${accent}30`,
+                      borderRadius: 10,
+                      background: `${accent}05`,
+                      color: "inherit",
+                      opacity: 0.85,
+                    }}
+                  >
+                    {children}
+                  </div>
+                );
 
             return (
-              <a
-                key={lane}
-                href={isLane1 ? "/learn/lane-1" : "#"}
-                style={{
-                  display: "block",
-                  padding: "20px 24px",
-                  border: `1px solid ${accent}30`,
-                  borderRadius: 10,
-                  background: `${accent}08`,
-                  textDecoration: "none",
-                  color: "inherit",
-                  cursor: isLane1 ? "pointer" : "default",
-                  opacity: isLane1 ? 1 : 0.7,
-                  transition: "all 0.15s ease",
-                }}
-              >
+              <Wrapper key={lane}>
                 <div
                   style={{
                     display: "flex",
                     alignItems: "baseline",
-                    gap: 16,
+                    gap: 12,
                     marginBottom: 8,
+                    flexWrap: "wrap",
                   }}
                 >
                   <span
@@ -155,11 +205,11 @@ export default function LearnIndexPage() {
                       fontFamily: "monospace",
                     }}
                   >
-                    Lane {lane}
+                    {isUnlocked ? `Lane ${lane}` : `🔒 Lane ${lane}`}
                   </span>
                   <span
                     style={{
-                      fontSize: 18,
+                      fontSize: "clamp(15px, 3.5vw, 18px)",
                       fontWeight: 600,
                       color: "#fff",
                     }}
@@ -177,29 +227,58 @@ export default function LearnIndexPage() {
                     {count} {count === 1 ? "record" : "records"}
                   </span>
                 </div>
-                <div style={{ fontSize: 14, color: "#aaa", lineHeight: 1.5 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: "#888",
+                    fontFamily: "monospace",
+                    marginBottom: 8,
+                  }}
+                >
                   {lc.subtitle}
                 </div>
-                {!isLane1 && (
+                <div
+                  style={{
+                    fontSize: 14,
+                    color: "#aaa",
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {longDesc}
+                </div>
+                {!isUnlocked && lockedHint && (
                   <div
                     style={{
                       fontSize: 11,
-                      color: "#666",
-                      marginTop: 10,
+                      color: "#777",
+                      marginTop: 12,
                       fontFamily: "monospace",
+                      letterSpacing: 0.4,
                     }}
                   >
-                    [walk-through coming soon — view records in the dataset on{" "}
+                    {lockedHint}
+                  </div>
+                )}
+                {!isUnlocked && !lockedHint && (
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "#777",
+                      marginTop: 12,
+                      fontFamily: "monospace",
+                      letterSpacing: 0.4,
+                    }}
+                  >
+                    Walk-through coming soon — view records on{" "}
                     <a
                       href="https://github.com/agent-maestro/monogate-lean"
                       style={{ color: accent }}
                     >
-                      GitHub
+                      GitHub ↗
                     </a>
-                    ]
                   </div>
                 )}
-                {isLane1 && (
+                {isUnlocked && (
                   <div
                     style={{
                       fontSize: 12,
@@ -212,7 +291,7 @@ export default function LearnIndexPage() {
                     Start →
                   </div>
                 )}
-              </a>
+              </Wrapper>
             );
           })}
         </div>
@@ -221,37 +300,25 @@ export default function LearnIndexPage() {
       <footer
         style={{
           marginTop: 64,
-          paddingTop: 32,
-          borderTop: "1px solid #222",
+          paddingTop: 24,
+          borderTop: "1px solid #1a1a1d",
           fontSize: 12,
           color: "#666",
           lineHeight: 1.7,
+          textAlign: "center",
         }}
       >
-        <p>
-          Powered by{" "}
-          <strong style={{ color: "#aaa" }}>PETAL</strong>{" "}
-          (Proof–Explanation–Tactic Aligned Lean). All 35 records grounded in
-          the actual Lean source — no fabricated tactics. 13 of 14 files
-          zero-sorry; the 14th carries 2 documented sorries on the
-          InfiniteZerosBarrier Part D.
-        </p>
-        <p style={{ marginTop: 12 }}>
-          Verified by <code style={{ color: "#aaa" }}>lake build</code>, not
-          peer-reviewed. Goal-state strings (<code>goal_before</code> /
-          <code> goal_after</code>) are deliberately omitted in this seed
-          rather than fabricated; a future release with extracted goal states
-          is planned.
-        </p>
-        <p style={{ marginTop: 18, color: "#888" }}>
-          Certification powered by{" "}
+        <p style={{ margin: 0 }}>
+          Powered by <strong style={{ color: "#aaa" }}>PETAL</strong> ·{" "}
+          {dataset.records.length} theorems · CC BY 4.0 ·{" "}
           <a
-            href="https://capcard.ai"
-            style={{ color: "#10b981", fontWeight: 600 }}
+            href="https://huggingface.co/datasets/Monogate/petal-eml"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: ACCENT_CYAN, textDecoration: "none" }}
           >
-            capcard.ai
+            huggingface.co/datasets/Monogate/petal-eml
           </a>
-          {" "}— browse verified playbooks, inherit competence, spawn agent swarms.
         </p>
       </footer>
     </main>
