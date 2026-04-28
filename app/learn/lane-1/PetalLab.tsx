@@ -51,7 +51,12 @@ type MistakesResp = {
 };
 
 const STORAGE_KEY = "petal-lab-v1";
-const DEFAULT_API = "http://localhost:8000";
+// Default to NEXT_PUBLIC_PETAL_API_URL if set in Vercel (which it
+// is in production — points at the deployed Fly.io instance), or
+// to localhost for local dev. Users can still override per-session
+// via the ⚙ settings panel.
+const DEFAULT_API =
+  process.env.NEXT_PUBLIC_PETAL_API_URL ?? "http://localhost:8000";
 
 const ACCENT = "#06B6D4";
 const ACCENT_DIM = "#06B6D440";
