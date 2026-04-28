@@ -243,6 +243,16 @@ export default function LearnIndexPage() {
           rather than fabricated; a future release with extracted goal states
           is planned.
         </p>
+        <p style={{ marginTop: 18, color: "#888" }}>
+          Certification powered by{" "}
+          <a
+            href="https://capcard.ai"
+            style={{ color: "#10b981", fontWeight: 600 }}
+          >
+            capcard.ai
+          </a>
+          {" "}— browse verified playbooks, inherit competence, spawn agent swarms.
+        </p>
       </footer>
     </main>
   );
