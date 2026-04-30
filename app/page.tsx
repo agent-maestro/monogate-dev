@@ -34,7 +34,7 @@ const FLOW_STEPS: { n: string; text: string; sub: string; highlight?: boolean }[
   {
     n: "03",
     text: "Lean output imports MachLib (not Mathlib)",
-    sub: "491 lines of axiomatic foundations. No external library.",
+    sub: "~500 lines of axiomatic foundations. No external library.",
   },
   {
     n: "04",
