@@ -6,7 +6,7 @@ import LearnHubClient from "./LearnHubClient";
 export const metadata: Metadata = {
   title: "Learn — monogate.dev",
   description:
-    "Two learning tracks: EML-lang (write math, compile to 21 targets, no prerequisites beyond algebra) and Lean (formal verification across 6 lanes, powered by the PETAL dataset).",
+    "Two learning tracks: EML-lang (write math, compile to 22 targets, no prerequisites beyond algebra) and Lean (formal verification across 6 lanes, powered by the PETAL dataset).",
 };
 
 export default function LearnHubPage() {

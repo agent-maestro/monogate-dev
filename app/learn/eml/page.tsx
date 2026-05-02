@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "EML-lang in 30 Minutes — monogate.dev/learn/eml",
   description:
     "Six lessons, five minutes each. By the end you'll have written your "
-    + "own equation, compiled it to 21 targets including FPGA hardware, "
+    + "own equation, compiled it to 22 targets including FPGA hardware, "
     + "added formal verification, and read the chain-order profile.",
 };
 
@@ -272,7 +272,7 @@ export default function ForgeTutorialPage() {
           }}
         >
           Six lessons, five minutes each. By the end you&apos;ll have written
-          your own equation, compiled it to 21 targets including FPGA
+          your own equation, compiled it to 22 targets including FPGA
           hardware, added formal verification, and read the chain-order
           profile that predicts numerical behaviour.
         </p>
@@ -324,7 +324,7 @@ export default function ForgeTutorialPage() {
           </li>
           <li>
             <a href="#l1" style={{ color: ACCENT_GOLD }}>
-              Compile it to 21 targets (C, Rust, Verilog, Lean, …)
+              Compile it to 22 targets (C, Rust, Verilog, Lean, …)
             </a>
           </li>
           <li>
@@ -900,20 +900,20 @@ fn realtime_spring(x: Real, v: Real) -> Real {
   4. Built a PID controller
   5. Added formal verification (@verify)
   6. Targeted FPGA hardware (@target)
-  7. Compiled YOUR OWN equation to 21 targets
+  7. Compiled YOUR OWN equation to 22 targets
 
 You can now:
   - Write any equation in EML-lang
   - Compile it to C, C++, Rust, Verilog, SystemVerilog,
     Lean, Coq, Isabelle, Ada/SPARK, MATLAB, ROS2,
-    Java, Kotlin, Go, AUTOSAR, AADL, and 5 more
+    Java, Kotlin, Go, AUTOSAR, AADL, Solidity, and 5 more
   - Read the structural profile (chain order, drift risk)
   - Add formal proofs to safety-critical functions
   - Deploy to FPGA hardware`}</Code>
 
         <StrongLine>
-          One equation. Twenty-one targets. Verified. Write math. Get
-          silicon.
+          One equation. Twenty-two targets. Verified. Write math. Get
+          silicon — and smart contracts.
         </StrongLine>
       </Lesson>
 
