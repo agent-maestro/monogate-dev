@@ -9,10 +9,12 @@ const TEXT = "#d4d4d4";
 const MUTED = "#6a6e85";
 
 // Six lessons in the EML 30-min course. Order + titles must mirror
-// /learn/eml/page.tsx so the lesson list on the card matches what the
-// reader sees when they click through. Time estimates here are
-// intentionally redundant with the badge but help set expectations
-// inline.
+// /learn/eml/intro/page.tsx so the lesson list on the card matches
+// what the reader sees when they click through. Time estimates here
+// are intentionally redundant with the badge but help set
+// expectations inline. (The /learn/eml/ root is now a 4-level
+// curriculum hub; the card jumps straight into Level 1 to preserve
+// the one-click "start learning" flow.)
 const EML_LESSONS: { n: number; title: string; minutes: number }[] = [
   { n: 1, title: "Your First Equation", minutes: 5 },
   { n: 2, title: "Constants and Real Math", minutes: 5 },
@@ -297,9 +299,9 @@ export default function LearnHubClient({
         <Card
           accent={ACCENT_GOLD}
           title="EML-lang in 30 Minutes"
-          subtitle="Write math. Compile to 22 targets. No prerequisites beyond algebra."
+          subtitle="Write math. Compile to 32 targets. No prerequisites beyond algebra. Level 2+ available after."
           badge="6 lessons · 30 minutes · beginner"
-          href="/learn/eml"
+          href="/learn/eml/intro"
           buttonLabel="Start Learning →"
           progressDone={emlDone}
           progressTotal={EML_LESSONS.length}
