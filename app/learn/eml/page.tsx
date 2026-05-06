@@ -116,7 +116,7 @@ const FORGE: Level = {
   blurb:
     "How Forge actually works: the parser, the Pfaffian profiler, the "
     + "optimizer pipeline (inline / CSE / SuperBEST / shake-imports), the "
-    + "32 backends, the FPGA allocator, and the Lean theorem-shape generator.",
+    + "33 backends, the FPGA allocator, and the Lean theorem-shape generator.",
   accent: ACCENT_PURPLE,
 };
 

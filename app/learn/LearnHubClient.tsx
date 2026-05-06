@@ -299,7 +299,7 @@ export default function LearnHubClient({
         <Card
           accent={ACCENT_GOLD}
           title="EML-lang in 30 Minutes"
-          subtitle="Write math. Compile to 32 targets. No prerequisites beyond algebra. Level 2+ available after."
+          subtitle="Write math. Compile to 33 targets. No prerequisites beyond algebra. Level 2+ available after."
           badge="6 lessons · 30 minutes · beginner"
           href="/learn/eml/intro"
           buttonLabel="Start Learning →"
