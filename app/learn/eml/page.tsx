@@ -39,7 +39,7 @@ const LEVELS: Level[] = [
     time: "30 min · 6 lessons",
     prereq: null,
     blurb:
-      "Write your first equation, compile it to 22 targets (Python, Rust, "
+      "Write your first equation, compile it to 36 targets (Python, Rust, "
       + "C, Lean, Verilog, …), add a verification contract, and read the "
       + "chain-order profile. No prerequisites beyond high-school algebra.",
     accent: ACCENT_GOLD,
@@ -116,7 +116,7 @@ const FORGE: Level = {
   blurb:
     "How Forge actually works: the parser, the Pfaffian profiler, the "
     + "optimizer pipeline (inline / CSE / SuperBEST / shake-imports), the "
-    + "33 backends, the FPGA allocator, and the Lean theorem-shape generator.",
+    + "36 targets, the FPGA allocator, and the Lean theorem-shape generator.",
   accent: ACCENT_PURPLE,
 };
 

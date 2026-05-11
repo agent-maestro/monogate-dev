@@ -107,7 +107,7 @@ eml-compile climate_control.eml greenhouse.eml --target all -o ./build
 # build/climate_control.c   + build/greenhouse.c
 # build/climate_control.rs  + build/greenhouse.rs
 # build/climate_control.lean + build/greenhouse.lean
-# ... all 33 targets`,
+# ... all 36 targets`,
         explanation: [],
       },
     ],
