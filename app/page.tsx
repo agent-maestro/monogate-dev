@@ -28,8 +28,8 @@ const FLOW_STEPS: { n: string; text: string; sub: string; highlight?: boolean }[
   },
   {
     n: "02",
-    text: "Forge compiles to 9 targets",
-    sub: "C, Rust, Python, LLVM, wasm, Lean, Verilog, VHDL, Chisel.",
+    text: "Forge compiles to 36 targets",
+    sub: "13 Free targets plus 23 Pro targets, from Python/C/Rust to HDL, EDA, and proof artifacts.",
   },
   {
     n: "03",
@@ -56,7 +56,7 @@ const TOOLKIT: { cmd: string; tagline: string; color: string }[] = [
   },
   {
     cmd: "pip install monogate-forge",
-    tagline: "Compile to 9 targets — C, Rust, Verilog, Lean, and more.",
+    tagline: "Compile to 36 targets — 13 Free, 23 Pro.",
     color: C.orange,
   },
   {
