@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { lessons, type Lesson } from "./lessons";
 
 const ACCENT = "#E8A020";
@@ -18,6 +18,18 @@ type CheckResult = {
   pass: boolean;
   message: string;
 };
+
+type CodeByLesson = Record<string, string>;
+
+type StoredWorkspace = {
+  version: 1;
+  lessonIndex: number;
+  codeByLesson: CodeByLesson;
+  checksPassedByLesson: Record<string, number>;
+  updatedAt: string;
+};
+
+const STORAGE_KEY = "monogate.eml.interactive.workspace.v1";
 
 const restrictedTerms = [
   "p" + "roved",
@@ -195,27 +207,130 @@ function ResultPill({ pass }: { pass: boolean }) {
 }
 
 export default function InteractiveCourseClient() {
-  const [lessonIndex, setLessonIndex] = useState(0);
-  const [codeByLesson, setCodeByLesson] = useState(() =>
-    Object.fromEntries(lessons.map((lesson) => [lesson.id, lesson.starterCode])),
+  const initialCodeByLesson = useMemo(
+    () => Object.fromEntries(lessons.map((item) => [item.id, item.starterCode])) as CodeByLesson,
+    [],
   );
+  const [hydrated, setHydrated] = useState(false);
+  const [lessonIndex, setLessonIndex] = useState(0);
+  const [codeByLesson, setCodeByLesson] = useState<CodeByLesson>(initialCodeByLesson);
+  const [copyStatus, setCopyStatus] = useState("");
   const [target, setTarget] = useState("python");
   const lesson = lessons[lessonIndex];
   const code = codeByLesson[lesson.id] ?? lesson.starterCode;
-  const results = useMemo(() => runChecks(lesson, code), [lesson, code]);
+  const resultsByLesson = useMemo(() => (
+    Object.fromEntries(
+      lessons.map((item) => [item.id, runChecks(item, codeByLesson[item.id] ?? item.starterCode)]),
+    ) as Record<string, CheckResult[]>
+  ), [codeByLesson]);
+  const checksPassedByLesson = useMemo(() => (
+    Object.fromEntries(
+      lessons.map((item) => [
+        item.id,
+        (resultsByLesson[item.id] ?? []).filter((result) => result.pass).length,
+      ]),
+    ) as Record<string, number>
+  ), [resultsByLesson]);
+  const results = resultsByLesson[lesson.id] ?? runChecks(lesson, code);
   const passed = results.filter((result) => result.pass).length;
   const allPassed = passed === results.length;
 
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        setHydrated(true);
+        return;
+      }
+
+      const parsed = JSON.parse(stored) as Partial<StoredWorkspace>;
+      if (parsed.version !== 1) {
+        setHydrated(true);
+        return;
+      }
+
+      if (parsed.codeByLesson && typeof parsed.codeByLesson === "object") {
+        setCodeByLesson({ ...initialCodeByLesson, ...parsed.codeByLesson });
+      }
+
+      if (typeof parsed.lessonIndex === "number" && parsed.lessonIndex >= 0 && parsed.lessonIndex < lessons.length) {
+        setLessonIndex(parsed.lessonIndex);
+      }
+    } catch {
+      // Ignore malformed local browser data; the starter workspace is still usable.
+    } finally {
+      setHydrated(true);
+    }
+  }, [initialCodeByLesson]);
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
+
+    const workspace: StoredWorkspace = {
+      version: 1,
+      lessonIndex,
+      codeByLesson,
+      checksPassedByLesson,
+      updatedAt: new Date().toISOString(),
+    };
+
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(workspace));
+  }, [checksPassedByLesson, codeByLesson, hydrated, lessonIndex]);
+
   function setCode(next: string) {
     setCodeByLesson((current) => ({ ...current, [lesson.id]: next }));
+    setCopyStatus("");
   }
 
   function selectLesson(index: number) {
     setLessonIndex(index);
+    setCopyStatus("");
   }
 
   function resetLesson() {
     setCode(lesson.starterCode);
+  }
+
+  async function copyAnswer() {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopyStatus("Copied current answer.");
+    } catch {
+      setCopyStatus("Copy failed; select the editor text manually.");
+    }
+  }
+
+  function exportAnswers() {
+    const timestamp = new Date().toISOString();
+    const payload = {
+      exported_at: timestamp,
+      storage: "local browser storage only",
+      lessons: lessons.map((item) => {
+        const answer = codeByLesson[item.id] ?? item.starterCode;
+        const checks = runChecks(item, answer);
+        return {
+          lesson_id: item.id,
+          title: item.title,
+          timestamp,
+          answer_text: answer,
+          checks,
+          checks_passed: checks.filter((result) => result.pass).length,
+          checks_total: checks.length,
+        };
+      }),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `eml-course-answers-${timestamp.replace(/[:.]/g, "-")}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    setCopyStatus("Exported answers JSON.");
   }
 
   const targetPreview = target === "python"
@@ -258,6 +373,9 @@ export default function InteractiveCourseClient() {
         </p>
         <p style={{ color: MUTED, maxWidth: 900, lineHeight: 1.65, marginTop: 10, fontSize: 13 }}>
           Live Forge compile is planned for a sandboxed route; this MVP uses local checks and sample outputs.
+        </p>
+        <p style={{ color: MUTED, maxWidth: 900, lineHeight: 1.65, marginTop: 6, fontSize: 13 }}>
+          Progress is saved in local browser storage only. Nothing is sent to a server.
         </p>
         <div
           style={{
@@ -332,6 +450,9 @@ export default function InteractiveCourseClient() {
                   {(index + 1).toString().padStart(2, "0")}
                 </div>
                 <div style={{ fontSize: 13, lineHeight: 1.4 }}>{item.title}</div>
+                <div style={{ color: MUTED, fontSize: 11, marginTop: 5 }}>
+                  {checksPassedByLesson[item.id] ?? 0}/{resultsByLesson[item.id]?.length ?? item.checks.length} checks
+                </div>
               </button>
             ))}
           </div>
@@ -419,6 +540,9 @@ export default function InteractiveCourseClient() {
                 Editor
               </div>
               <div style={{ color: "#fff", fontSize: 16, marginTop: 2 }}>{lesson.title}</div>
+              <div style={{ color: MUTED, fontSize: 12, marginTop: 4 }}>
+                Saved locally {hydrated ? "in this browser" : "after page load"}
+              </div>
             </div>
             <button
               type="button"
@@ -432,7 +556,7 @@ export default function InteractiveCourseClient() {
                 padding: "7px 10px",
               }}
             >
-              Reset
+              Reset Lesson
             </button>
           </div>
           <textarea
@@ -466,6 +590,7 @@ export default function InteractiveCourseClient() {
           >
             <button
               type="button"
+              onClick={() => setCopyStatus(`${passed}/${results.length} checks evaluated.`)}
               style={{
                 minHeight: 38,
                 border: `1px solid rgba(74,222,128,0.45)`,
@@ -476,6 +601,34 @@ export default function InteractiveCourseClient() {
               }}
             >
               Run checks
+            </button>
+            <button
+              type="button"
+              onClick={copyAnswer}
+              style={{
+                minHeight: 38,
+                border: `1px solid ${BORDER}`,
+                borderRadius: 5,
+                background: SURFACE,
+                color: TEXT,
+                padding: "8px 12px",
+              }}
+            >
+              Copy Answer
+            </button>
+            <button
+              type="button"
+              onClick={exportAnswers}
+              style={{
+                minHeight: 38,
+                border: `1px solid ${BORDER}`,
+                borderRadius: 5,
+                background: SURFACE,
+                color: TEXT,
+                padding: "8px 12px",
+              }}
+            >
+              Export Answers
             </button>
             <button
               type="button"
@@ -510,6 +663,9 @@ export default function InteractiveCourseClient() {
                 <option value="lean">Lean</option>
               </select>
             </label>
+            {copyStatus ? (
+              <span style={{ color: BLUE, fontSize: 12 }}>{copyStatus}</span>
+            ) : null}
           </div>
         </section>
 
