@@ -45,12 +45,17 @@ function runChecks(lesson: Lesson, code: string): CheckResult[] {
       const hasModule = /\bmodule\s+[a-zA-Z_][a-zA-Z0-9_]*\s*;/.test(code);
       const hasFn = /\bfn\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\(/.test(code);
       const staleBlock = /\bkernel\s*\{/.test(code);
+      const fixes = [
+        !hasModule ? "add `module name;` near the top" : null,
+        !hasFn ? "add a `fn name(...) -> Type { ... }` declaration" : null,
+        staleBlock ? "remove the older `kernel { ... }` block shape" : null,
+      ].filter(Boolean);
       return {
         label: check.label,
         pass: hasModule && hasFn && !staleBlock,
         message: hasModule && hasFn && !staleBlock
           ? "Current module / fn structure found."
-          : "Use current Forge syntax: module name; then fn name(...). Avoid older kernel block syntax.",
+          : `Fix current Forge syntax: ${fixes.join("; ")}.`,
       };
     }
 
@@ -60,24 +65,33 @@ function runChecks(lesson: Lesson, code: string): CheckResult[] {
       return {
         label: check.label,
         pass,
-        message: pass ? `Found: ${terms.join(", ")}` : `Missing one or more: ${terms.join(", ")}`,
+        message: pass
+          ? `Found: ${terms.join(", ")}`
+          : `Add these lesson markers: ${terms.filter((term) => !code.toLowerCase().includes(term.toLowerCase())).join(", ")}.`,
       };
     }
 
     if (check.kind === "guardContract") {
       const terms = ["requested_output", "safe_output", "safety_margin", "bottleneck", "guard_action"];
       const pass = includesAll(code, terms);
+      const missing = terms.filter((term) => !code.toLowerCase().includes(term));
       return {
         label: check.label,
         pass,
         message: pass
           ? "Guard fields are present."
-          : "Include requested_output, safe_output, safety_margin, bottleneck, and guard_action.",
+          : `Add the missing guard fields: ${missing.join(", ")}.`,
       };
     }
 
     if (check.kind === "findingsDiscipline") {
       const lower = code.toLowerCase();
+      const missing = [
+        !lower.includes("observation") ? "OBSERVATION tier" : null,
+        !lower.includes("across this test set") ? "the phrase `across this test set`" : null,
+        !lower.includes("limitations") ? "limitations section" : null,
+        !lower.includes("reproduce") ? "reproduce command" : null,
+      ].filter(Boolean);
       const pass = lower.includes("observation")
         && lower.includes("across this test set")
         && lower.includes("limitations")
@@ -87,13 +101,22 @@ function runChecks(lesson: Lesson, code: string): CheckResult[] {
         pass,
         message: pass
           ? "Observation-tier structure is present."
-          : "Include OBSERVATION, across this test set, limitations, and a reproduce command.",
+          : `Tighten the report with: ${missing.join(", ")}.`,
       };
     }
 
     if (check.kind === "auditDiscipline") {
       const lower = code.toLowerCase();
       const hasDecision = lower.includes("go") || lower.includes("no-go");
+      const missing = [
+        !hasDecision ? "an explicit GO or NO-GO decision" : null,
+        !lower.includes("dirty") ? "dirty-file classification" : null,
+        !lower.includes("token") ? "token handling" : null,
+        !lower.includes("approval") ? "approval boundary" : null,
+        !lower.includes("do not publish") ? "`do not publish` boundary" : null,
+        !lower.includes("do not push") ? "`do not push` boundary" : null,
+        !lower.includes("do not deploy") ? "`do not deploy` boundary" : null,
+      ].filter(Boolean);
       const pass = hasDecision
         && lower.includes("dirty")
         && lower.includes("token")
@@ -106,7 +129,7 @@ function runChecks(lesson: Lesson, code: string): CheckResult[] {
         pass,
         message: pass
           ? "Release boundary and risk classification are present."
-          : "Include GO/NO-GO, dirty-file classification, token handling, approval boundary, and no publish/push/deploy wording.",
+          : `Add release discipline markers: ${missing.join(", ")}.`,
       };
     }
 
@@ -116,12 +139,20 @@ function runChecks(lesson: Lesson, code: string): CheckResult[] {
       return {
         label: check.label,
         pass: !blocked,
-        message: blocked ? "Remove destructive or unsafe hardware framing." : "No destructive hardware framing found.",
+        message: blocked
+          ? `Remove unsafe hardware framing around "${blocked}" and keep the lesson at contract level.`
+          : "No destructive hardware framing found.",
       };
     }
 
     if (check.kind === "roundtripDiscipline") {
       const lower = code.toLowerCase();
+      const missing = [
+        !lower.includes("supported source") ? "supported source" : null,
+        !lower.includes("efrog") ? "eFrog" : null,
+        !lower.includes("forge-compatible eml") ? "Forge-compatible EML" : null,
+        !lower.includes("target") ? "target flow" : null,
+      ].filter(Boolean);
       const pass = lower.includes("supported source")
         && lower.includes("efrog")
         && lower.includes("forge-compatible eml")
@@ -131,7 +162,7 @@ function runChecks(lesson: Lesson, code: string): CheckResult[] {
         pass,
         message: pass
           ? "Supported-source to eFrog to EML to target flow is present."
-          : "Name supported source, eFrog, Forge-compatible EML, and target flow.",
+          : `Name the missing roundtrip pieces: ${missing.join(", ")}.`,
       };
     }
 
@@ -173,6 +204,7 @@ export default function InteractiveCourseClient() {
   const code = codeByLesson[lesson.id] ?? lesson.starterCode;
   const results = useMemo(() => runChecks(lesson, code), [lesson, code]);
   const passed = results.filter((result) => result.pass).length;
+  const allPassed = passed === results.length;
 
   function setCode(next: string) {
     setCodeByLesson((current) => ({ ...current, [lesson.id]: next }));
@@ -227,6 +259,38 @@ export default function InteractiveCourseClient() {
         <p style={{ color: MUTED, maxWidth: 900, lineHeight: 1.65, marginTop: 10, fontSize: 13 }}>
           Live Forge compile is planned for a sandboxed route; this MVP uses local checks and sample outputs.
         </p>
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            flexWrap: "wrap",
+            marginTop: 16,
+            color: "#cbd2df",
+            fontSize: 13,
+          }}
+        >
+          <span
+            style={{
+              border: `1px solid ${BORDER}`,
+              borderRadius: 999,
+              background: SURFACE_2,
+              padding: "6px 10px",
+            }}
+          >
+            Lesson {lessonIndex + 1} of {lessons.length}
+          </span>
+          <span
+            style={{
+              border: `1px solid ${allPassed ? "rgba(74,222,128,0.35)" : BORDER}`,
+              borderRadius: 999,
+              background: allPassed ? "rgba(74,222,128,0.08)" : SURFACE_2,
+              color: allPassed ? GREEN : "#cbd2df",
+              padding: "6px 10px",
+            }}
+          >
+            {passed}/{results.length} checks passing
+          </span>
+        </div>
       </header>
 
       <section
@@ -277,6 +341,33 @@ export default function InteractiveCourseClient() {
               Goal
             </div>
             <p style={{ marginTop: 8, fontSize: 13, lineHeight: 1.6 }}>{lesson.objective}</p>
+            <p style={{ marginTop: 9, color: "#aeb5c4", fontSize: 13, lineHeight: 1.65 }}>
+              {lesson.explanation}
+            </p>
+          </div>
+
+          <div
+            style={{
+              border: "1px solid rgba(232,160,32,0.28)",
+              borderRadius: 6,
+              background: "rgba(232,160,32,0.06)",
+              marginTop: 16,
+              padding: 12,
+            }}
+          >
+            <div style={{ color: ACCENT, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+              Why this matters
+            </div>
+            <p style={{ marginTop: 8, fontSize: 13, lineHeight: 1.6 }}>{lesson.whyThisMatters}</p>
+          </div>
+
+          <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: 16, paddingTop: 14 }}>
+            <div style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+              What you are learning
+            </div>
+            <ul style={{ paddingLeft: 18, marginTop: 8, color: "#bfc4d2", fontSize: 13, lineHeight: 1.55 }}>
+              {lesson.whatYouAreLearning.map((item) => <li key={item}>{item}</li>)}
+            </ul>
           </div>
 
           <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: 16, paddingTop: 14 }}>
@@ -286,6 +377,22 @@ export default function InteractiveCourseClient() {
             <ul style={{ paddingLeft: 18, marginTop: 8, color: "#bfc4d2", fontSize: 13, lineHeight: 1.55 }}>
               {lesson.expectedConcepts.map((concept) => <li key={concept}>{concept}</li>)}
             </ul>
+          </div>
+
+          <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: 16, paddingTop: 14 }}>
+            <div style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+              Success criteria
+            </div>
+            <ul style={{ paddingLeft: 18, marginTop: 8, color: "#bfc4d2", fontSize: 13, lineHeight: 1.55 }}>
+              {lesson.successCriteria.map((criterion) => <li key={criterion}>{criterion}</li>)}
+            </ul>
+          </div>
+
+          <div style={{ borderTop: `1px solid ${BORDER}`, marginTop: 16, paddingTop: 14 }}>
+            <div style={{ color: MUTED, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+              Common mistake
+            </div>
+            <p style={{ marginTop: 8, color: "#c8cedb", fontSize: 13, lineHeight: 1.6 }}>{lesson.commonMistake}</p>
           </div>
         </aside>
 
