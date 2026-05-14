@@ -667,6 +667,20 @@ export default function InteractiveCourseClient() {
               <span style={{ color: BLUE, fontSize: 12 }}>{copyStatus}</span>
             ) : null}
           </div>
+          <div
+            style={{
+              borderTop: `1px solid ${BORDER}`,
+              padding: "11px 12px",
+              color: MUTED,
+              fontSize: 12,
+              lineHeight: 1.55,
+              background: SURFACE,
+            }}
+          >
+            Exported answers can be checked locally from the repo with{" "}
+            <code>python tools/eml_course/check_exported_answers.py &lt;exported_answers.json&gt;</code>.
+            This web page does not run Forge or execute code server-side.
+          </div>
         </section>
 
         <aside style={{ display: "grid", gap: 14 }}>
