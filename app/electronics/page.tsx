@@ -84,8 +84,9 @@ export default function ElectronicsPage() {
         <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.8, maxWidth: 610, marginBottom: 18 }}>
           Monogate Electronics is an education track for building small
           sensor-to-output loops that are traceable, replayable, and safe to
-          reason about. The first course uses ESP32-class boards, FPGA-style
-          switch streams, JSONL traces, and dashboard replay.
+          reason about. The curriculum treats electronics projects as starter
+          kernels: compact contracts with inputs, guards, physical outputs,
+          traces, and evidence packets.
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {["low voltage", "guard telemetry", "trace replay", "starter kernels"].map((tag) => (
@@ -141,12 +142,51 @@ export default function ElectronicsPage() {
       </section>
 
       <section style={{ marginBottom: 46 }}>
+        <Label color={C.blue}>course 002</Label>
+        <h2 style={{ color: C.text, fontSize: 20, marginBottom: 8 }}>Soundfield Kernels</h2>
+        <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.75, marginBottom: 16 }}>
+          A sound-reactive 64x64 LED matrix project. Learners start with
+          simulated microphone features, render replayable matrix frames, then
+          move toward INMP441 input and HUB75 panel hardware with explicit
+          brightness and lit-pixel guards.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 9 }}>
+          {["I2S microphone", "64x64 RGB matrix", "feature traces", "brightness guard"].map((item) => (
+            <div key={item} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 13, color: C.text, fontSize: 12 }}>
+              {item}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ marginBottom: 46 }}>
+        <Label color={C.orange}>course 003</Label>
+        <h2 style={{ color: C.text, fontSize: 20, marginBottom: 8 }}>Environmental Guard Node</h2>
+        <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.75, marginBottom: 16 }}>
+          A BME280 sensor and SSD1306 OLED become a small environmental node:
+          temperature, humidity, pressure, stale-sensor behavior, local display
+          state, and guarded LED/buzzer alerts.
+        </p>
+        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 18 }}>
+          <pre style={{ background: "#090b11", border: `1px solid ${C.border2}`, borderRadius: 6, padding: 14, color: C.green, fontSize: 11, overflowX: "auto", margin: 0 }}>
+{`BME280 reading
+-> environment_guard_v0
+-> OLED state + guarded alert
+-> JSONL trace
+-> replay summary
+-> evidence packet`}
+          </pre>
+        </div>
+      </section>
+
+      <section style={{ marginBottom: 46 }}>
         <Label>starter kernel</Label>
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 18 }}>
-          <div style={{ color: C.text, fontSize: 15, marginBottom: 8 }}>threshold_reflex_v0</div>
+          <div style={{ color: C.text, fontSize: 15, marginBottom: 8 }}>starter kernel set</div>
           <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.75, marginBottom: 12 }}>
-            A compact teaching kernel for thresholding, rate limiting, guard
-            clamping, and evidence-friendly telemetry.
+            Compact teaching kernels for thresholding, rate limiting, mapping,
+            stale-sensor handling, guard clamping, and evidence-friendly
+            telemetry.
           </p>
           <pre style={{ background: "#090b11", border: `1px solid ${C.border2}`, borderRadius: 6, padding: 14, color: C.green, fontSize: 11, overflowX: "auto", marginBottom: 12 }}>
 {`centered = (pot_raw - 0.55) / 0.10
@@ -155,7 +195,7 @@ requested = rate_limit(previous, target, max_step=0.20)
 safe = clamp(requested, 0.0, 0.85)`}
           </pre>
           <div style={{ display: "grid", gap: 6 }}>
-            {KERNEL_FILES.map((file) => (
+            {[...KERNEL_FILES, "kernels/soundfield_energy_v0/", "kernels/environment_guard_v0/"].map((file) => (
               <code key={file} style={{ color: C.blue, fontSize: 11 }}>
                 {file}
               </code>
