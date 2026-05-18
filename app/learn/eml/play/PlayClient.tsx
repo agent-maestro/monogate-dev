@@ -135,20 +135,29 @@ function codeBlock(text: string) {
 export default function PlayClient() {
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
+  const [maxSolved, setMaxSolved] = useState(0);
   const level = LEVELS[index];
   const correct = picked === level.answer;
-  const solved = useMemo(
-    () => LEVELS.slice(0, index).length + (correct ? 1 : 0),
-    [index, correct]
-  );
+  const solved = Math.max(maxSolved, correct ? index + 1 : 0);
+  const unlocked = solved === LEVELS.length;
+  const progress = useMemo(() => solved / LEVELS.length, [solved]);
 
   function choose(choice: string) {
     setPicked(choice);
+    if (choice === level.answer) {
+      setMaxSolved((value) => Math.max(value, index + 1));
+    }
   }
 
   function next() {
     setPicked(null);
     setIndex((value) => Math.min(LEVELS.length - 1, value + 1));
+  }
+
+  function reset() {
+    setIndex(0);
+    setPicked(null);
+    setMaxSolved(0);
   }
 
   return (
@@ -178,6 +187,22 @@ export default function PlayClient() {
             smooth an output, satisfy a guard, then turn the result into a
             starter electronics kernel.
           </p>
+          <div style={{ marginTop: 18, maxWidth: 520 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", color: C.muted, fontSize: 11, marginBottom: 6 }}>
+              <span>contract meter</span>
+              <span>{Math.round(progress * 100)}%</span>
+            </div>
+            <div style={{ height: 8, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 999, overflow: "hidden" }}>
+              <div
+                style={{
+                  height: "100%",
+                  width: `${progress * 100}%`,
+                  background: `linear-gradient(90deg, ${C.green}, ${C.blue})`,
+                  transition: "width 180ms ease",
+                }}
+              />
+            </div>
+          </div>
         </section>
 
         <section
@@ -238,7 +263,9 @@ export default function PlayClient() {
             </div>
 
             <div style={{ minHeight: 44, color: correct ? C.green : picked ? C.red : C.muted, fontSize: 13, lineHeight: 1.55 }}>
-              {correct
+              {unlocked && correct
+                ? "Kernel unlocked. You can now carry this pattern into the electronics courses."
+                : correct
                 ? "Contract satisfied. The kernel is ready to inspect."
                 : picked
                   ? "Not quite. The hardware wants a bounded, replayable decision."
@@ -261,18 +288,32 @@ export default function PlayClient() {
               >
                 Next level
               </button>
-              <a
-                href="/electronics"
+              <button
+                type="button"
+                onClick={reset}
                 style={{
                   border: `1px solid ${C.border2}`,
                   borderRadius: 5,
-                  color: C.blue,
+                  background: C.surface2,
+                  color: C.muted,
+                  padding: "9px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                Reset run
+              </button>
+              <a
+                href="/electronics"
+                style={{
+                  border: `1px solid ${unlocked ? C.green : C.border2}`,
+                  borderRadius: 5,
+                  color: unlocked ? C.green : C.blue,
                   padding: "9px 12px",
                   textDecoration: "none",
                   fontSize: 13,
                 }}
               >
-                Electronics courses
+                {unlocked ? "Unlock electronics kernels" : "Electronics courses"}
               </a>
             </div>
           </div>
@@ -280,7 +321,7 @@ export default function PlayClient() {
           <aside style={{ display: "grid", gap: 14 }}>
             <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 16 }}>
               <div style={{ color: C.gold, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>
-                kernel view
+                {unlocked ? "unlocked kernel" : "kernel view"}
               </div>
               {codeBlock(level.kernel)}
             </div>
@@ -290,6 +331,17 @@ export default function PlayClient() {
                 why it matters
               </div>
               <p style={{ color: C.text, fontSize: 13, lineHeight: 1.7, margin: 0 }}>{level.electronics}</p>
+            </div>
+
+            <div style={{ background: unlocked ? "rgba(74,222,128,0.07)" : C.surface, border: `1px solid ${unlocked ? "rgba(74,222,128,0.28)" : C.border}`, borderRadius: 8, padding: 16 }}>
+              <div style={{ color: unlocked ? C.green : C.muted, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 10 }}>
+                next build
+              </div>
+              <p style={{ color: C.text, fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                {unlocked
+                  ? "Take this kernel shape into Monogate Electronics: LED clamp, soundfield matrix, or environmental guard node."
+                  : "Finish the puzzle run to unlock the electronics bridge."}
+              </p>
             </div>
           </aside>
         </section>
