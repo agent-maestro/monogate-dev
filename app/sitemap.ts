@@ -8,6 +8,7 @@ const STATIC_PATHS: Array<{ path: string; priority: number; changefreq: Metadata
   { path: "/challenge/leaderboard",       priority: 0.8, changefreq: "weekly" },
   { path: "/challenge/search",            priority: 0.7, changefreq: "monthly" },
   { path: "/lab",                         priority: 0.9, changefreq: "weekly" },
+  { path: "/electronics",                 priority: 0.8, changefreq: "monthly" },
   { path: "/lab/optimizer",               priority: 0.8, changefreq: "monthly" },
   { path: "/lab/em-cost",                 priority: 0.8, changefreq: "monthly" },
   { path: "/electronics",                 priority: 0.9, changefreq: "weekly" },
