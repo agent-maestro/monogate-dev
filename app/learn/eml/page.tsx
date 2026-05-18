@@ -32,6 +32,19 @@ type Level = {
 
 const LEVELS: Level[] = [
   {
+    number: "00",
+    title: "Play EML",
+    href: "/learn/eml/play",
+    status: "live",
+    time: "10 min - 5 puzzles",
+    prereq: null,
+    blurb:
+      "Learn the language by solving tiny control puzzles: clamp a signal, "
+      + "cross a threshold, smooth an output, satisfy a guard, and turn the "
+      + "solution into a starter electronics kernel.",
+    accent: ACCENT_GREEN,
+  },
+  {
     number: "01",
     title: "EML in 30 Minutes",
     href: "/learn/eml/intro",
@@ -369,10 +382,11 @@ export default function LearnEMLHub() {
             maxWidth: 660,
           }}
         >
-          A four-level ladder. Start at Level 1 with no prerequisites; finish
-          Level 2 and you can run multi-module verified systems on real
-          hardware. Pick a Level 3 track for your domain. Open the Forge
-          internals when you want to extend the compiler itself.
+          A playable ladder into mathematical programming. Start with tiny
+          control puzzles, continue into Level 1 with no prerequisites, and
+          finish Level 2 ready to reason about multi-module systems on real
+          hardware. The electronics path turns EML into starter kernels for
+          sensors, guards, outputs, traces, and evidence packets.
         </p>
         <p
           style={{
@@ -519,7 +533,11 @@ export default function LearnEMLHub() {
           >
             <li>
               <strong style={{ color: "#fff" }}>Never seen EML before?</strong>{" "}
-              Start at{" "}
+              Start by playing{" "}
+              <a href="/learn/eml/play" style={{ color: ACCENT_GOLD }}>
+                Level 0
+              </a>
+              , then move to{" "}
               <a href="/learn/eml/intro" style={{ color: ACCENT_GOLD }}>
                 Level 1
               </a>
@@ -532,6 +550,17 @@ export default function LearnEMLHub() {
                 Level 2
               </a>{" "}
               for module composition, contracts, and CI.
+            </li>
+            <li>
+              <strong style={{ color: "#fff" }}>
+                Want to build hardware?
+              </strong>{" "}
+              Finish Level 0, then jump to{" "}
+              <a href="/electronics" style={{ color: ACCENT_GOLD }}>
+                Monogate Electronics
+              </a>{" "}
+              to turn EML-style kernels into LED, sensor, display, and matrix
+              projects.
             </li>
             <li>
               <strong style={{ color: "#fff" }}>
