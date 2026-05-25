@@ -237,8 +237,8 @@
           {
             "step": 1,
             "tactic": "rw [Real.cosh_sq, Real.sinh_sq]",
-            "explanation": "Rewrite using two Mathlib lemmas: `Real.cosh_sq` expresses `cosh^2 x` in terms of `cosh (2x)` (or equivalent expansion), and `Real.sinh_sq` does the same for `sinh^2 x`. After the rewrite both sides are pure exponential arithmetic.",
-            "tactic_rationale": "The shortest path to the identity is to expand both squared hyperbolic functions to their `(exp x ± exp(-x))/2` form. Mathlib already has the expansion lemmas; `rw` substitutes them in.",
+            "explanation": "Rewrite using two named hyperbolic-square identities: `Real.cosh_sq` expresses `cosh^2 x` in terms of `cosh (2x)` (or equivalent expansion), and `Real.sinh_sq` does the same for `sinh^2 x`. After the rewrite both sides are pure exponential arithmetic.",
+            "tactic_rationale": "The shortest path to the identity is to expand both squared hyperbolic functions to their `(exp x ± exp(-x))/2` form. The legacy Lean source has those names available; MachLib-facing curriculum should treat them as reference targets until the zero-Mathlib port lands.",
             "common_mistakes": [
               "Trying to expand only `cosh_sq` and leaving `sinh^2` — `ring` later cannot reconcile the asymmetric form.",
               "Using `simp [Real.cosh_sq, Real.sinh_sq]` works too but `simp` may rewrite past what we want; `rw` is more deliberate."
