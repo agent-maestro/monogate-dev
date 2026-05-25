@@ -4,6 +4,8 @@ import LandingPage from "./components/LandingPage.jsx";
 import AttractorViz from "./components/AttractorViz.jsx";
 import BenchmarkTab from "./components/BenchmarkTab.jsx";
 import ExprTreeTab from "./components/ExprTreeTab.jsx";
+import EMLIRInspectorTab from "./components/EMLIRInspectorTab.jsx";
+import ComplexFieldTab from "./components/ComplexFieldTab.jsx";
 import { op, exp, ln, E, ZERO, sub, neg, add, mul, div, pow, recip,
          BEST, sin_best, cos_best, pow_exl, div_edl, ln_exl } from "./eml.js";
 const deml = (x, y) => Math.exp(-x) - Math.log(y);
@@ -315,7 +317,7 @@ export default function ExplorerApp() {
                 {label}
               </a>
             ))}
-            {["calc","verify","table","tree","best","sandbox","deml","attractor","benchmarks"].map(t => {
+            {["calc","verify","table","tree","best","ir","field","sandbox","deml","attractor","benchmarks"].map(t => {
               const isCalc  = t === "calc";
               const isBench = t === "benchmarks";
               const isHighlit = isCalc || isBench || t === "attractor" || t === "deml";
@@ -324,6 +326,8 @@ export default function ExplorerApp() {
                 calc: "✦ calc",
                 attractor: "⊛ attractor",
                 deml: "⊖ DEML",
+                ir: "IR beta",
+                field: "field",
                 benchmarks: "▶ bench",
               };
               return (
@@ -909,6 +913,12 @@ export default function ExplorerApp() {
       {/* ── TAB: BENCHMARKS ── */}
       {tab === "benchmarks" && <BenchmarkTab />}
 
+      {/* ── TAB: EML IR INSPECTOR ── */}
+      {tab === "ir" && <EMLIRInspectorTab />}
+
+      {/* ── TAB: COMPLEX FIELD ── */}
+      {tab === "field" && <ComplexFieldTab />}
+
       {/* ── TAB: ATTRACTOR ── */}
       {tab === "attractor" && <AttractorViz />}
 
@@ -934,6 +944,18 @@ export default function ExplorerApp() {
               title: "BEST Routing",
               desc: "See how hybrid routing cuts node count by 52–74%.",
               badge: "benchmark",
+            },
+            {
+              tab: "ir", label: "IR",
+              title: "EML IR Inspector",
+              desc: "Inspect expression DAGs, replay frames, and internal prototype sharing.",
+              badge: "prototype",
+            },
+            {
+              tab: "field", label: "field",
+              title: "Complex Domain Coloring",
+              desc: "See phase, magnitude, and symmetry cues for EML-adjacent complex functions.",
+              badge: "visual",
             },
             {
               tab: "attractor", label: "⊛ attractor",

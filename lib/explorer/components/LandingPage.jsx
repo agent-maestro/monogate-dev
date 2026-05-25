@@ -178,6 +178,10 @@ export default function LandingPage({ onEnter }) {
               body: "EML gradient descent traps at spurious minima in 100% of trials at λ=0. Complexity penalty λ=0.005 flips convergence to 100% — a sharp phase transition.",
             },
             {
+              label: "Complex field visual bridge",
+              body: "The field view uses domain coloring to make phase, magnitude, periodicity, and branch behavior visible for simple complex functions and EML slices.",
+            },
+            {
               label: "sin(x) barrier — proved",
               body: "No finite real EML tree equals sin(x). Proof: EML trees are real-analytic with finitely many zeros; sin has infinitely many. Confirmed computationally: 281M trees at N≤11, zero matches.",
             },
@@ -376,6 +380,8 @@ export default function LandingPage({ onEnter }) {
             <NavLink label="✦ viz"       tab="viz"       onEnter={onEnter} />
             <NavLink label="sin↗"        tab="sinex"     onEnter={onEnter} />
             <NavLink label="⚡ demo"     tab="demo"      onEnter={onEnter} />
+            <NavLink label="IR beta"     tab="ir"        onEnter={onEnter} />
+            <NavLink label="field"       tab="field"     onEnter={onEnter} />
             <NavLink label="⊛ attractor" tab="attractor" onEnter={onEnter} />
             <NavLink label="table"       tab="table"     onEnter={onEnter} />
             <NavLink label="verify"      tab="verify"    onEnter={onEnter} />
