@@ -6,6 +6,7 @@ import BenchmarkTab from "./components/BenchmarkTab.jsx";
 import ExprTreeTab from "./components/ExprTreeTab.jsx";
 import EMLIRInspectorTab from "./components/EMLIRInspectorTab.jsx";
 import ComplexFieldTab from "./components/ComplexFieldTab.jsx";
+import HighDimensionalTab from "./components/HighDimensionalTab.jsx";
 import { op, exp, ln, E, ZERO, sub, neg, add, mul, div, pow, recip,
          BEST, sin_best, cos_best, pow_exl, div_edl, ln_exl } from "./eml.js";
 const deml = (x, y) => Math.exp(-x) - Math.log(y);
@@ -317,16 +318,17 @@ export default function ExplorerApp() {
                 {label}
               </a>
             ))}
-            {["calc","verify","table","tree","best","ir","field","sandbox","deml","attractor","benchmarks"].map(t => {
+            {["calc","verify","table","tree","best","ir","highd","field","sandbox","deml","attractor","benchmarks"].map(t => {
               const isCalc  = t === "calc";
               const isBench = t === "benchmarks";
-              const isHighlit = isCalc || isBench || t === "attractor" || t === "deml";
+              const isHighlit = isCalc || isBench || t === "attractor" || t === "deml" || t === "highd";
               const isActive = tab === t;
               const LABELS = {
                 calc: "✦ calc",
                 attractor: "⊛ attractor",
                 deml: "⊖ DEML",
                 ir: "IR beta",
+                highd: "high-D",
                 field: "field",
                 benchmarks: "▶ bench",
               };
@@ -919,6 +921,9 @@ export default function ExplorerApp() {
       {/* ── TAB: COMPLEX FIELD ── */}
       {tab === "field" && <ComplexFieldTab />}
 
+      {/* ── TAB: HIGH-D GEOMETRY ── */}
+      {tab === "highd" && <HighDimensionalTab />}
+
       {/* ── TAB: ATTRACTOR ── */}
       {tab === "attractor" && <AttractorViz />}
 
@@ -956,6 +961,12 @@ export default function ExplorerApp() {
               title: "Complex Domain Coloring",
               desc: "See phase, magnitude, and symmetry cues for EML-adjacent complex functions.",
               badge: "visual",
+            },
+            {
+              tab: "highd", label: "high-D",
+              title: "Corner Concentration",
+              desc: "See why EML tree optimization lives near boundary, domain, and overflow cliffs.",
+              badge: "research",
             },
             {
               tab: "attractor", label: "⊛ attractor",
