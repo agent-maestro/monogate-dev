@@ -12,6 +12,8 @@ const STATIC_PATHS: Array<{ path: string; priority: number; changefreq: Metadata
   { path: "/lab/em-cost",                 priority: 0.8, changefreq: "monthly" },
   { path: "/electronics",                 priority: 0.9, changefreq: "weekly" },
   { path: "/electronics/trainer-board-v0", priority: 0.8, changefreq: "monthly" },
+  { path: "/electronics/other",           priority: 0.8, changefreq: "monthly" },
+  { path: "/electronics/other/OptimizationBoundary", priority: 0.7, changefreq: "monthly" },
   { path: "/explorer",                    priority: 0.8, changefreq: "monthly" },
   { path: "/superbest",                   priority: 0.9, changefreq: "monthly" },
   { path: "/one-operator",                priority: 0.7, changefreq: "monthly" },

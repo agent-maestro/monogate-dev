@@ -7,7 +7,12 @@ const nextConfig = {
       { source: "/electronics/trainer-board-v0", destination: "/electronics-lab/index.html" },
       { source: "/electronics/trainer-board-v0/:path*", destination: "/electronics-lab/index.html" },
       { source: "/electronics/arty-a7", destination: "/electronics-lab/index.html" },
+      { source: "/electronics/other", destination: "/electronics-lab/index.html" },
+      { source: "/electronics/other/:path*", destination: "/electronics-lab/index.html" },
+      { source: "/electronics/othersystems", destination: "/electronics-lab/index.html" },
+      { source: "/electronics/othersystems/:path*", destination: "/electronics-lab/index.html" },
       { source: "/electronics/optimization-boundary", destination: "/electronics-lab/index.html" },
+      { source: "/electronics/optimization-boundary/:path*", destination: "/electronics-lab/index.html" },
     ];
   },
   async redirects() {
