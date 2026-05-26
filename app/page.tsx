@@ -113,6 +113,13 @@ const SPOTLIGHTS = [
     color: C.green,
   },
   {
+    href: "/explorer/rescue-suite",
+    title: "Rescue Suite",
+    eyebrow: "new · replay contract",
+    text: "Inspect Forge boundary-event rescue packets, replay status, trace frames, and MachLib obligation routing.",
+    color: C.orange,
+  },
+  {
     href: "/explorer?tab=field",
     title: "Complex Field",
     eyebrow: "visual EML",
