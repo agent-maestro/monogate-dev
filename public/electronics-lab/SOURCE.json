@@ -1,0 +1,43 @@
+{
+  "schema_version": "monogate.electronics_lab_source.v0",
+  "generated_at": "2026-05-26T07:05:27.190701+00:00",
+  "public_route": "https://monogate.dev/electronics",
+  "public_rewrite_target": "/electronics-lab/index.html",
+  "source_repo": "https://github.com/agent-maestro/monogate-electronics",
+  "source_path": "apps/electronics-lab",
+  "source_commit": "8b42ae8b51cc9c3b6290ef70711936e98cf40507",
+  "source_dirty": false,
+  "source_status": [],
+  "build_command": "npm ci && npm run build",
+  "artifact_repo": "https://github.com/agent-maestro/monogate-dev",
+  "artifact_path": "public/electronics-lab",
+  "boundary_flags": {
+    "hardware_observed": false,
+    "simulated": true,
+    "live_serial_capture_performed": false,
+    "hardware_action_performed": false,
+    "esp32_flash_performed": false,
+    "fpga_programming_performed": false,
+    "medical_claim": false,
+    "therapy_claim": false,
+    "certified_safety_claim": false,
+    "production_controller_claim": false
+  },
+  "artifacts": [
+    {
+      "path": "assets/index-Blrj7nmP.js",
+      "bytes": 148939,
+      "sha256": "80f8aeb9eb1d74684484d59366494fd6bdcf02a4dc4c662a697a1581a239fbc3"
+    },
+    {
+      "path": "assets/index-ClHtoI8o.css",
+      "bytes": 6485,
+      "sha256": "a64a50e95568420023bfbf033a930d4e3245ba04de0937a6e7b6f86636dc3caa"
+    },
+    {
+      "path": "index.html",
+      "bytes": 434,
+      "sha256": "5693e9f0deee4ff33b0cacdcad538b3e11c017b61a746709962bd0e2638ef813"
+    }
+  ]
+}
