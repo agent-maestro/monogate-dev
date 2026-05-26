@@ -78,6 +78,8 @@ const corpusPackets = {
 
 export default function HighDimensionalTab() {
   const [selectedPacketId, setSelectedPacketId] = useState(corpusIndex.packets[0]?.id ?? "");
+  const [showReplayFrames, setShowReplayFrames] = useState(false);
+  const [copiedPacket, setCopiedPacket] = useState(false);
   const rows = cornerPacket.rows;
   const final = rows[rows.length - 1];
   const traceRows = tracePacket.summary;
@@ -88,6 +90,13 @@ export default function HighDimensionalTab() {
   const selectedReplayFrames = selectedPacket.replay?.frames ?? [];
   const guardFrames = selectedReplayFrames.filter((frame) => frame.guard_action && frame.guard_action !== "PASS");
   const packetJson = useMemo(() => JSON.stringify(selectedPacket, null, 2), [selectedPacket]);
+
+  const copyPacketJson = () => {
+    navigator.clipboard.writeText(packetJson).then(() => {
+      setCopiedPacket(true);
+      setTimeout(() => setCopiedPacket(false), 1600);
+    });
+  };
 
   return (
     <div>
@@ -298,12 +307,60 @@ export default function HighDimensionalTab() {
                 {(selectedPacket.research_status?.labels ?? []).map((label) => <Chip key={label} tone={C.blue}>{label}</Chip>)}
                 {guardFrames.length > 0 ? <Chip tone={C.warn}>guarded</Chip> : <Chip tone={C.green}>guards pass</Chip>}
               </div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                <button onClick={copyPacketJson} style={{
+                  border: `1px solid ${copiedPacket ? C.green : C.border}`,
+                  background: copiedPacket ? "rgba(94,196,122,0.10)" : "transparent",
+                  color: copiedPacket ? C.green : C.text,
+                  borderRadius: 5,
+                  padding: "5px 8px",
+                  fontSize: 9,
+                  cursor: "pointer",
+                }}>
+                  {copiedPacket ? "copied" : "copy JSON"}
+                </button>
+                <button onClick={() => setShowReplayFrames((value) => !value)} style={{
+                  border: `1px solid ${showReplayFrames ? C.accent : C.border}`,
+                  background: showReplayFrames ? "rgba(232,160,32,0.10)" : "transparent",
+                  color: showReplayFrames ? C.accent : C.text,
+                  borderRadius: 5,
+                  padding: "5px 8px",
+                  fontSize: 9,
+                  cursor: "pointer",
+                }}>
+                  replay frames
+                </button>
+              </div>
               <div style={{ color: C.muted, fontSize: 9, lineHeight: 1.7, wordBreak: "break-all" }}>
                 root {selectedPacket.dag.root}<br />
                 {selectedPacket.packet_hash}
               </div>
             </div>
-            <pre style={{
+            {showReplayFrames ? (
+              <div style={{
+                maxHeight: 220,
+                overflow: "auto",
+                background: "#05060b",
+                border: `1px solid ${C.border}`,
+                borderRadius: 6,
+                padding: 10,
+              }}>
+                {selectedReplayFrames.map((frame) => (
+                  <div key={frame.frame_id} style={{ borderBottom: `1px solid ${C.border}`, padding: "7px 0" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+                      <span style={{ color: C.accent, fontSize: 9, fontWeight: 700 }}>{frame.frame_id}</span>
+                      <span style={{ color: C.blue, fontSize: 9 }}>{frame.lifecycle_state}</span>
+                    </div>
+                    <div style={{ color: C.text, fontSize: 9, lineHeight: 1.55 }}>{frame.what_happened}</div>
+                    <div style={{ color: C.muted, fontSize: 8, lineHeight: 1.6, wordBreak: "break-all", marginTop: 3 }}>
+                      {frame.node_id ? `${frame.node_id} / ${frame.op_kind} / ${frame.guard_action}` : "packet frame"}<br />
+                      {frame.replay_hash}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <pre style={{
               margin: 0,
               maxHeight: 220,
               overflow: "auto",
@@ -316,7 +373,8 @@ export default function HighDimensionalTab() {
               lineHeight: 1.55,
               whiteSpace: "pre-wrap",
               wordBreak: "break-word",
-            }}>{packetJson}</pre>
+              }}>{packetJson}</pre>
+            )}
           </div>
         </div>
       </div>
