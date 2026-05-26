@@ -21,8 +21,8 @@ const humanCopy: Record<string, { problem: string; rescue: string; proof: string
   log_domain_lift: {
     problem: "The raw sample asks log-domain math to evaluate at a non-positive coordinate.",
     rescue: "Forge replays the sample through a positive internal coordinate produced by the log-domain lift.",
-    proof: "MachLib now has a concrete positive-coordinate witness theorem for this lane, plus the existing packet obligation route.",
-    limit: "This is a sample-level witness and packet bridge, not a full semantic rewrite theorem for arbitrary programs.",
+    proof: "MachLib now has a restricted semantic rewrite theorem for this small log-domain class, plus the concrete positive-coordinate witness.",
+    limit: "This is a restricted theorem for the witness class, not a full semantic rewrite theorem for arbitrary programs.",
   },
   guard_clamp: {
     problem: "The raw expression hits overflow pressure and loses finite output.",
