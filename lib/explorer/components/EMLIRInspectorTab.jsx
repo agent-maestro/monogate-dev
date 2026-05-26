@@ -2,7 +2,7 @@ import model from "../data/eml_ir_inspector_model.json";
 import polynomialEvidence from "../data/machlib_polynomial_evidence_internal_card.json";
 import finiteZeroPacket from "../data/machlib_finite_zero_packet_internal_card.json";
 import { useMemo, useState } from "react";
-import { certifyLowering, validateReplayPacket } from "../ir-runtime.js";
+import { buildEvidencePacket, validateEvidencePacket } from "../ir-runtime.js";
 
 const C = {
   bg: "#07080f",
@@ -91,6 +91,19 @@ function EquivalenceRows({ evidence }) {
       ))}
     </div>
   );
+}
+
+function exportEvidencePacket(packet) {
+  const json = JSON.stringify(packet, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${packet.packet_hash.replace(/[^a-zA-Z0-9]+/g, "_")}.json`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }
 
 function MiniDag({ program }) {
@@ -231,13 +244,18 @@ export default function EMLIRInspectorTab() {
   const best = selected;
   const live = useMemo(() => {
     try {
-      const cert = certifyLowering(liveExpr);
-      const dag = cert.dag;
-      const packet = cert.replay;
-      const validation = validateReplayPacket(packet);
-      return { cert, dag, packet, validation, error: null };
+      const evidence = buildEvidencePacket(liveExpr);
+      const cert = {
+        dag: evidence.dag,
+        replay: evidence.replay,
+        lowering: evidence.lowering,
+        structural: evidence.checks.structural_lowering,
+        equivalence: evidence.checks.sampled_equivalence,
+      };
+      const validation = validateEvidencePacket(evidence);
+      return { evidence, cert, dag: evidence.dag, packet: evidence.replay, validation, error: null };
     } catch (error) {
-      return { cert: null, dag: null, packet: null, validation: null, error: error.message };
+      return { evidence: null, cert: null, dag: null, packet: null, validation: null, error: error.message };
     }
   }, [liveExpr]);
 
@@ -285,7 +303,7 @@ export default function EMLIRInspectorTab() {
             <div style={{ color: C.accent, fontSize: 13, fontWeight: 700 }}>Live IR Replay Builder</div>
             <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7 }}>
               Type an expression to generate normalized DAG nodes, a hash-chained replay packet, lowered code,
-              and sampled interpreter-vs-lowered evidence from the EML IR v1 artifact.
+              structural lowering gates, and sampled interpreter-vs-lowered evidence from the EML IR v1 artifact.
             </div>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -332,8 +350,42 @@ export default function EMLIRInspectorTab() {
               <Stat label="tree cost" value={live.dag.tree_cost} />
               <Stat label="DAG cost" value={live.dag.dag_cost} tone={C.green} />
               <Stat label="packet valid" value={live.validation.ok ? "yes" : "no"} tone={live.validation.ok ? C.green : C.warn} />
+              <Stat label="structural" value={live.cert.structural.structural_lowering_verified ? "verified" : "blocked"} tone={live.cert.structural.structural_lowering_verified ? C.green : C.warn} />
               <Stat label="sampled eq" value={live.cert.equivalence.behavioral_equivalence_sampled ? "yes" : "no"} tone={live.cert.equivalence.behavioral_equivalence_sampled ? C.green : C.warn} />
               <Stat label="max abs error" value={live.cert.equivalence.max_abs_error.toExponential(1)} tone={C.blue} />
+            </div>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 10,
+              flexWrap: "wrap",
+              alignItems: "center",
+              background: C.bg,
+              border: `1px solid ${C.border}`,
+              borderRadius: 7,
+              padding: 10,
+              marginBottom: 12,
+            }}>
+              <div>
+                <div style={{ color: C.text, fontSize: 11, fontWeight: 700, marginBottom: 3 }}>
+                  Evidence Packet
+                </div>
+                <div style={{ color: C.muted, fontSize: 9, lineHeight: 1.6, wordBreak: "break-word" }}>
+                  {live.evidence.schema_version} · {live.evidence.packet_hash} · status {live.evidence.research_status.labels.join(" / ")}
+                </div>
+              </div>
+              <button onClick={() => exportEvidencePacket(live.evidence)} style={{
+                border: `1px solid ${C.accent}`,
+                background: "rgba(232,160,32,0.10)",
+                color: C.accent,
+                borderRadius: 4,
+                padding: "7px 10px",
+                fontSize: 10,
+                fontFamily: "inherit",
+                cursor: "pointer",
+              }}>
+                Export JSON
+              </button>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
               <div>
@@ -364,6 +416,7 @@ export default function EMLIRInspectorTab() {
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-start" }}>
+                  <Chip tone={C.green}>{live.cert.structural.verified_node_count}/{live.cert.structural.node_count} structural</Chip>
                   <Chip tone={C.green}>{live.cert.equivalence.valid_sample_count} valid samples</Chip>
                   <Chip tone={C.warn}>formal_verification_claim: false</Chip>
                 </div>
