@@ -1,14 +1,14 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-05-26T10:23:24.319671+00:00",
+  "generated_at": "2026-05-26T10:27:03.197424+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "7150807dbcefac44ed733f3ee3029bc408169b83",
+  "source_commit": "490da4eb3c0a9aa68cd8188df5ef4d6cf049f82d",
   "source_dirty": false,
   "source_status": [],
-  "build_command": "npm ci && npm run build",
+  "build_command": "npm ci && npm run build:monogate-dev",
   "artifact_repo": "https://github.com/agent-maestro/monogate-dev",
   "artifact_path": "public/electronics-lab",
   "boundary_flags": {
@@ -56,8 +56,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 402,
-      "sha256": "0fc71237198536e176773a4f147d9135c084431cd552179dc4b9c47f1084a63f"
+      "bytes": 434,
+      "sha256": "fe15cd28d116af29f1f34b9548ee9d84a1722c90bf9f1dff65e23189d1094072"
     }
   ]
 }
