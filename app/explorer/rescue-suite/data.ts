@@ -18,6 +18,15 @@ export type RescueLane = {
   toEvent: string;
   transition: string;
   obligation: string;
+  semanticContract: {
+    semantic_strength: string;
+    accepts: string;
+    restores: string;
+    allowed_change: string;
+    must_not_claim: string;
+    preservation_scope: string;
+    public_copy_safe: boolean;
+  };
   source: string;
   fixture: string;
   packetSchema: string;

@@ -27,20 +27,20 @@ const humanCopy: Record<string, { problem: string; rescue: string; proof: string
   guard_clamp: {
     problem: "The raw expression hits overflow pressure and loses finite output.",
     rescue: "Forge replays the sample through a bounded guard coordinate.",
-    proof: "The packet routes to an output-safety obligation and carries a transition witness.",
+    proof: "MachLib now has a concrete output-safety witness theorem for this lane, plus the existing packet obligation route.",
     limit: "The optimizer is not yet claiming production rewrite behavior.",
   },
   precision_escape: {
     problem: "Low precision makes the sample look stuck in a phantom attractor.",
     rescue: "Forge replays at higher precision and exposes an interior escape direction.",
     proof: "The packet routes to a precision-sensitivity obligation and keeps the transition explicit.",
-    limit: "The lane is replay evidence, not a universal convergence guarantee.",
+    limit: "This lane is packet-bridge-only in v0: it does not yet have a concrete sample-invariant theorem.",
   },
   saturation_deshelf: {
     problem: "A clamp shelf hides useful boundary pressure behind saturated output.",
     rescue: "Forge replays pre-clamp pressure so the boundary structure becomes measurable again.",
-    proof: "The packet routes to a clamp-invariant obligation with a transition witness.",
-    limit: "No hardware observation or full semantic proof is claimed for v0.",
+    proof: "MachLib now has a concrete clamp-invariant witness theorem for this lane, plus the existing packet obligation route.",
+    limit: "No rescue-normal completion, hardware observation, or full semantic rewrite theorem is claimed for v0.",
   },
 };
 
@@ -245,6 +245,25 @@ export default function RescueSuiteExplorer() {
               <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>MachLib obligation</div>
               {codePill(lane.obligation, C.green)}
             </div>
+            <div>
+              <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>semantic strength</div>
+              {codePill(lane.semanticContract.semantic_strength, lane.semanticContract.semantic_strength === "packet_bridge_only" ? C.orange : C.green)}
+            </div>
+            {viewMode === "machine" && (
+              <div style={{ display: "grid", gap: 7, fontSize: 11 }}>
+                {[
+                  ["accepts", lane.semanticContract.accepts],
+                  ["restores", lane.semanticContract.restores],
+                  ["allowed change", lane.semanticContract.allowed_change],
+                  ["must not claim", lane.semanticContract.must_not_claim],
+                ].map(([label, value]) => (
+                  <div key={label} style={{ display: "grid", gridTemplateColumns: "94px minmax(0, 1fr)", gap: 10 }}>
+                    <span style={{ color: C.muted }}>{label}</span>
+                    <strong style={{ color: C.text, fontWeight: 600, overflowWrap: "anywhere" }}>{value}</strong>
+                  </div>
+                ))}
+              </div>
+            )}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <div>
                 <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>samples</div>
@@ -352,6 +371,9 @@ export default function RescueSuiteExplorer() {
             {codePill(approval?.decision ?? "pending", approval?.surface_allowed ? C.green : C.red)}
             {codePill(`surface:${String(Boolean(approval?.surface_allowed))}`, C.blue)}
             {codePill(`deploy:${String(Boolean(approval?.deploy_allowed))}`, C.orange)}
+            {approval?.semantic_summary?.packet_bridge_only?.map((operator: string) => (
+              <span key={operator}>{codePill(`packet_bridge_only:${operator}`, C.orange)}</span>
+            ))}
           </div>
         </div>
 
