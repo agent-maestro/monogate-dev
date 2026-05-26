@@ -44,6 +44,8 @@ export const replayStatus = fixture.replayStatus;
 
 export const boundaryFlags = Object.entries(fixture.boundaryFlags);
 
+export const approval = fixture.approval;
+
 export const lanes: RescueLane[] = fixture.lanes.map(lane => ({
   ...lane,
   accent: accents[lane.operator] ?? "#e8a020",

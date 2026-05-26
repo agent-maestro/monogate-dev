@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { boundaryFlags, explorerFixture, lanes, replayStatus, type TraceFrame } from "./data";
+import { approval, boundaryFlags, explorerFixture, lanes, replayStatus, type TraceFrame } from "./data";
 
 const C = {
   bg: "#08090e",
@@ -332,7 +332,7 @@ export default function RescueSuiteExplorer() {
         </section>
       )}
 
-      <section style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 16 }}>
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 16 }}>
         <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
           <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
             Manifest
@@ -341,6 +341,17 @@ export default function RescueSuiteExplorer() {
             {codePill(replayStatus.manifest, C.blue)}
             {codePill(replayStatus.replay, C.green)}
             {codePill(replayStatus.sourceSchema, C.orange)}
+          </div>
+        </div>
+
+        <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
+          <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+            Approval
+          </div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {codePill(approval?.decision ?? "pending", approval?.surface_allowed ? C.green : C.red)}
+            {codePill(`surface:${String(Boolean(approval?.surface_allowed))}`, C.blue)}
+            {codePill(`deploy:${String(Boolean(approval?.deploy_allowed))}`, C.orange)}
           </div>
         </div>
 
