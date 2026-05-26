@@ -33,8 +33,8 @@ const humanCopy: Record<string, { problem: string; rescue: string; proof: string
   precision_escape: {
     problem: "Low precision makes the sample look stuck in a phantom attractor.",
     rescue: "Forge replays at higher precision and exposes an interior escape direction.",
-    proof: "The packet routes to a precision-sensitivity obligation and keeps the transition explicit.",
-    limit: "This lane is packet-bridge-only in v0: it does not yet have a concrete sample-invariant theorem.",
+    proof: "MachLib now has a concrete precision-escape witness theorem for this lane, plus the existing packet obligation route.",
+    limit: "This is a local precision-sensitivity witness, not a convergence or optimizer-wide precision-correctness theorem.",
   },
   saturation_deshelf: {
     problem: "A clamp shelf hides useful boundary pressure behind saturated output.",
