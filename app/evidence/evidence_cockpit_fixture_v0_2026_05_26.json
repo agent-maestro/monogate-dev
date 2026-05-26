@@ -1,0 +1,305 @@
+{
+  "schemaVersion": "monogate.dev.evidence_cockpit_fixture.v0",
+  "date": "2026-05-26",
+  "reviewer": "codex-reviewer",
+  "generatedFrom": {
+    "schemaVersion": "monogate.evidence_review_gate.v0",
+    "path": "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+  },
+  "decisionCounts": {
+    "approved_for_surface": 2,
+    "candidate_only": 2
+  },
+  "artifacts": [
+    {
+      "id": "forge-rescue",
+      "title": "Forge Rescue Suite",
+      "href": "/explorer/rescue-suite",
+      "color": "orange",
+      "summary": "Boundary-event rescue packets with replay validation, MachLib witness routing, and a restricted log-domain semantic theorem.",
+      "claimBoundary": "Approved for existing public/dev surfaces; no full optimizer semantic rewrite or hardware observation is claimed.",
+      "evidencePaths": [
+        "forge/reports/proof_carrying_rescue_suite_v0_2026_05_26.json",
+        "forge/reports/proof_carrying_rescue_replay_v0_2026_05_26.json",
+        "forge/reports/rescue_obligation_registry_v0_2026_05_26.json",
+        "forge/reports/rescue_artifact_approval_v0_2026_05_26.json"
+      ],
+      "sourceReportPath": "forge/reports/rescue_artifact_approval_v0_2026_05_26.json",
+      "lane": "optimizer evidence",
+      "sourceLane": "forge_rescue",
+      "decision": "approved_for_surface",
+      "validationStatus": "pass",
+      "replayStatus": "pass",
+      "semanticStrength": "1_restricted_semantic_rewrite_plus_3_concrete_sample_invariant_plus_0_packet_bridge_only",
+      "semanticsLabel": "1 restricted rewrite, 3 concrete invariants",
+      "claimFlags": {
+        "public_ready": true,
+        "hardware_observed": false,
+        "live_serial_capture_performed": false,
+        "certified_safety_claim": false,
+        "production_controller_claim": false
+      },
+      "semanticReview": {
+        "registry_path": "forge/reports/rescue_obligation_registry_v0_2026_05_26.json",
+        "strength_by_operator": {
+          "log_domain_lift": "restricted_semantic_rewrite",
+          "guard_clamp": "concrete_sample_invariant",
+          "precision_escape": "concrete_sample_invariant",
+          "saturation_deshelf": "concrete_sample_invariant"
+        },
+        "restricted_semantic_rewrite": [
+          "log_domain_lift"
+        ],
+        "packet_bridge_only": [],
+        "semantic_rewrite_claim": false,
+        "reviewer_note": "Log-domain lift has a restricted semantic rewrite theorem; the other v0 lanes restore concrete local invariants. Full semantic rewrite correctness remains outside the v0 claim boundary."
+      },
+      "reviewReasons": [],
+      "reviewNotes": "Forge rescue approval gate.",
+      "packetHref": "/evidence/forge-rescue/packet.json",
+      "reviewPacket": {
+        "schemaVersion": "monogate.evidence_public_packet.v0",
+        "artifactId": "forge-rescue",
+        "title": "Forge Rescue Suite",
+        "reviewDecision": "approved_for_surface",
+        "validationStatus": "pass",
+        "replayStatus": "pass",
+        "semanticStrength": "1_restricted_semantic_rewrite_plus_3_concrete_sample_invariant_plus_0_packet_bridge_only",
+        "semanticReview": {
+          "registry_path": "forge/reports/rescue_obligation_registry_v0_2026_05_26.json",
+          "strength_by_operator": {
+            "log_domain_lift": "restricted_semantic_rewrite",
+            "guard_clamp": "concrete_sample_invariant",
+            "precision_escape": "concrete_sample_invariant",
+            "saturation_deshelf": "concrete_sample_invariant"
+          },
+          "restricted_semantic_rewrite": [
+            "log_domain_lift"
+          ],
+          "packet_bridge_only": [],
+          "semantic_rewrite_claim": false,
+          "reviewer_note": "Log-domain lift has a restricted semantic rewrite theorem; the other v0 lanes restore concrete local invariants. Full semantic rewrite correctness remains outside the v0 claim boundary."
+        },
+        "claimFlags": {
+          "public_ready": true,
+          "hardware_observed": false,
+          "live_serial_capture_performed": false,
+          "certified_safety_claim": false,
+          "production_controller_claim": false
+        },
+        "claimBoundary": "Approved for existing public/dev surfaces; no full optimizer semantic rewrite or hardware observation is claimed.",
+        "reviewReasons": [],
+        "reviewNotes": "Forge rescue approval gate.",
+        "sourceReportPath": "forge/reports/rescue_artifact_approval_v0_2026_05_26.json",
+        "evidencePaths": [
+          "forge/reports/proof_carrying_rescue_suite_v0_2026_05_26.json",
+          "forge/reports/proof_carrying_rescue_replay_v0_2026_05_26.json",
+          "forge/reports/rescue_obligation_registry_v0_2026_05_26.json",
+          "forge/reports/rescue_artifact_approval_v0_2026_05_26.json"
+        ]
+      }
+    },
+    {
+      "id": "electronics-trainer",
+      "title": "Electronics Trainer Packet",
+      "href": "/electronics",
+      "color": "green",
+      "summary": "Simulated Trainer Board packet using the shared evidence grammar for trace, replay, validation, and claim flags.",
+      "claimBoundary": "Approved as simulated evidence only; hardware truth requires a real capture packet from the laptop-agent lane.",
+      "evidencePaths": [
+        "monogate-electronics/docs/evidence-grammar.md",
+        "monogate-electronics/evidence/trainer_board_v0/simulated_reflex_packet_2026_05_26/evidence_packet.json",
+        "monogate-electronics/evidence/trainer_board_v0/simulated_reflex_packet_2026_05_26/trace.jsonl"
+      ],
+      "sourceReportPath": "monogate-electronics/evidence/trainer_board_v0/simulated_reflex_packet_2026_05_26/evidence_packet.json",
+      "lane": "simulated hardware evidence",
+      "sourceLane": "electronics",
+      "decision": "approved_for_surface",
+      "validationStatus": "pass",
+      "replayStatus": "pass",
+      "semanticStrength": "evidence_grammar_packet",
+      "semanticsLabel": "evidence grammar packet",
+      "claimFlags": {
+        "public_ready": true,
+        "hardware_observed": false,
+        "live_serial_capture_performed": false,
+        "certified_safety_claim": false,
+        "production_controller_claim": false
+      },
+      "semanticReview": {
+        "capture_mode": "simulated",
+        "hardware_observed": false,
+        "reviewer_note": "Grammar-valid packet; hardware truth requires a real capture packet."
+      },
+      "reviewReasons": [],
+      "reviewNotes": "Electronics evidence-grammar packet.",
+      "packetHref": "/evidence/electronics-trainer/packet.json",
+      "reviewPacket": {
+        "schemaVersion": "monogate.evidence_public_packet.v0",
+        "artifactId": "electronics-trainer",
+        "title": "Electronics Trainer Packet",
+        "reviewDecision": "approved_for_surface",
+        "validationStatus": "pass",
+        "replayStatus": "pass",
+        "semanticStrength": "evidence_grammar_packet",
+        "semanticReview": {
+          "capture_mode": "simulated",
+          "hardware_observed": false,
+          "reviewer_note": "Grammar-valid packet; hardware truth requires a real capture packet."
+        },
+        "claimFlags": {
+          "public_ready": true,
+          "hardware_observed": false,
+          "live_serial_capture_performed": false,
+          "certified_safety_claim": false,
+          "production_controller_claim": false
+        },
+        "claimBoundary": "Approved as simulated evidence only; hardware truth requires a real capture packet from the laptop-agent lane.",
+        "reviewReasons": [],
+        "reviewNotes": "Electronics evidence-grammar packet.",
+        "sourceReportPath": "monogate-electronics/evidence/trainer_board_v0/simulated_reflex_packet_2026_05_26/evidence_packet.json",
+        "evidencePaths": [
+          "monogate-electronics/docs/evidence-grammar.md",
+          "monogate-electronics/evidence/trainer_board_v0/simulated_reflex_packet_2026_05_26/evidence_packet.json",
+          "monogate-electronics/evidence/trainer_board_v0/simulated_reflex_packet_2026_05_26/trace.jsonl"
+        ]
+      }
+    },
+    {
+      "id": "monogate-os-replay",
+      "title": "Monogate OS Replay Chain",
+      "href": "https://monogate.org/research/frontier/",
+      "color": "blue",
+      "summary": "QEMU/replay/Observatory evidence chain with passing cards, kept internal until promotion criteria are sharper.",
+      "claimBoundary": "Candidate only; not a bootable OS claim, not certified safety, and not production runtime assurance.",
+      "evidencePaths": [
+        "monogate-research/data/monogate_os_m7a_observatory_status_2026_05_24.json",
+        "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+      ],
+      "sourceReportPath": "monogate-research/data/monogate_os_m7a_observatory_status_2026_05_24.json",
+      "lane": "runtime evidence",
+      "sourceLane": "monogate_os_replay",
+      "decision": "candidate_only",
+      "validationStatus": "pass",
+      "replayStatus": "pass",
+      "semanticStrength": "candidate_replay_chain",
+      "semanticsLabel": "candidate replay chain",
+      "claimFlags": {
+        "public_ready": false,
+        "hardware_observed": false,
+        "live_serial_capture_performed": false,
+        "certified_safety_claim": false,
+        "production_controller_claim": false
+      },
+      "semanticReview": {
+        "passing_cards": 188,
+        "reviewer_note": "Replay-native runtime evidence remains candidate-only, not a bootable OS claim."
+      },
+      "reviewReasons": [],
+      "reviewNotes": "Observatory status with 188 passing card(s).",
+      "packetHref": "/evidence/monogate-os-replay/packet.json",
+      "reviewPacket": {
+        "schemaVersion": "monogate.evidence_public_packet.v0",
+        "artifactId": "monogate-os-replay",
+        "title": "Monogate OS Replay Chain",
+        "reviewDecision": "candidate_only",
+        "validationStatus": "pass",
+        "replayStatus": "pass",
+        "semanticStrength": "candidate_replay_chain",
+        "semanticReview": {
+          "passing_cards": 188,
+          "reviewer_note": "Replay-native runtime evidence remains candidate-only, not a bootable OS claim."
+        },
+        "claimFlags": {
+          "public_ready": false,
+          "hardware_observed": false,
+          "live_serial_capture_performed": false,
+          "certified_safety_claim": false,
+          "production_controller_claim": false
+        },
+        "claimBoundary": "Candidate only; not a bootable OS claim, not certified safety, and not production runtime assurance.",
+        "reviewReasons": [],
+        "reviewNotes": "Observatory status with 188 passing card(s).",
+        "sourceReportPath": "monogate-research/data/monogate_os_m7a_observatory_status_2026_05_24.json",
+        "evidencePaths": [
+          "monogate-research/data/monogate_os_m7a_observatory_status_2026_05_24.json",
+          "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+        ]
+      }
+    },
+    {
+      "id": "capcard-internal",
+      "title": "CapCard Internal Lane",
+      "href": "https://monogate.org/research/frontier/",
+      "color": "purple",
+      "summary": "Internal CapCard marketplace/import evidence that exercises review grammar without public-ready promotion.",
+      "claimBoundary": "Candidate only; no public marketplace promotion and no external capability certification.",
+      "evidencePaths": [
+        "capcard/capcard/reports/capcard_marketplace_import_flow_qa_2026_05_25.json",
+        "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+      ],
+      "sourceReportPath": "capcard/capcard/reports/capcard_marketplace_import_flow_qa_2026_05_25.json",
+      "lane": "capability evidence",
+      "sourceLane": "capcard",
+      "decision": "candidate_only",
+      "validationStatus": "pass",
+      "replayStatus": "pass",
+      "semanticStrength": "internal_candidate_capability",
+      "semanticsLabel": "internal candidate capability",
+      "claimFlags": {
+        "public_ready": false,
+        "hardware_observed": false,
+        "live_serial_capture_performed": false,
+        "certified_safety_claim": false,
+        "production_controller_claim": false
+      },
+      "semanticReview": {
+        "reviewer_note": "Internal capability/import evidence only; no public-ready promotion."
+      },
+      "reviewReasons": [],
+      "reviewNotes": "CapCard internal candidate lane remains non-public.",
+      "packetHref": "/evidence/capcard-internal/packet.json",
+      "reviewPacket": {
+        "schemaVersion": "monogate.evidence_public_packet.v0",
+        "artifactId": "capcard-internal",
+        "title": "CapCard Internal Lane",
+        "reviewDecision": "candidate_only",
+        "validationStatus": "pass",
+        "replayStatus": "pass",
+        "semanticStrength": "internal_candidate_capability",
+        "semanticReview": {
+          "reviewer_note": "Internal capability/import evidence only; no public-ready promotion."
+        },
+        "claimFlags": {
+          "public_ready": false,
+          "hardware_observed": false,
+          "live_serial_capture_performed": false,
+          "certified_safety_claim": false,
+          "production_controller_claim": false
+        },
+        "claimBoundary": "Candidate only; no public marketplace promotion and no external capability certification.",
+        "reviewReasons": [],
+        "reviewNotes": "CapCard internal candidate lane remains non-public.",
+        "sourceReportPath": "capcard/capcard/reports/capcard_marketplace_import_flow_qa_2026_05_25.json",
+        "evidencePaths": [
+          "capcard/capcard/reports/capcard_marketplace_import_flow_qa_2026_05_25.json",
+          "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+        ]
+      }
+    }
+  ],
+  "boundaries": {
+    "deploy_performed": false,
+    "hardware_action_performed": false,
+    "package_publish_performed": false,
+    "public_theorem_claim": false
+  },
+  "reviewerContract": {
+    "surface_requires_validation": true,
+    "surface_requires_replay": true,
+    "surface_requires_semantic_review": true,
+    "semantic_rewrite_claim_requires_separate_review": true,
+    "precision_escape_status": "concrete_sample_invariant",
+    "log_domain_lift_status": "restricted_semantic_rewrite"
+  }
+}
