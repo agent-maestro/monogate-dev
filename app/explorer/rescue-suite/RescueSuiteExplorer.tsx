@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { boundaryFlags, lanes, replayStatus } from "./data";
+import { useEffect, useMemo, useState } from "react";
+import { boundaryFlags, explorerFixture, lanes, replayStatus, type TraceFrame } from "./data";
 
 const C = {
   bg: "#08090e",
@@ -36,13 +36,54 @@ function codePill(text: string, color = C.orange) {
   );
 }
 
+function valueText(value: unknown) {
+  if (value === null) return "null";
+  if (typeof value === "boolean") return String(value);
+  if (typeof value === "number") return Number.isFinite(value) ? String(value) : "non-finite";
+  if (typeof value === "string") return value;
+  return JSON.stringify(value);
+}
+
+function payloadRows(payload: Record<string, unknown>) {
+  return Object.entries(payload).filter(([key]) => key !== "event_class");
+}
+
+function PayloadPanel({ title, frame, payload, color }: { title: string; frame: TraceFrame; payload: Record<string, unknown>; color: string }) {
+  return (
+    <div style={{ border: `1px solid ${C.border}`, background: C.surface2, borderRadius: 8, padding: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", marginBottom: 10 }}>
+        <div style={{ color, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>{title}</div>
+        {frame.isWitness ? codePill("witness", color) : codePill("context", C.muted)}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(88px, 0.45fr) minmax(0, 1fr)", gap: "7px 10px", fontSize: 11 }}>
+        <span style={{ color: C.muted }}>event</span>
+        <strong style={{ color }}>{valueText(payload.event_class)}</strong>
+        {payloadRows(payload).map(([key, value]) => (
+          <div key={`${title}-${frame.sample}-${key}`} style={{ display: "contents" }}>
+            <span style={{ color: C.muted, overflowWrap: "anywhere" }}>{key}</span>
+            <strong style={{ color: C.text, overflowWrap: "anywhere", fontWeight: 600 }}>{valueText(value)}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function RescueSuiteExplorer() {
   const [active, setActive] = useState(0);
+  const [showWitnessOnly, setShowWitnessOnly] = useState(false);
+  const [frameCursor, setFrameCursor] = useState(0);
   const lane = lanes[active];
   const witnessCount = useMemo(
     () => lanes.filter(item => item.frames.some(frame => frame.transition === item.transition)).length,
     []
   );
+  const visibleFrames = showWitnessOnly ? lane.frames.filter(frame => frame.isWitness) : lane.frames;
+  const selectedFrame = visibleFrames[Math.min(frameCursor, Math.max(visibleFrames.length - 1, 0))] ?? lane.frames[0];
+
+  useEffect(() => {
+    setFrameCursor(0);
+  }, [active, showWitnessOnly]);
 
   return (
     <main style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 16px 72px", background: C.bg }}>
@@ -58,6 +99,10 @@ export default function RescueSuiteExplorer() {
             Software replay surface for Forge boundary-event rescue packets. Each lane shows the raw event,
             named rescue operator, witness transition, trace frames, and MachLib obligation routed by the v0 manifest.
           </p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
+            {codePill(explorerFixture.schemaVersion, C.blue)}
+            {codePill(explorerFixture.generatedFrom.suite, C.orange)}
+          </div>
         </div>
 
         <aside style={{ border: `1px solid ${replayStatus.valid ? C.green : C.red}55`, background: replayStatus.valid ? "#0d1712" : "#1b1012", borderRadius: 8, padding: 18 }}>
@@ -69,6 +114,7 @@ export default function RescueSuiteExplorer() {
             <span style={{ color: C.muted }}>issues</span><strong style={{ color: C.text }}>{replayStatus.issueCount}</strong>
             <span style={{ color: C.muted }}>lanes</span><strong style={{ color: C.text }}>{replayStatus.laneCount}</strong>
             <span style={{ color: C.muted }}>witnesses</span><strong style={{ color: C.text }}>{witnessCount}</strong>
+            <span style={{ color: C.muted }}>fixture</span><strong style={{ color: C.text }}>generated</strong>
           </div>
         </aside>
       </section>
@@ -130,13 +176,40 @@ export default function RescueSuiteExplorer() {
               <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>MachLib obligation</div>
               {codePill(lane.obligation, C.green)}
             </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div>
+                <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>samples</div>
+                {codePill(String(lane.summary.sampleCount), C.text)}
+              </div>
+              <div>
+                <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>rescued events</div>
+                {codePill(String(lane.summary.rescuedEventCount), lane.accent)}
+              </div>
+            </div>
             <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.7, margin: 0 }}>{lane.claim}</p>
           </div>
         </div>
 
         <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
-          <div style={{ color: lane.accent, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
-            Trace frames
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 12 }}>
+            <div style={{ color: lane.accent, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              Trace frames
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowWitnessOnly(value => !value)}
+              style={{
+                color: showWitnessOnly ? C.bg : lane.accent,
+                background: showWitnessOnly ? lane.accent : `${lane.accent}12`,
+                border: `1px solid ${lane.accent}66`,
+                borderRadius: 6,
+                padding: "6px 8px",
+                fontSize: 11,
+                fontWeight: 700,
+              }}
+            >
+              {showWitnessOnly ? "All frames" : "Witness only"}
+            </button>
           </div>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
@@ -150,19 +223,31 @@ export default function RescueSuiteExplorer() {
                 </tr>
               </thead>
               <tbody>
-                {lane.frames.map(frame => (
-                  <tr key={`${lane.operator}-${frame.sample}-${frame.input}`}>
+                {visibleFrames.map((frame, index) => {
+                  const selectedFrameRow = selectedFrame.sample === frame.sample && selectedFrame.input === frame.input;
+                  return (
+                  <tr
+                    key={`${lane.operator}-${frame.sample}-${frame.input}`}
+                    onClick={() => setFrameCursor(index)}
+                    style={{ cursor: "pointer", background: selectedFrameRow ? `${lane.accent}10` : "transparent" }}
+                  >
                     <td style={{ color: C.muted, fontSize: 11, padding: "10px 8px", borderBottom: `1px solid ${C.border}` }}>{frame.sample}</td>
                     <td style={{ color: C.text, fontSize: 11, padding: "10px 8px", borderBottom: `1px solid ${C.border}`, overflowWrap: "anywhere" }}>{frame.input}</td>
                     <td style={{ padding: "10px 8px", borderBottom: `1px solid ${C.border}` }}>{codePill(frame.rawEvent, C.red)}</td>
                     <td style={{ padding: "10px 8px", borderBottom: `1px solid ${C.border}` }}>{codePill(frame.rescueEvent, lane.accent)}</td>
                     <td style={{ color: C.muted, fontSize: 11, padding: "10px 8px", borderBottom: `1px solid ${C.border}`, overflowWrap: "anywhere" }}>{frame.metric}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
+      </section>
+
+      <section style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 16, marginBottom: 16 }}>
+        <PayloadPanel title="Before rescue" frame={selectedFrame} payload={selectedFrame.raw} color={C.red} />
+        <PayloadPanel title="After rescue" frame={selectedFrame} payload={selectedFrame.rescued} color={lane.accent} />
       </section>
 
       <section style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 16 }}>
