@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-05-26T10:59:21.596507+00:00",
+  "generated_at": "2026-05-26T11:16:21.744588+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "bafec15a49a170bca6c1b3dcf18b40698b5336ad",
+  "source_commit": "c3b67a354e311855b1e3f5e955ff5036a5e47445",
   "source_dirty": false,
   "source_status": [],
   "build_command": "npm ci && npm run build:monogate-dev",
@@ -25,29 +25,29 @@
   },
   "artifacts": [
     {
-      "path": "assets/index-9j8L8O0m.css",
-      "bytes": 54414,
-      "sha256": "5d47029f629754c2b24e986f3a4f7eefdbd0b39333ff2e619fe168bc04d115a9"
+      "path": "assets/index-_lck3yB8.css",
+      "bytes": 63949,
+      "sha256": "73cef6bee232b094ee1c7c5bddf07be991a835c660a434de10a71151385b6045"
     },
     {
-      "path": "assets/index-DseR2DIv.js",
-      "bytes": 1236656,
-      "sha256": "aac69041957e1211d2caae4754457c480e84a13310d25efafa92687d469b8230"
+      "path": "assets/index-DgViTat2.js",
+      "bytes": 1240668,
+      "sha256": "4da636252800cf93eb2cf433e653f32062b6598d257c3a599e66cd4ba89b0d10"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/electrocookie-build-guide.md",
-      "bytes": 4459,
-      "sha256": "b723588545fcbf7eb61d2aa6d511e7034620c8e6137d272c9466ac5436e12033"
+      "bytes": 4633,
+      "sha256": "7ad9f86c4b33f5589d08566294b935c30d089b3414a49446404de36dbc862b87"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/lab-packet.md",
-      "bytes": 9128,
-      "sha256": "27a35fd580ad15ace0cd3573189410d584987d2f348e4930da11bf975b463af2"
+      "bytes": 9563,
+      "sha256": "22292a6441a2a6a5b417b92462f65b131a87eeeff3101a7f2782666c698190a4"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/quick-start.html",
-      "bytes": 4152,
-      "sha256": "97935ca68ee97617856a7af56bad0594024dc41e04caac4135b049a468118984"
+      "bytes": 4315,
+      "sha256": "27116deac937a757598c7e0ceaa888465ff68056457c34ff9a3f121d713c3c5e"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/quick-start.pdf",
@@ -56,8 +56,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 434,
-      "sha256": "a2631d54004acd5108b69e37fe3889ebc6f78fad2575704ea7c7f232206bc13f"
+      "bytes": 446,
+      "sha256": "36ce09a230337f7552c41c9331e5a9adbefd0d817fafeddaa65ba6c59db90f50"
     }
   ]
 }
