@@ -68,6 +68,13 @@ const TOOLKIT: { cmd: string; tagline: string; color: string }[] = [
 
 const SECTIONS = [
   {
+    href: "/evidence",
+    label: "Evidence Cockpit",
+    desc: "Review artifacts by validation, replay, semantic strength, claim flags, and reviewer decision.",
+    color: C.green,
+    tag: "review",
+  },
+  {
     href: "/explorer",
     label: "Explorer",
     desc: "Build and optimize EML expression trees interactively.",
@@ -105,6 +112,13 @@ const SECTIONS = [
 ];
 
 const SPOTLIGHTS = [
+  {
+    href: "/evidence",
+    title: "Evidence Cockpit",
+    eyebrow: "new · reviewer gate",
+    text: "Inspect approved and candidate evidence packets before claims move onto public surfaces.",
+    color: C.green,
+  },
   {
     href: "/electronics",
     title: "Electronics Lab",

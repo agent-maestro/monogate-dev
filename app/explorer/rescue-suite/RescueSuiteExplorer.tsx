@@ -17,6 +17,12 @@ const C = {
   red: "#f87171",
 };
 
+const evidenceLinks = [
+  { href: "/evidence", label: "Evidence cockpit" },
+  { href: "https://monogate.org/blog/proof-carrying-rescue-status/", label: "Status note" },
+  { href: "https://monogate.org/research/frontier/", label: "Frontier map" },
+];
+
 const humanCopy: Record<string, { problem: string; rescue: string; proof: string; limit: string }> = {
   log_domain_lift: {
     problem: "The raw sample asks log-domain math to evaluate at a non-positive coordinate.",
@@ -75,6 +81,13 @@ function payloadRows(payload: Record<string, unknown>) {
   return Object.entries(payload).filter(([key]) => key !== "event_class");
 }
 
+function semanticColor(strength: string) {
+  if (strength === "restricted_semantic_rewrite") return C.blue;
+  if (strength === "concrete_sample_invariant") return C.green;
+  if (strength === "packet_bridge_only") return C.orange;
+  return C.muted;
+}
+
 function PayloadPanel({ title, frame, payload, color }: { title: string; frame: TraceFrame; payload: Record<string, unknown>; color: string }) {
   return (
     <div style={{ border: `1px solid ${C.border}`, background: C.surface2, borderRadius: 8, padding: 12 }}>
@@ -109,6 +122,14 @@ export default function RescueSuiteExplorer() {
   );
   const visibleFrames = showWitnessOnly ? lane.frames.filter(frame => frame.isWitness) : lane.frames;
   const selectedFrame = visibleFrames[Math.min(frameCursor, Math.max(visibleFrames.length - 1, 0))] ?? lane.frames[0];
+  const replaySteps = [
+    { label: "raw event", value: selectedFrame.rawEvent, color: C.red },
+    { label: "rescue operator", value: lane.operator, color: lane.accent },
+    { label: "rescued event", value: selectedFrame.rescueEvent, color: lane.accent },
+    { label: "obligation", value: lane.obligation, color: C.green },
+    { label: "semantic tier", value: lane.semanticContract.semantic_strength, color: semanticColor(lane.semanticContract.semantic_strength) },
+    { label: "approval", value: approval?.decision ?? "pending", color: approval?.surface_allowed ? C.green : C.red },
+  ];
 
   useEffect(() => {
     setFrameCursor(0);
@@ -124,6 +145,9 @@ export default function RescueSuiteExplorer() {
           <h1 style={{ color: C.text, fontSize: 28, lineHeight: 1.15, margin: "0 0 10px", letterSpacing: 0 }}>
             Proof-carrying rescue suite
           </h1>
+          <p style={{ color: C.orange, fontSize: 14, lineHeight: 1.65, maxWidth: 760, margin: "0 0 8px" }}>
+            Watch Forge turn optimization failures into reviewable, proof-carrying rescues.
+          </p>
           <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.75, maxWidth: 740, margin: 0 }}>
             Software replay surface for Forge boundary-event rescue packets. Each lane shows the raw event,
             named rescue operator, witness transition, trace frames, and MachLib obligation routed by the v0 manifest.
@@ -131,6 +155,25 @@ export default function RescueSuiteExplorer() {
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
             {codePill(explorerFixture.schemaVersion, C.blue)}
             {codePill(explorerFixture.generatedFrom.suite, C.orange)}
+            {codePill("reviewed artifact", C.green)}
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+            {evidenceLinks.map(link => (
+              <a
+                key={link.href}
+                href={link.href}
+                style={{
+                  color: C.text,
+                  border: `1px solid ${C.border2}`,
+                  borderRadius: 5,
+                  padding: "6px 8px",
+                  fontSize: 11,
+                  textDecoration: "none",
+                }}
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
           <div style={{ display: "inline-grid", gridTemplateColumns: "1fr 1fr", gap: 4, marginTop: 14, border: `1px solid ${C.border}`, borderRadius: 8, padding: 4 }}>
             {(["human", "machine"] as const).map(mode => (
@@ -247,7 +290,7 @@ export default function RescueSuiteExplorer() {
             </div>
             <div>
               <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>semantic strength</div>
-              {codePill(lane.semanticContract.semantic_strength, lane.semanticContract.semantic_strength === "packet_bridge_only" ? C.orange : C.green)}
+              {codePill(lane.semanticContract.semantic_strength, semanticColor(lane.semanticContract.semantic_strength))}
             </div>
             {viewMode === "machine" && (
               <div style={{ display: "grid", gap: 7, fontSize: 11 }}>
@@ -350,6 +393,45 @@ export default function RescueSuiteExplorer() {
           </p>
         </section>
       )}
+
+      <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18, marginBottom: 16 }}>
+        <div style={{ color: lane.accent, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+          Replay chain
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, minmax(0, 1fr))", gap: 8 }}>
+          {replaySteps.map((step, index) => (
+            <div key={step.label} style={{ border: `1px solid ${C.border}`, background: C.surface2, borderRadius: 8, padding: 10, minHeight: 86 }}>
+              <div style={{ color: C.muted, fontSize: 10, marginBottom: 7 }}>{String(index + 1).padStart(2, "0")} / {step.label}</div>
+              <div style={{ color: step.color, fontSize: 11, lineHeight: 1.45, overflowWrap: "anywhere", fontWeight: 700 }}>{step.value}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.9fr) minmax(0, 1.1fr)", gap: 16, marginBottom: 16 }}>
+        <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
+          <div style={{ color: lane.accent, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+            Selected sample review
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "8px 12px", fontSize: 12 }}>
+            <span style={{ color: C.muted }}>sample</span><strong style={{ color: C.text }}>{selectedFrame.sample}</strong>
+            <span style={{ color: C.muted }}>transition</span><strong style={{ color: lane.accent, overflowWrap: "anywhere" }}>{selectedFrame.transition}</strong>
+            <span style={{ color: C.muted }}>witness frame</span><strong style={{ color: selectedFrame.isWitness ? C.green : C.orange }}>{String(selectedFrame.isWitness)}</strong>
+            <span style={{ color: C.muted }}>allowed claim</span><strong style={{ color: semanticColor(lane.semanticContract.semantic_strength), overflowWrap: "anywhere" }}>{lane.semanticContract.semantic_strength}</strong>
+          </div>
+        </article>
+        <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
+          <div style={{ color: lane.accent, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+            Review packet
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {codePill(replayStatus.manifest, C.blue)}
+            {codePill(replayStatus.replay, C.green)}
+            {codePill("reports/rescue_obligation_registry_v0_2026_05_26.json", C.orange)}
+            {codePill("reports/rescue_artifact_approval_v0_2026_05_26.json", C.green)}
+          </div>
+        </article>
+      </section>
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 16 }}>
         <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
