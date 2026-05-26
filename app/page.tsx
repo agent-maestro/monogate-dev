@@ -75,6 +75,13 @@ const SECTIONS = [
     tag: "tool",
   },
   {
+    href: "/electronics",
+    label: "Electronics Lab",
+    desc: "Trainer Board v0 simulator: wire the pot-to-guarded-LED loop, emit simulated traces, and learn the evidence packet path.",
+    color: C.green,
+    tag: "sim lab",
+  },
+  {
     href: "/challenge",
     label: "Challenge Board",
     desc: "Open problems: construct sin, cos, π, i from eml(x,y) = exp(x) − ln(y). Submit a construction, get credited permanently.",
@@ -83,23 +90,47 @@ const SECTIONS = [
   },
   {
     href: "/lab",
-    label: "Lab",
+    label: "Math Lab",
     desc: "Interactive experiments and experiences built on the EML grammar.",
-    color: C.green,
+    color: C.purple,
     tag: "lab",
   },
   {
     href: "/docs",
     label: "Docs",
     desc: "API reference, quickstart, and tutorial for the monogate library.",
-    color: C.purple,
+    color: C.blue,
     tag: "docs",
+  },
+];
+
+const SPOTLIGHTS = [
+  {
+    href: "/electronics",
+    title: "Electronics Lab",
+    eyebrow: "new · simulated trainer board",
+    text: "A guided low-voltage bench simulator for threshold_reflex_v0: ground, 3V3, potentiometer, resistor, LED, guard clamp, trace.",
+    color: C.green,
+  },
+  {
+    href: "/explorer?tab=field",
+    title: "Complex Field",
+    eyebrow: "visual EML",
+    text: "Domain coloring for complex EML slices, including the modular-symmetry-inspired visual grammar.",
+    color: C.blue,
+  },
+  {
+    href: "/explorer?tab=ir",
+    title: "IR Inspector",
+    eyebrow: "prototype",
+    text: "Inspect DAG sharing, replay frames, and MachLib polynomial evidence packets behind the Explorer.",
+    color: C.orange,
   },
 ];
 
 export default function LandingPage() {
   return (
-    <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 680, margin: "0 auto", padding: "0 16px 80px" }}>
+    <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 920, margin: "0 auto", padding: "0 18px 80px" }}>
 
       {/* Hero */}
       <section style={{ marginBottom: 56 }}>
@@ -109,13 +140,13 @@ export default function LandingPage() {
         <h1 style={{ fontSize: 36, fontWeight: 700, color: C.orange, fontFamily: "monospace", marginBottom: 16, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
           One operator.<br />All of mathematics.
         </h1>
-        <p style={{ fontSize: 15, color: C.text, lineHeight: 1.8, maxWidth: 560, marginBottom: 24 }}>
+        <p style={{ fontSize: 15, color: C.text, lineHeight: 1.8, maxWidth: 640, marginBottom: 24 }}>
           The research layer that powers Monogate Forge and MachLib. Profile,
           measure, and optimize EML expressions before the compiler ever sees
           them. Built on Odrzywołek (2026) — every elementary function as a
           finite binary tree of <code style={{ color: C.orange, fontFamily: "monospace" }}>eml(x, y) = exp(x) − ln(y)</code>.
         </p>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
           <code style={{ fontSize: 12, color: C.blue, background: "rgba(106,176,245,0.07)", border: `1px solid rgba(106,176,245,0.2)`, borderRadius: 4, padding: "6px 12px" }}>
             pip install eml-cost
           </code>
@@ -123,14 +154,40 @@ export default function LandingPage() {
             npm install monogate
           </code>
         </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <a href="/explorer" style={{ fontSize: 12, color: C.bg, background: C.orange, border: `1px solid ${C.orange}`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
+            Open Explorer
+          </a>
+          <a href="/electronics" style={{ fontSize: 12, color: C.green, background: "rgba(74,222,128,0.07)", border: `1px solid rgba(74,222,128,0.28)`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
+            Try Electronics Lab
+          </a>
+        </div>
       </section>
 
-      {/* Toolkit row — three pip installs side by side */}
-      <section style={{ marginBottom: 56 }}>
+      {/* Spotlight workbenches */}
+      <section style={{ marginBottom: 48 }}>
+        <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
+          Workbenches
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
+          {SPOTLIGHTS.map(({ href, title, eyebrow, text, color }) => (
+            <a key={href} href={href} style={{ display: "block", minHeight: 150, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "16px 18px", textDecoration: "none", color: "inherit" }}>
+              <div style={{ fontSize: 9, color, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "monospace", marginBottom: 10 }}>
+                {eyebrow}
+              </div>
+              <div style={{ fontSize: 16, color, fontWeight: 700, marginBottom: 8 }}>{title}</div>
+              <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{text}</div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Toolkit row */}
+      <section style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
           The complete toolkit
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
           {TOOLKIT.map(({ cmd, tagline, color }) => (
             <div key={cmd} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "16px 20px" }}>
               <div style={{ fontFamily: "monospace", fontSize: 13, color, marginBottom: 6, fontWeight: 700 }}>
@@ -186,9 +243,9 @@ export default function LandingPage() {
       </section>
 
       {/* Section cards */}
-      <section style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 48 }}>
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10, marginBottom: 48 }}>
         {SECTIONS.map(({ href, label, desc, color, tag }) => (
-          <a key={href} href={href} style={{ display: "block", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "18px 22px", textDecoration: "none", color: "inherit" }}>
+          <a key={href} href={href} style={{ display: "block", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "18px 18px", textDecoration: "none", color: "inherit" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
               <div style={{ fontSize: 15, fontWeight: 700, color }}>{label}</div>
               <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color, background: `${color}15`, border: `1px solid ${color}30`, borderRadius: 3, padding: "2px 6px" }}>
