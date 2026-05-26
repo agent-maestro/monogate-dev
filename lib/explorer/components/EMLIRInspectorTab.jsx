@@ -1,7 +1,8 @@
 import model from "../data/eml_ir_inspector_model.json";
 import polynomialEvidence from "../data/machlib_polynomial_evidence_internal_card.json";
 import finiteZeroPacket from "../data/machlib_finite_zero_packet_internal_card.json";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { emitReplayPacket, normalizeDag, validateReplayPacket } from "../ir-runtime.js";
 
 const C = {
   bg: "#07080f",
@@ -74,6 +75,72 @@ function MiniDag({ program }) {
   );
 }
 
+function LiveDag({ dag }) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 8 }}>
+      {dag.nodes.map((node) => (
+        <div key={node.id} style={{
+          border: `1px solid ${node.domain_annotations.length ? "rgba(245,158,11,0.45)" : C.border}`,
+          background: node.domain_annotations.length ? "rgba(245,158,11,0.05)" : C.bg,
+          borderRadius: 7,
+          padding: 10,
+          minHeight: 92,
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 5 }}>
+            <strong style={{ color: C.text }}>{node.id}</strong>
+            <span style={{ color: C.blue, fontSize: 10 }}>{node.op_kind}</span>
+          </div>
+          <div style={{ color: C.muted, fontSize: 9, lineHeight: 1.6 }}>
+            args={node.args.length ? node.args.join(", ") : "none"}
+          </div>
+          <div style={{ color: C.muted, fontSize: 9, lineHeight: 1.6 }}>
+            literal={node.literal ?? "none"}
+          </div>
+          {node.domain_annotations.length ? (
+            <div style={{ color: C.warn, fontSize: 9, marginTop: 7, lineHeight: 1.5 }}>
+              {node.domain_annotations.map((item) => item.kind).join(", ")}
+            </div>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LiveReplay({ packet }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+      {packet.frames.map((frame) => {
+        const guarded = frame.guard_action === "ANNOTATE_DOMAIN";
+        return (
+          <div key={frame.frame_id} style={{
+            border: `1px solid ${guarded ? "rgba(245,158,11,0.45)" : C.border}`,
+            background: guarded ? "rgba(245,158,11,0.055)" : C.bg,
+            borderRadius: 7,
+            padding: "9px 10px",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ color: frame.lifecycle_state === "PARKED" ? C.green : C.text, fontWeight: 700 }}>
+                {frame.lifecycle_state}
+              </span>
+              <span style={{ color: guarded ? C.warn : C.green, fontSize: 10 }}>
+                {frame.guard_action ?? "LIFECYCLE"}
+              </span>
+            </div>
+            <div style={{ color: C.muted, fontSize: 10, marginTop: 3 }}>
+              {frame.node_id ? `${frame.node_id} · ${frame.op_kind}` : frame.frame_id}
+            </div>
+            <div style={{ color: C.text, fontSize: 10, lineHeight: 1.6, marginTop: 6 }}>{frame.what_happened}</div>
+            <div style={{ color: C.muted, fontSize: 9, marginTop: 6, wordBreak: "break-word" }}>
+              {frame.replay_hash.slice(0, 32)}...
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function Timeline({ program }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
@@ -111,8 +178,19 @@ function Timeline({ program }) {
 export default function EMLIRInspectorTab() {
   const programs = model.programs;
   const [selectedId, setSelectedId] = useState(model.best_program_id);
+  const [liveExpr, setLiveExpr] = useState("exp(x) + exp(x)");
   const selected = programs.find((row) => row.program_id === selectedId) ?? programs[0];
   const best = selected;
+  const live = useMemo(() => {
+    try {
+      const dag = normalizeDag(liveExpr);
+      const packet = emitReplayPacket(dag);
+      const validation = validateReplayPacket(packet);
+      return { dag, packet, validation, error: null };
+    } catch (error) {
+      return { dag: null, packet: null, validation: null, error: error.message };
+    }
+  }, [liveExpr]);
 
   return (
     <div>
@@ -150,6 +228,73 @@ export default function EMLIRInspectorTab() {
       }}>
         Tree SuperBEST costs are the public-safe baseline. DAG/IR savings shown here are internal prototype evidence
         until the lowering contract and product copy are reviewed.
+      </div>
+
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: C.accent, fontSize: 13, fontWeight: 700 }}>Live IR Replay Builder</div>
+            <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7 }}>
+              Type an expression to generate normalized DAG nodes and a hash-chained replay packet from the EML IR v1 artifact.
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <Chip tone={C.warn}>public_savings_claim: false</Chip>
+            <Chip tone={C.warn}>formal_verification_claim: false</Chip>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+          {["exp(x) + exp(x)", "ln(x) + sqrt(y)", "div(exp(x), exp(y))", "sin(x) + cos(x)", "tanh(x*x)"].map((expr) => (
+            <button key={expr} onClick={() => setLiveExpr(expr)} style={{
+              border: `1px solid ${liveExpr === expr ? C.accent : C.border}`,
+              background: liveExpr === expr ? "rgba(232,160,32,0.10)" : C.bg,
+              color: liveExpr === expr ? C.accent : C.muted,
+              borderRadius: 4,
+              padding: "5px 8px",
+              fontSize: 10,
+              fontFamily: "inherit",
+            }}>
+              {expr}
+            </button>
+          ))}
+        </div>
+        <input
+          value={liveExpr}
+          onChange={(event) => setLiveExpr(event.target.value)}
+          style={{
+            width: "100%",
+            background: C.bg,
+            border: `1px solid ${live.error ? C.warn : C.border}`,
+            color: C.text,
+            borderRadius: 6,
+            padding: "10px 12px",
+            fontSize: 12,
+            fontFamily: "inherit",
+            marginBottom: 12,
+          }}
+        />
+        {live.error ? (
+          <div style={{ color: C.warn, fontSize: 10, lineHeight: 1.7 }}>{live.error}</div>
+        ) : (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))", gap: 10, marginBottom: 12 }}>
+              <Stat label="nodes" value={live.dag.nodes.length} tone={C.blue} />
+              <Stat label="tree cost" value={live.dag.tree_cost} />
+              <Stat label="DAG cost" value={live.dag.dag_cost} tone={C.green} />
+              <Stat label="packet valid" value={live.validation.ok ? "yes" : "no"} tone={live.validation.ok ? C.green : C.warn} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(260px,1fr) minmax(260px,1fr)", gap: 12 }}>
+              <div>
+                <div style={{ color: C.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Normalized DAG</div>
+                <LiveDag dag={live.dag} />
+              </div>
+              <div>
+                <div style={{ color: C.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Replay Packet</div>
+                <LiveReplay packet={live.packet} />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <div style={{
