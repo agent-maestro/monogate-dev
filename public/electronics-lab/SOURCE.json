@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-05-26T10:19:53.795359+00:00",
+  "generated_at": "2026-05-26T10:23:24.319671+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "d7fc7e8b0d842e494c7f546895d74d795ab95d5e",
+  "source_commit": "7150807dbcefac44ed733f3ee3029bc408169b83",
   "source_dirty": false,
   "source_status": [],
   "build_command": "npm ci && npm run build",
@@ -25,19 +25,39 @@
   },
   "artifacts": [
     {
-      "path": "assets/index-CiuB04jJ.js",
-      "bytes": 150199,
-      "sha256": "6c23a4e1182afb3775a5978ed68efa2e52e9123dd152329f31d600ea33c9369d"
+      "path": "assets/index-DFGOl51X.js",
+      "bytes": 1226765,
+      "sha256": "caf2603a543200b850a654567da9faadcf5bc3a062cd749ae8d4efe1dda56908"
     },
     {
-      "path": "assets/index-Cx1tdYAT.css",
-      "bytes": 7334,
-      "sha256": "0291d4d6f42c32c33674461f2581aaf0e5430e8098ae064bd1d35a2308a8259f"
+      "path": "assets/index-xz_lHFK7.css",
+      "bytes": 47889,
+      "sha256": "56853ff02172a5967b43f5287a5394b38e19635f70a7bdb413a0dcf574423b15"
+    },
+    {
+      "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/electrocookie-build-guide.md",
+      "bytes": 4459,
+      "sha256": "b723588545fcbf7eb61d2aa6d511e7034620c8e6137d272c9466ac5436e12033"
+    },
+    {
+      "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/lab-packet.md",
+      "bytes": 9128,
+      "sha256": "27a35fd580ad15ace0cd3573189410d584987d2f348e4930da11bf975b463af2"
+    },
+    {
+      "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/quick-start.html",
+      "bytes": 4152,
+      "sha256": "97935ca68ee97617856a7af56bad0594024dc41e04caac4135b049a468118984"
+    },
+    {
+      "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/quick-start.pdf",
+      "bytes": 112421,
+      "sha256": "35360c718675923c89e921f912eeca6114d03abc6302c7eea9d90feed849dee8"
     },
     {
       "path": "index.html",
-      "bytes": 434,
-      "sha256": "3d1f03440718a6f4d0af066884c40b634bdd5d2933112228e6ba5e382419d92e"
+      "bytes": 402,
+      "sha256": "0fc71237198536e176773a4f147d9135c084431cd552179dc4b9c47f1084a63f"
     }
   ]
 }
