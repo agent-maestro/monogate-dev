@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-05-26T08:56:16.799841+00:00",
+  "generated_at": "2026-05-26T09:34:16.413735+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "5d23fb69f24a14db9717a67cc13120eef487b39d",
+  "source_commit": "e399ee8e74b3976e74fb8bbcf3d008f863e66bbd",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -25,19 +25,19 @@
   },
   "artifacts": [
     {
-      "path": "assets/index-CCfBSs1y.css",
-      "bytes": 47608,
-      "sha256": "38c241043f1d8930ebbb4c49e8f40501907c8bdf49547666cbdb590ed5cb8e98"
+      "path": "assets/index-CsBRqAzL.js",
+      "bytes": 1226725,
+      "sha256": "796085a25dbf69aa0d9513b403e5b3a2cf91a1c99ebdcff5dde4228dd6ef8e3f"
     },
     {
-      "path": "assets/index-rc50XZfh.js",
-      "bytes": 1226236,
-      "sha256": "7ce71d47cb2671c4a11cdafb2c89cfe21306d0085ebcf30f3e67c5a773a97977"
+      "path": "assets/index-xz_lHFK7.css",
+      "bytes": 47889,
+      "sha256": "56853ff02172a5967b43f5287a5394b38e19635f70a7bdb413a0dcf574423b15"
     },
     {
       "path": "index.html",
       "bytes": 446,
-      "sha256": "22ddd2c6b1d9134d18edeea941570625f49c1fbeae6e3972e12bb206a8851d05"
+      "sha256": "55b84955987c79042b31bfc4a45ce0c4afe47c60db30f81979e39946b6bd01e0"
     }
   ]
 }
