@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-05-26T11:33:48.619470+00:00",
+  "generated_at": "2026-05-26T11:44:19.025924+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "605a753e6301070dcd9cc0ddecd3c79b0f103b78",
+  "source_commit": "6dfc4132a868fbab775ba47455d1357d8fbfb901",
   "source_dirty": false,
   "source_status": [],
   "build_command": "npm ci && npm run build:monogate-dev",
@@ -25,14 +25,14 @@
   },
   "artifacts": [
     {
-      "path": "assets/index-Btr1l6ph.js",
-      "bytes": 1247024,
-      "sha256": "74afb0ed798bcdffd39ef90a7f68fde48995f438a419436e2e22d39662e4781c"
+      "path": "assets/index-BO71ow_j.css",
+      "bytes": 66506,
+      "sha256": "babf3a7f43f8b15ec65ffc64f0079fef48123a78b0ea3d7aecdbe82e10d084e4"
     },
     {
-      "path": "assets/index-DrOzejd6.css",
-      "bytes": 66275,
-      "sha256": "73982083ddb493c4fde344768f221f041e18ba9e0bb37b9d1109c06562cddcbb"
+      "path": "assets/index-DWmAXE-Z.js",
+      "bytes": 1248176,
+      "sha256": "723cc6fcf1c20fa90caa89f02ef760adddcd0074eb7740c6745fe1278c3cd9e2"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/electrocookie-build-guide.md",
@@ -57,7 +57,7 @@
     {
       "path": "index.html",
       "bytes": 446,
-      "sha256": "3c01b0360b870c590ad241835282e064ad505fb2253bf13baf7b4784c1cac56c"
+      "sha256": "bcc0bd924a28efebbbc695448c5e1019c8400026d0cf3a2b30e69bdbb86e5b78"
     }
   ]
 }
