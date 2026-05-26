@@ -1,7 +1,9 @@
 import cornerPacket from "../data/high_dim_corner_concentration_2026_05_26.json";
 import tracePacket from "../data/forge_attractor_trace_packet_2026_05_26.json";
+import heuristicPacket from "../data/forge_heuristic_frontier_2026_05_26.json";
 import usefulPacket from "../data/high_dim_useful_volume_census_2026_05_26.json";
 import formalizationPacket from "../data/high_dim_formalization_bridge_2026_05_26.json";
+import corpusIndex from "../data/ir_evidence_corpus_index.json";
 
 const C = {
   bg: "#07080f",
@@ -64,6 +66,7 @@ export default function HighDimensionalTab() {
   const rows = cornerPacket.rows;
   const final = rows[rows.length - 1];
   const traceRows = tracePacket.summary;
+  const heuristicRows = heuristicPacket.rows.filter((row) => row.depth >= 3);
   const usefulRows = usefulPacket.rows.filter((row) => row.target === "pi" && row.distribution !== "raw_cube");
 
   return (
@@ -121,6 +124,36 @@ export default function HighDimensionalTab() {
           <Chip tone={C.warn}>orange: boundary shell</Chip>
           <Chip tone={C.blue}>blue: middle proxy</Chip>
           <Chip tone={C.green}>green: non-saturated EML</Chip>
+        </div>
+      </div>
+
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: C.text, fontSize: 12, fontWeight: 700 }}>Forge Heuristic Frontier</div>
+            <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7 }}>
+              Multi-seed comparison for guarded, boundary-aware, and random-search regimes.
+            </div>
+          </div>
+          <Chip tone={C.warn}>optimizer_release_claim: false</Chip>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 8 }}>
+          {heuristicRows.map((row) => (
+            <div key={`${row.depth}_${row.regime}`} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 7, padding: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                <span style={{ color: C.accent, fontSize: 10, fontWeight: 700 }}>d{row.depth}</span>
+                <span style={{ color: C.muted, fontSize: 9 }}>{row.regime}</span>
+              </div>
+              <Bar value={1 - row.mean_saturation_rate} tone={row.mean_saturation_rate < 0.5 ? C.green : C.red} />
+              <div style={{ color: C.muted, fontSize: 9, lineHeight: 1.7, marginTop: 7 }}>
+                mean loss {fmt(row.mean_best_loss)}<br />
+                finite {(row.mean_finite_fraction * 100).toFixed(0)}% · saturation {(row.mean_saturation_rate * 100).toFixed(0)}%
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7, marginTop: 12 }}>
+          Next Forge experiment: log-domain parameterization. Random search remains a control, not a release heuristic.
         </div>
       </div>
 
@@ -197,6 +230,27 @@ export default function HighDimensionalTab() {
         </div>
         <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7, marginTop: 12 }}>
           These are theorem stubs only. No formal verification claim is attached to this packet.
+        </div>
+      </div>
+
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, marginTop: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: C.text, fontSize: 12, fontWeight: 700 }}>IR Evidence Corpus</div>
+            <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7 }}>
+              Stable packet index for lowering, replay, guard, and saturation cases.
+            </div>
+          </div>
+          <Chip tone={C.warn}>formal_verification_claim: false</Chip>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 8 }}>
+          {corpusIndex.packets.map((packet) => (
+            <div key={packet.id} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 7, padding: 10 }}>
+              <div style={{ color: C.accent, fontSize: 10, fontWeight: 700, marginBottom: 5 }}>{packet.id}</div>
+              <div style={{ color: C.text, fontSize: 10, lineHeight: 1.6, marginBottom: 6 }}>{packet.expression}</div>
+              <div style={{ color: C.muted, fontSize: 9, wordBreak: "break-all" }}>{packet.packet_hash}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
