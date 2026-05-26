@@ -1,5 +1,7 @@
 import cornerPacket from "../data/high_dim_corner_concentration_2026_05_26.json";
 import tracePacket from "../data/forge_attractor_trace_packet_2026_05_26.json";
+import usefulPacket from "../data/high_dim_useful_volume_census_2026_05_26.json";
+import formalizationPacket from "../data/high_dim_formalization_bridge_2026_05_26.json";
 
 const C = {
   bg: "#07080f",
@@ -62,6 +64,7 @@ export default function HighDimensionalTab() {
   const rows = cornerPacket.rows;
   const final = rows[rows.length - 1];
   const traceRows = tracePacket.summary;
+  const usefulRows = usefulPacket.rows.filter((row) => row.target === "pi" && row.distribution !== "raw_cube");
 
   return (
     <div>
@@ -121,7 +124,7 @@ export default function HighDimensionalTab() {
         </div>
       </div>
 
-      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: C.text, fontSize: 12, fontWeight: 700 }}>Forge Attractor Trace Packet</div>
@@ -151,6 +154,49 @@ export default function HighDimensionalTab() {
         <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7, marginTop: 12 }}>
           MachLib/Lean queue: ball/cube collapse, boundary-shell probability, first-layer log-domain survival,
           and guarded lowering domain preservation.
+        </div>
+      </div>
+
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14, marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: C.text, fontSize: 12, fontWeight: 700 }}>Useful Volume Census</div>
+            <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7 }}>
+              Target-adjacent sampled volume for pi under positive and guarded terminal distributions.
+            </div>
+          </div>
+          <Chip tone={C.warn}>symbolic_usefulness_proof: false</Chip>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 8 }}>
+          {usefulRows.map((row) => (
+            <div key={`${row.distribution}_${row.depth}`} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 7, padding: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                <span style={{ color: C.accent, fontSize: 10, fontWeight: 700 }}>d{row.depth}</span>
+                <span style={{ color: C.muted, fontSize: 9 }}>{row.distribution}</span>
+              </div>
+              <Bar value={row.target_adjacent_fraction} tone={row.target_adjacent_fraction > 0 ? C.green : C.red} />
+              <div style={{ color: C.muted, fontSize: 9, lineHeight: 1.7, marginTop: 7 }}>
+                adjacent {(row.target_adjacent_fraction * 100).toFixed(2)}%<br />
+                finite {(row.finite_fraction * 100).toFixed(1)}% · best {fmt(row.best_abs_error)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
+        <div style={{ color: C.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Formalization Bridge</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 8 }}>
+          {formalizationPacket.obligations.map((item) => (
+            <div key={item.id} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 7, padding: 10 }}>
+              <div style={{ color: C.accent, fontSize: 10, fontWeight: 700, marginBottom: 5 }}>{item.id}</div>
+              <div style={{ color: C.text, fontSize: 10, lineHeight: 1.6, marginBottom: 6 }}>{item.informal_statement}</div>
+              <div style={{ color: C.blue, fontSize: 9, wordBreak: "break-word" }}>{item.lean_name}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7, marginTop: 12 }}>
+          These are theorem stubs only. No formal verification claim is attached to this packet.
         </div>
       </div>
     </div>
