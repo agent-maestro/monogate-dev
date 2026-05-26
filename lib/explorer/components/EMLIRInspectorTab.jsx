@@ -2,7 +2,7 @@ import model from "../data/eml_ir_inspector_model.json";
 import polynomialEvidence from "../data/machlib_polynomial_evidence_internal_card.json";
 import finiteZeroPacket from "../data/machlib_finite_zero_packet_internal_card.json";
 import { useMemo, useState } from "react";
-import { emitReplayPacket, normalizeDag, validateReplayPacket } from "../ir-runtime.js";
+import { certifyLowering, validateReplayPacket } from "../ir-runtime.js";
 
 const C = {
   bg: "#07080f",
@@ -42,6 +42,54 @@ function Chip({ children, tone = C.muted }) {
     }}>
       {children}
     </span>
+  );
+}
+
+function CodeBlock({ children }) {
+  return (
+    <pre style={{
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+      margin: 0,
+      background: C.bg,
+      border: `1px solid ${C.border}`,
+      borderRadius: 6,
+      padding: 12,
+      color: C.text,
+      fontSize: 10,
+      lineHeight: 1.6,
+      minHeight: 172,
+    }}>{children}</pre>
+  );
+}
+
+function EquivalenceRows({ evidence }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 7, overflowX: "auto", paddingBottom: 2 }}>
+      {evidence.rows.map((row, index) => (
+        <div key={index} style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(150px,1.3fr) minmax(88px,0.8fr) minmax(88px,0.8fr) minmax(78px,0.7fr) 54px",
+          gap: 8,
+          alignItems: "center",
+          minWidth: 520,
+          background: C.bg,
+          border: `1px solid ${row.valid ? C.border : "rgba(245,158,11,0.45)"}`,
+          borderRadius: 7,
+          padding: "8px 10px",
+          color: C.muted,
+          fontSize: 10,
+        }}>
+          <span style={{ color: C.blue, wordBreak: "break-word" }}>{JSON.stringify(row.sample)}</span>
+          <span style={{ color: C.text }}>{Number(row.interpreted).toPrecision(8)}</span>
+          <span style={{ color: C.text }}>{Number(row.lowered).toPrecision(8)}</span>
+          <span style={{ color: row.abs_error <= evidence.tolerance ? C.green : C.warn }}>
+            {Number(row.abs_error).toExponential(1)}
+          </span>
+          <span style={{ color: row.valid ? C.green : C.warn, fontWeight: 700 }}>{row.valid ? "ok" : "skip"}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -183,12 +231,13 @@ export default function EMLIRInspectorTab() {
   const best = selected;
   const live = useMemo(() => {
     try {
-      const dag = normalizeDag(liveExpr);
-      const packet = emitReplayPacket(dag);
+      const cert = certifyLowering(liveExpr);
+      const dag = cert.dag;
+      const packet = cert.replay;
       const validation = validateReplayPacket(packet);
-      return { dag, packet, validation, error: null };
+      return { cert, dag, packet, validation, error: null };
     } catch (error) {
-      return { dag: null, packet: null, validation: null, error: error.message };
+      return { cert: null, dag: null, packet: null, validation: null, error: error.message };
     }
   }, [liveExpr]);
 
@@ -235,16 +284,17 @@ export default function EMLIRInspectorTab() {
           <div>
             <div style={{ color: C.accent, fontSize: 13, fontWeight: 700 }}>Live IR Replay Builder</div>
             <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7 }}>
-              Type an expression to generate normalized DAG nodes and a hash-chained replay packet from the EML IR v1 artifact.
+              Type an expression to generate normalized DAG nodes, a hash-chained replay packet, lowered code,
+              and sampled interpreter-vs-lowered evidence from the EML IR v1 artifact.
             </div>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             <Chip tone={C.warn}>public_savings_claim: false</Chip>
-            <Chip tone={C.warn}>formal_verification_claim: false</Chip>
+            <Chip tone={C.warn}>sampled_evidence_only: true</Chip>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-          {["exp(x) + exp(x)", "ln(x) + sqrt(y)", "div(exp(x), exp(y))", "sin(x) + cos(x)", "tanh(x*x)"].map((expr) => (
+          {["exp(x) + exp(x)", "ln(x) + sqrt(y)", "exp(x) / exp(y)", "sin(x) + cos(x)", "tanh(x*x)"].map((expr) => (
             <button key={expr} onClick={() => setLiveExpr(expr)} style={{
               border: `1px solid ${liveExpr === expr ? C.accent : C.border}`,
               background: liveExpr === expr ? "rgba(232,160,32,0.10)" : C.bg,
@@ -282,8 +332,10 @@ export default function EMLIRInspectorTab() {
               <Stat label="tree cost" value={live.dag.tree_cost} />
               <Stat label="DAG cost" value={live.dag.dag_cost} tone={C.green} />
               <Stat label="packet valid" value={live.validation.ok ? "yes" : "no"} tone={live.validation.ok ? C.green : C.warn} />
+              <Stat label="sampled eq" value={live.cert.equivalence.behavioral_equivalence_sampled ? "yes" : "no"} tone={live.cert.equivalence.behavioral_equivalence_sampled ? C.green : C.warn} />
+              <Stat label="max abs error" value={live.cert.equivalence.max_abs_error.toExponential(1)} tone={C.blue} />
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "minmax(260px,1fr) minmax(260px,1fr)", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
               <div>
                 <div style={{ color: C.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Normalized DAG</div>
                 <LiveDag dag={live.dag} />
@@ -292,6 +344,31 @@ export default function EMLIRInspectorTab() {
                 <div style={{ color: C.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Replay Packet</div>
                 <LiveReplay packet={live.packet} />
               </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12, marginTop: 12 }}>
+              <div>
+                <div style={{ color: C.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Lowered JavaScript</div>
+                <CodeBlock>{live.cert.lowering.javascript.source}</CodeBlock>
+              </div>
+              <div>
+                <div style={{ color: C.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Lowered Python</div>
+                <CodeBlock>{live.cert.lowering.python.source}</CodeBlock>
+              </div>
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+                <div>
+                  <div style={{ color: C.text, fontSize: 12, fontWeight: 700 }}>Sampled Equivalence Evidence</div>
+                  <div style={{ color: C.muted, fontSize: 10, lineHeight: 1.7 }}>
+                    DAG interpreter compared with lowered JavaScript across positive-domain samples.
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "flex-start" }}>
+                  <Chip tone={C.green}>{live.cert.equivalence.valid_sample_count} valid samples</Chip>
+                  <Chip tone={C.warn}>formal_verification_claim: false</Chip>
+                </div>
+              </div>
+              <EquivalenceRows evidence={live.cert.equivalence} />
             </div>
           </>
         )}
