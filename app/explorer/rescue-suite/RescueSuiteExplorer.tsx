@@ -17,6 +17,33 @@ const C = {
   red: "#f87171",
 };
 
+const humanCopy: Record<string, { problem: string; rescue: string; proof: string; limit: string }> = {
+  log_domain_lift: {
+    problem: "The raw sample asks log-domain math to evaluate at a non-positive coordinate.",
+    rescue: "Forge replays the sample through a positive internal coordinate produced by the log-domain lift.",
+    proof: "MachLib now has a concrete positive-coordinate witness theorem for this lane, plus the existing packet obligation route.",
+    limit: "This is a sample-level witness and packet bridge, not a full semantic rewrite theorem for arbitrary programs.",
+  },
+  guard_clamp: {
+    problem: "The raw expression hits overflow pressure and loses finite output.",
+    rescue: "Forge replays the sample through a bounded guard coordinate.",
+    proof: "The packet routes to an output-safety obligation and carries a transition witness.",
+    limit: "The optimizer is not yet claiming production rewrite behavior.",
+  },
+  precision_escape: {
+    problem: "Low precision makes the sample look stuck in a phantom attractor.",
+    rescue: "Forge replays at higher precision and exposes an interior escape direction.",
+    proof: "The packet routes to a precision-sensitivity obligation and keeps the transition explicit.",
+    limit: "The lane is replay evidence, not a universal convergence guarantee.",
+  },
+  saturation_deshelf: {
+    problem: "A clamp shelf hides useful boundary pressure behind saturated output.",
+    rescue: "Forge replays pre-clamp pressure so the boundary structure becomes measurable again.",
+    proof: "The packet routes to a clamp-invariant obligation with a transition witness.",
+    limit: "No hardware observation or full semantic proof is claimed for v0.",
+  },
+};
+
 function codePill(text: string, color = C.orange) {
   return (
     <code style={{
@@ -73,7 +100,9 @@ export default function RescueSuiteExplorer() {
   const [active, setActive] = useState(0);
   const [showWitnessOnly, setShowWitnessOnly] = useState(false);
   const [frameCursor, setFrameCursor] = useState(0);
+  const [viewMode, setViewMode] = useState<"human" | "machine">("human");
   const lane = lanes[active];
+  const human = humanCopy[lane.operator];
   const witnessCount = useMemo(
     () => lanes.filter(item => item.frames.some(frame => frame.transition === item.transition)).length,
     []
@@ -102,6 +131,28 @@ export default function RescueSuiteExplorer() {
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
             {codePill(explorerFixture.schemaVersion, C.blue)}
             {codePill(explorerFixture.generatedFrom.suite, C.orange)}
+          </div>
+          <div style={{ display: "inline-grid", gridTemplateColumns: "1fr 1fr", gap: 4, marginTop: 14, border: `1px solid ${C.border}`, borderRadius: 8, padding: 4 }}>
+            {(["human", "machine"] as const).map(mode => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setViewMode(mode)}
+                style={{
+                  minWidth: 88,
+                  border: "none",
+                  borderRadius: 5,
+                  background: viewMode === mode ? C.orange : "transparent",
+                  color: viewMode === mode ? C.bg : C.muted,
+                  padding: "7px 9px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: "capitalize",
+                }}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -148,6 +199,22 @@ export default function RescueSuiteExplorer() {
         })}
       </section>
 
+      {viewMode === "human" && (
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 10, marginBottom: 16 }}>
+          {[
+            ["What failed", human.problem, C.red],
+            ["What rescue did", human.rescue, lane.accent],
+            ["What is proven", human.proof, C.green],
+            ["What is not claimed", human.limit, C.muted],
+          ].map(([title, body, color]) => (
+            <article key={title} style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 14 }}>
+              <div style={{ color, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>{title}</div>
+              <p style={{ color: C.text, fontSize: 12, lineHeight: 1.65, margin: 0 }}>{body}</p>
+            </article>
+          ))}
+        </section>
+      )}
+
       <section style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.95fr) minmax(0, 1.05fr)", gap: 16, marginBottom: 16 }}>
         <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
           <div style={{ color: lane.accent, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
@@ -158,10 +225,12 @@ export default function RescueSuiteExplorer() {
               <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>source fixture</div>
               {codePill(lane.source, lane.accent)}
             </div>
-            <div>
-              <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>function family</div>
-              {codePill(lane.fixture, C.text)}
-            </div>
+            {viewMode === "machine" && (
+              <div>
+                <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>function family</div>
+                {codePill(lane.fixture, C.text)}
+              </div>
+            )}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <div>
                 <div style={{ color: C.muted, fontSize: 10, marginBottom: 5 }}>raw event</div>
@@ -186,7 +255,9 @@ export default function RescueSuiteExplorer() {
                 {codePill(String(lane.summary.rescuedEventCount), lane.accent)}
               </div>
             </div>
-            <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.7, margin: 0 }}>{lane.claim}</p>
+            <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.7, margin: 0 }}>
+              {viewMode === "human" ? human.rescue : lane.claim}
+            </p>
           </div>
         </div>
 
@@ -245,10 +316,21 @@ export default function RescueSuiteExplorer() {
         </div>
       </section>
 
-      <section style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 16, marginBottom: 16 }}>
-        <PayloadPanel title="Before rescue" frame={selectedFrame} payload={selectedFrame.raw} color={C.red} />
-        <PayloadPanel title="After rescue" frame={selectedFrame} payload={selectedFrame.rescued} color={lane.accent} />
-      </section>
+      {viewMode === "machine" ? (
+        <section style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 16, marginBottom: 16 }}>
+          <PayloadPanel title="Before rescue" frame={selectedFrame} payload={selectedFrame.raw} color={C.red} />
+          <PayloadPanel title="After rescue" frame={selectedFrame} payload={selectedFrame.rescued} color={lane.accent} />
+        </section>
+      ) : (
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18, marginBottom: 16 }}>
+          <div style={{ color: lane.accent, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            Selected sample
+          </div>
+          <p style={{ color: C.text, fontSize: 13, lineHeight: 1.75, margin: 0 }}>
+            Sample {selectedFrame.sample}: {selectedFrame.input}. The event moves from {selectedFrame.rawEvent} to {selectedFrame.rescueEvent}; {selectedFrame.metric}.
+          </p>
+        </section>
+      )}
 
       <section style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 16 }}>
         <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
