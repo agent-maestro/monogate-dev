@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { C, pill } from "../../evidence/data";
-import { emlLanguageManifest, emlLanguagePrograms } from "./data";
+import { emlCanonicalComparisons, emlLanguageManifest, emlLanguagePrograms } from "./data";
 
 export const metadata: Metadata = {
   title: "EML Language Kernel",
@@ -20,6 +20,7 @@ export default function EmlLanguageKernelPage() {
   const guardCount = emlLanguagePrograms.reduce((sum, program) => sum + program.guards.length, 0);
   const letCount = emlLanguagePrograms.reduce((sum, program) => sum + program.lets.length, 0);
   const inputCount = emlLanguagePrograms.reduce((sum, program) => sum + program.inputs.length, 0);
+  const expansionTagCount = emlLanguagePrograms.reduce((sum, program) => sum + program.expansionTags.length, 0);
 
   return (
     <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
@@ -33,6 +34,7 @@ export default function EmlLanguageKernelPage() {
         <header style={{ marginBottom: 28 }}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
             {pill("EML-L1", C.orange)}
+            {pill("EML-L2", C.orange)}
             {pill("language kernel", C.blue)}
             {pill(emlLanguageManifest.status, C.green)}
             {pill("no compiler change", C.green)}
@@ -50,6 +52,31 @@ export default function EmlLanguageKernelPage() {
           <Metric label="Inputs" value={inputCount} color={C.purple} />
           <Metric label="Guards" value={guardCount} color={C.green} />
           <Metric label="Let bindings" value={letCount} color={C.orange} />
+          <Metric label="Expansion tags" value={expansionTagCount} color={C.blue} />
+          <Metric label="Canonical pairs" value={emlCanonicalComparisons.summary.equivalent_count} color={C.green} />
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            canonical operator tree lab
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 10 }}>
+            {emlCanonicalComparisons.comparisons.map((item) => (
+              <article key={item.label} style={{ border: `1px solid ${C.border}`, background: C.bg, borderRadius: 8, padding: 12 }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+                  {pill(item.equivalentByCanonicalization ? "canonical match" : "different", item.equivalentByCanonicalization ? C.green : C.red)}
+                </div>
+                <h2 style={{ color: C.text, fontSize: 13, lineHeight: 1.35, margin: "0 0 8px" }}>{item.label}</h2>
+                <code style={{ display: "block", color: C.blue, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 6 }}>
+                  {item.left.surfaceExpression}
+                </code>
+                <code style={{ display: "block", color: C.orange, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 8 }}>
+                  {item.right.surfaceExpression}
+                </code>
+                <p style={{ color: C.muted, fontSize: 11, lineHeight: 1.55, margin: 0 }}>{item.claimBoundary}</p>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 12 }}>
@@ -66,6 +93,14 @@ export default function EmlLanguageKernelPage() {
               <pre style={{ color: C.text, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 12, fontSize: 11, lineHeight: 1.55, whiteSpace: "pre-wrap", overflowWrap: "anywhere", margin: "0 0 12px" }}>
                 {program.normalized_expression}
               </pre>
+              <code style={{ display: "block", color: C.green, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 12 }}>
+                {program.canonicalHash}
+              </code>
+              {program.expansionTags.length ? (
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                  {program.expansionTags.map((tag, index) => pill(`${tag.operator} expands`, index % 2 ? C.orange : C.green))}
+                </div>
+              ) : null}
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
                 {program.inputs.map((input) => pill(input.name, C.purple))}
               </div>
@@ -90,9 +125,18 @@ export default function EmlLanguageKernelPage() {
                 </div>
               ) : null}
               <details>
-                <summary style={{ color: C.muted, cursor: "pointer", fontSize: 12 }}>AST</summary>
+                <summary style={{ color: C.muted, cursor: "pointer", fontSize: 12 }}>ASTs</summary>
+                <div style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 10 }}>surface</div>
                 <pre style={{ color: C.muted, fontSize: 10, lineHeight: 1.5, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
-                  {JSON.stringify(program.ast, null, 2)}
+                  {JSON.stringify(program.surfaceAst, null, 2)}
+                </pre>
+                <div style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>expanded</div>
+                <pre style={{ color: C.muted, fontSize: 10, lineHeight: 1.5, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+                  {JSON.stringify(program.expandedAst, null, 2)}
+                </pre>
+                <div style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>canonical</div>
+                <pre style={{ color: C.muted, fontSize: 10, lineHeight: 1.5, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+                  {JSON.stringify(program.canonicalAst, null, 2)}
                 </pre>
               </details>
             </article>
@@ -102,4 +146,3 @@ export default function EmlLanguageKernelPage() {
     </main>
   );
 }
-

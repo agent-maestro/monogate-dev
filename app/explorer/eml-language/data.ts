@@ -1,4 +1,5 @@
 import manifestJson from "./data/eml_language_kernel_manifest_2026_05_27.json";
+import comparisonsJson from "./data/eml_language_canonical_comparisons_2026_05_27.json";
 import gaussianEnergyJson from "./data/gaussian_energy_v0_language_2026_05_27.json";
 import guardedEmlSoftplusJson from "./data/guarded_eml_softplus_v0_language_2026_05_27.json";
 import rawEmlPrimitiveJson from "./data/raw_eml_primitive_v0_language_2026_05_27.json";
@@ -10,6 +11,7 @@ export type EmlLanguageProgram = {
   program_id: string;
   family: string;
   source: string;
+  surface_expression: string;
   physical_meaning: string;
   source_repo: string;
   normalized_expression: string;
@@ -17,6 +19,11 @@ export type EmlLanguageProgram = {
   guards: Array<{ kind: string; expression: string; min?: number; max?: number }>;
   lets: Array<{ name: string; expression: string; normalized_expression: string }>;
   ast: Record<string, unknown>;
+  surfaceAst: Record<string, unknown>;
+  expandedAst: Record<string, unknown>;
+  canonicalAst: Record<string, unknown>;
+  canonicalHash: string;
+  expansionTags: Array<{ operator: string; expandsTo: string }>;
   claim_flags: Record<string, boolean>;
   nonClaims: string[];
 };
@@ -30,6 +37,23 @@ export const emlLanguageManifest = manifestJson as unknown as {
     normalized_expression: string;
     guard_count: number;
     let_count: number;
+    canonical_hash: string;
+    expansion_tag_count: number;
+  }>;
+};
+
+export const emlCanonicalComparisons = comparisonsJson as unknown as {
+  status: string;
+  summary: {
+    comparison_count: number;
+    equivalent_count: number;
+  };
+  comparisons: Array<{
+    label: string;
+    equivalentByCanonicalization: boolean;
+    claimBoundary: string;
+    left: { surfaceExpression: string; expandedExpression: string; canonicalHash: string };
+    right: { surfaceExpression: string; expandedExpression: string; canonicalHash: string };
   }>;
 };
 
@@ -40,4 +64,3 @@ export const emlLanguagePrograms = [
   sigmoidDerivativeJson,
   softplusPairJson,
 ] as unknown as EmlLanguageProgram[];
-
