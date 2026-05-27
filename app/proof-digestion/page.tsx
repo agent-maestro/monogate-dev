@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import Nav from "@/app/components/Nav";
 import { C, pill } from "@/app/evidence/data";
 
 import fixtureJson from "./proof_digestion_lab_fixture_v0_2026_05_27.json";
@@ -86,7 +85,6 @@ export default function ProofDigestionPage() {
 
   return (
     <div style={{ background: C.bg, minHeight: "100vh" }}>
-      <Nav />
       <main style={{ maxWidth: 920, margin: "0 auto", padding: "58px 18px 84px" }}>
         <header style={{ marginBottom: 34 }}>
           <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 14 }}>
