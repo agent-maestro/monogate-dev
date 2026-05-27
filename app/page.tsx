@@ -169,10 +169,10 @@ const SPOTLIGHTS = [
     color: C.blue,
   },
   {
-    href: "/explorer?tab=ir",
-    title: "IR Inspector",
-    eyebrow: "prototype",
-    text: "Inspect DAG sharing, replay frames, and MachLib polynomial evidence packets behind the Explorer.",
+    href: "/explorer/eml-ir-bridge",
+    title: "EML IR Bridge",
+    eyebrow: "new · candidate fixture",
+    text: "Inspect one EML expression as a shared DAG, replay packet, and explicit non-claim boundary.",
     color: C.orange,
   },
 ];
