@@ -189,6 +189,7 @@ export default function EmlPacketDetailPage({ params }: Props) {
         <Section title="Domain Safety Lens">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10, marginBottom: 14 }}>
             <Metric label="Unresolved obligations" value={packet.domainSafety.summary.unresolved_obligation_count} color={C.orange} />
+            <Metric label="Checked witnesses" value={packet.domainSafety.summary.checked_obligation_count} color={C.green} />
             <Metric label="Safe rewrite candidates" value={packet.domainSafety.summary.safe_rewrite_candidate_count} color={C.blue} />
             <Metric label="Proved by lens" value={packet.domainSafety.summary.proved_count} color={C.green} />
           </div>
@@ -199,12 +200,20 @@ export default function EmlPacketDetailPage({ params }: Props) {
                 <article key={requirement.requirementId} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
                     {pill(requirement.trigger, C.blue)}
-                    {pill(requirement.status, C.orange)}
+                    {pill(requirement.status, requirement.status === "checked_small_witness" ? C.green : C.orange)}
                   </div>
                   <h3 style={{ color: C.text, fontSize: 13, lineHeight: 1.35, margin: "0 0 8px", overflowWrap: "anywhere" }}>
                     {requirement.requirement}
                   </h3>
                   <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.65, margin: "0 0 8px" }}>{requirement.blockedPublicClaim}</p>
+                  {requirement.checkedBy ? (
+                    <code style={{ display: "block", color: C.green, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 8 }}>
+                      {requirement.checkedBy}
+                    </code>
+                  ) : null}
+                  {requirement.proofSummary ? (
+                    <p style={{ color: C.green, fontSize: 12, lineHeight: 1.65, margin: "0 0 8px" }}>{requirement.proofSummary}</p>
+                  ) : null}
                   <p style={{ color: C.blue, fontSize: 12, lineHeight: 1.65, margin: 0 }}>{requirement.possibleSafeRewrite}</p>
                 </article>
               ))}
@@ -237,6 +246,21 @@ export default function EmlPacketDetailPage({ params }: Props) {
               {packet.domainSafety.blockedPublicClaims.map((claim) => pill(claim, C.red))}
             </div>
           </div>
+
+          {packet.safeRewriteProposals.length ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 10, marginTop: 14 }}>
+              {packet.safeRewriteProposals.map((proposal) => (
+                <article key={proposal.proposalId} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                    {pill("rewrite proposal", C.blue)}
+                    {pill(proposal.status, C.orange)}
+                  </div>
+                  <p style={{ color: C.text, fontSize: 12, lineHeight: 1.65, margin: "0 0 8px" }}>{proposal.proposal}</p>
+                  <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.65, margin: 0 }}>{proposal.blockedAction}</p>
+                </article>
+              ))}
+            </div>
+          ) : null}
         </Section>
 
         <Section title="Obligation Cards">
@@ -245,7 +269,7 @@ export default function EmlPacketDetailPage({ params }: Props) {
               <article key={card.obligationId} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
                   {pill(card.kind, C.purple)}
-                  {pill(card.status, C.orange)}
+                  {pill(card.status, card.status === "checked_small_witness" ? C.green : C.orange)}
                   {pill(card.trigger, C.blue)}
                 </div>
                 <h3 style={{ color: C.text, fontSize: 13, lineHeight: 1.35, margin: "0 0 8px", overflowWrap: "anywhere" }}>
@@ -255,6 +279,14 @@ export default function EmlPacketDetailPage({ params }: Props) {
                 <code style={{ display: "block", color: C.text, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 8 }}>
                   {card.obligationId}
                 </code>
+                {card.checkedBy ? (
+                  <code style={{ display: "block", color: C.green, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 8 }}>
+                    {card.checkedBy}
+                  </code>
+                ) : null}
+                {card.proofSummary ? (
+                  <p style={{ color: C.green, fontSize: 11, lineHeight: 1.6, margin: "0 0 8px" }}>{card.proofSummary}</p>
+                ) : null}
                 <p style={{ color: C.muted, fontSize: 11, lineHeight: 1.6, margin: 0 }}>{card.nonClaim}</p>
               </article>
             ))}

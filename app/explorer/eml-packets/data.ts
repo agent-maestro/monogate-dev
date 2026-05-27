@@ -33,6 +33,9 @@ export type EmlDomainSafety = {
     status: string;
     blockedPublicClaim: string;
     possibleSafeRewrite: string;
+    checkedBy?: string;
+    proofArtifact?: string;
+    proofSummary?: string;
   }>;
   rangeAssumptions: Array<{
     input: string;
@@ -48,12 +51,22 @@ export type EmlDomainSafety = {
     proofTarget: string;
     reason: string;
   }>;
+  checkedObligations: Array<{
+    obligationId: string;
+    kind: string;
+    proofTarget: string;
+    checkedBy?: string;
+    proofArtifact?: string;
+    proofSummary?: string;
+  }>;
   possibleSafeRewrites: string[];
   blockedPublicClaims: string[];
   summary: {
     domain_requirement_count: number;
     range_assumption_count: number;
     unresolved_obligation_count: number;
+    checked_obligation_count: number;
+    checked_domain_requirement_count: number;
     safe_rewrite_candidate_count: number;
     blocked_public_claim_count: number;
     proved_count: number;
@@ -120,6 +133,9 @@ export type EmlPacketResult = {
       description: string;
       proofTarget: string;
       nonClaim: string;
+      checkedBy?: string;
+      proofArtifact?: string;
+      proofSummary?: string;
     }>;
     summary: {
       count: number;
@@ -130,6 +146,15 @@ export type EmlPacketResult = {
     nonClaims: string[];
   };
   domainSafety: EmlDomainSafety;
+  safeRewriteProposals: Array<{
+    proposalId: string;
+    status: string;
+    nodeId?: string;
+    requirementId: string;
+    proposal: string;
+    blockedAction: string;
+    proofArtifact?: string;
+  }>;
 };
 
 export const emlPackets = [

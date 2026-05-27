@@ -24,6 +24,7 @@ export default function EmlPacketGalleryPage() {
   const internalDelta = emlPackets.reduce((sum, packet) => sum + packet.costs.internalExtraDagSavingsNodes, 0);
   const domainRequirementCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.domain_requirement_count, 0);
   const blockedClaimCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.blocked_public_claim_count, 0);
+  const checkedWitnessCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.checked_obligation_count, 0);
 
   return (
     <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
@@ -42,6 +43,7 @@ export default function EmlPacketGalleryPage() {
             {pill("candidate gallery", C.orange)}
             {pill("generated from EML-R2", C.blue)}
             {pill("R6 safety lens", C.purple)}
+            {pill("R8 checked witness", C.green)}
             {pill("no public savings claim", C.green)}
           </div>
           <h1 style={{ color: C.orange, fontSize: 34, lineHeight: 1.1, margin: "0 0 12px", fontFamily: "monospace" }}>
@@ -59,6 +61,7 @@ export default function EmlPacketGalleryPage() {
           <Metric label="Shared nodes" value={reusedNodeCount} color={C.orange} />
           <Metric label="Internal DAG delta" value={internalDelta} color={C.orange} />
           <Metric label="Domain reqs" value={domainRequirementCount} color={C.red} />
+          <Metric label="Checked witnesses" value={checkedWitnessCount} color={C.green} />
           <Metric label="Blocked claims" value={blockedClaimCount} color={C.purple} />
         </section>
 
@@ -121,6 +124,7 @@ export default function EmlPacketGalleryPage() {
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
                 {pill(`${packet.obligations.summary.count} obligations`, C.purple)}
                 {pill(`${packet.domainSafety.summary.domain_requirement_count} domain reqs`, C.red)}
+                {pill(`${packet.domainSafety.summary.checked_obligation_count} checked`, C.green)}
                 {pill(`${packet.domainSafety.summary.blocked_public_claim_count} blocked claims`, C.orange)}
                 {pill(`${packet.obligations.summary.proved_count} proved`, C.green)}
               </div>
