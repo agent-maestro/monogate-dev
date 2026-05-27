@@ -1,0 +1,105 @@
+import type { Metadata } from "next";
+import { C, pill } from "../../evidence/data";
+import { emlLanguageManifest, emlLanguagePrograms } from "./data";
+
+export const metadata: Metadata = {
+  title: "EML Language Kernel",
+  description: "Candidate-only EML language kernel programs, guards, lets, ASTs, and normalized packet handoffs.",
+};
+
+function Metric({ label, value, color = C.orange }: { label: string; value: string | number; color?: string }) {
+  return (
+    <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 14, minHeight: 78 }}>
+      <div style={{ color: C.muted, fontSize: 11, lineHeight: 1.4 }}>{label}</div>
+      <div style={{ color, fontSize: 22, fontWeight: 800, fontFamily: "monospace", marginTop: 8 }}>{value}</div>
+    </div>
+  );
+}
+
+export default function EmlLanguageKernelPage() {
+  const guardCount = emlLanguagePrograms.reduce((sum, program) => sum + program.guards.length, 0);
+  const letCount = emlLanguagePrograms.reduce((sum, program) => sum + program.lets.length, 0);
+  const inputCount = emlLanguagePrograms.reduce((sum, program) => sum + program.inputs.length, 0);
+
+  return (
+    <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "32px 18px 72px" }}>
+        <nav style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28, fontSize: 12 }}>
+          <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
+          <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
+          <a href="/explorer/eml-packets" style={{ color: C.muted, textDecoration: "none" }}>EML Packets</a>
+        </nav>
+
+        <header style={{ marginBottom: 28 }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+            {pill("EML-L1", C.orange)}
+            {pill("language kernel", C.blue)}
+            {pill(emlLanguageManifest.status, C.green)}
+            {pill("no compiler change", C.green)}
+          </div>
+          <h1 style={{ color: C.orange, fontSize: 34, lineHeight: 1.1, margin: "0 0 12px", fontFamily: "monospace" }}>
+            EML Language Kernel
+          </h1>
+          <p style={{ color: C.text, fontSize: 16, lineHeight: 1.75, maxWidth: 780, margin: 0 }}>
+            Inspect candidate EML programs before they lower into Expression Packet v0.
+          </p>
+        </header>
+
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 10, marginBottom: 28 }}>
+          <Metric label="Programs" value={emlLanguagePrograms.length} color={C.blue} />
+          <Metric label="Inputs" value={inputCount} color={C.purple} />
+          <Metric label="Guards" value={guardCount} color={C.green} />
+          <Metric label="Let bindings" value={letCount} color={C.orange} />
+        </section>
+
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 12 }}>
+          {emlLanguagePrograms.map((program) => (
+            <article key={program.program_id} style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                {pill(program.family, C.blue)}
+                {pill(`${program.guards.length} guards`, C.green)}
+                {pill(`${program.lets.length} lets`, C.orange)}
+              </div>
+              <h2 style={{ color: C.text, fontSize: 18, lineHeight: 1.25, margin: "0 0 10px", overflowWrap: "anywhere" }}>
+                {program.program_id}
+              </h2>
+              <pre style={{ color: C.text, background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: 12, fontSize: 11, lineHeight: 1.55, whiteSpace: "pre-wrap", overflowWrap: "anywhere", margin: "0 0 12px" }}>
+                {program.normalized_expression}
+              </pre>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                {program.inputs.map((input) => pill(input.name, C.purple))}
+              </div>
+              {program.guards.length ? (
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>guards</div>
+                  {program.guards.map((guard, index) => (
+                    <code key={`${guard.kind}-${index}`} style={{ display: "block", color: C.green, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 6 }}>
+                      {guard.kind}({guard.expression})
+                    </code>
+                  ))}
+                </div>
+              ) : null}
+              {program.lets.length ? (
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>lets</div>
+                  {program.lets.map((item) => (
+                    <code key={item.name} style={{ display: "block", color: C.orange, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 6 }}>
+                      {item.name} = {item.normalized_expression}
+                    </code>
+                  ))}
+                </div>
+              ) : null}
+              <details>
+                <summary style={{ color: C.muted, cursor: "pointer", fontSize: 12 }}>AST</summary>
+                <pre style={{ color: C.muted, fontSize: 10, lineHeight: 1.5, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+                  {JSON.stringify(program.ast, null, 2)}
+                </pre>
+              </details>
+            </article>
+          ))}
+        </section>
+      </div>
+    </main>
+  );
+}
+

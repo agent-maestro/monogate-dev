@@ -39,6 +39,7 @@ export default function EmlPacketGalleryPage() {
         <nav style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28, fontSize: 12 }}>
           <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
+          <a href="/explorer/eml-language" style={{ color: C.muted, textDecoration: "none" }}>Language Kernel</a>
           <a href="/explorer/eml-ir-bridge" style={{ color: C.muted, textDecoration: "none" }}>IR Bridge</a>
           <a href="/explorer/eml-packets/builder" style={{ color: C.muted, textDecoration: "none" }}>Builder</a>
           <a href="/evidence" style={{ color: C.muted, textDecoration: "none" }}>Evidence</a>
