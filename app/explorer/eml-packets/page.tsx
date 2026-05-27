@@ -25,6 +25,13 @@ export default function EmlPacketGalleryPage() {
   const domainRequirementCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.domain_requirement_count, 0);
   const blockedClaimCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.blocked_public_claim_count, 0);
   const checkedWitnessCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.checked_obligation_count, 0);
+  const obligationCount = emlPackets.reduce((sum, packet) => sum + packet.obligations.summary.count, 0);
+  const unresolvedObligations = emlPackets.flatMap((packet) =>
+    packet.obligations.cards
+      .filter((card) => card.status !== "checked_small_witness")
+      .map((card) => ({ packet, card }))
+  );
+  const nextProofTarget = unresolvedObligations[0];
 
   return (
     <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
@@ -61,8 +68,35 @@ export default function EmlPacketGalleryPage() {
           <Metric label="Shared nodes" value={reusedNodeCount} color={C.orange} />
           <Metric label="Internal DAG delta" value={internalDelta} color={C.orange} />
           <Metric label="Domain reqs" value={domainRequirementCount} color={C.red} />
+          <Metric label="Obligations" value={obligationCount} color={C.purple} />
           <Metric label="Checked witnesses" value={checkedWitnessCount} color={C.green} />
+          <Metric label="Unresolved" value={unresolvedObligations.length} color={C.orange} />
           <Metric label="Blocked claims" value={blockedClaimCount} color={C.purple} />
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12, alignItems: "start" }}>
+            <div>
+              <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+                proof coverage
+              </div>
+              <div style={{ color: C.text, fontSize: 14, lineHeight: 1.55 }}>
+                {checkedWitnessCount} of {obligationCount} obligations have checked small witnesses.
+              </div>
+            </div>
+            <div>
+              <div style={{ color: C.muted, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+                next proof target
+              </div>
+              {nextProofTarget ? (
+                <a href={`/explorer/eml-packets/${nextProofTarget.packet.artifactId}`} style={{ color: C.orange, textDecoration: "none", fontSize: 12, lineHeight: 1.6, overflowWrap: "anywhere", display: "block" }}>
+                  {nextProofTarget.card.obligationId}
+                </a>
+              ) : (
+                <div style={{ color: C.green, fontSize: 12 }}>No unresolved obligations in the generated fixture set.</div>
+              )}
+            </div>
+          </div>
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>

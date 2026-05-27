@@ -80,6 +80,7 @@ export default function EmlPacketDetailPage({ params }: Props) {
           <Metric label="Internal DAG delta" value={packet.costs.internalExtraDagSavingsNodes} />
           <Metric label="Obligation cards" value={packet.obligations.summary.count} color={C.purple} />
           <Metric label="Domain requirements" value={packet.domainSafety.summary.domain_requirement_count} color={C.red} />
+          <Metric label="Checked witnesses" value={packet.domainSafety.summary.checked_obligation_count} color={C.green} />
           <Metric label="Blocked claims" value={packet.domainSafety.summary.blocked_public_claim_count} color={C.orange} />
         </div>
 
