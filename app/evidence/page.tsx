@@ -30,7 +30,8 @@ export default function EvidencePage() {
           </h1>
           <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.75, maxWidth: 760, margin: 0 }}>
             Monogate turns traces, replay logs, proof obligations, semantic tiers, and claim flags into reviewer decisions.
-            The cockpit shows what is approved, what is only candidate evidence, and what remains unsafe to say.
+            The cockpit shows what is approved, what is only candidate evidence, and what remains unsafe to say, including
+            agent outputs that must carry their own evidence before anyone trusts them.
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
             {pill("validation")}
@@ -143,6 +144,18 @@ export default function EvidencePage() {
               <span key={path}>{pill(path, C.blue)}</span>
             ))}
           </div>
+        </article>
+
+        <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
+          <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+            New frontier
+          </div>
+          <h2 style={{ color: C.text, fontSize: 18, margin: "0 0 10px" }}>Claim-governed agents</h2>
+          <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.7, margin: "0 0 12px" }}>
+            Agent outputs are now represented as candidate evidence packets with task, output, replay log, validator checks,
+            claim flags, and explicit non-claims.
+          </p>
+          <a href="/evidence/agent-output-demo" style={{ color: C.blue, border: `1px solid ${C.blue}55`, borderRadius: 5, padding: "7px 10px", fontSize: 11, fontWeight: 700 }}>Open agent packet</a>
         </article>
       </section>
     </main>

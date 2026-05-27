@@ -15,14 +15,14 @@ if (fixture.schemaVersion !== "monogate.dev.evidence_cockpit_fixture.v0") {
 
 const artifacts = fixture.artifacts ?? [];
 const ids = new Set(artifacts.map((artifact) => artifact.id));
-for (const id of ["forge-rescue", "electronics-trainer", "monogate-os-replay", "capcard-internal"]) {
+for (const id of ["forge-rescue", "electronics-trainer", "monogate-os-replay", "capcard-internal", "agent-output-demo"]) {
   if (!ids.has(id)) fail(`missing artifact: ${id}`);
 }
 
 if (fixture.decisionCounts?.approved_for_surface !== 2) {
   fail("approved_for_surface count drifted");
 }
-if (fixture.decisionCounts?.candidate_only !== 2) {
+if (fixture.decisionCounts?.candidate_only !== 3) {
   fail("candidate_only count drifted");
 }
 
@@ -79,6 +79,17 @@ if (!osReplay.nonClaims?.some((claim) => claim.includes("bootable OS"))) {
 }
 if (!osReplay.evidencePaths?.some((path) => path.includes("m7d_replay_identity_ci_result"))) {
   fail("monogate-os-replay missing M7D result evidence path");
+}
+
+const agentOutput = artifacts.find((artifact) => artifact.id === "agent-output-demo");
+if (!agentOutput) fail("agent-output-demo missing");
+if (agentOutput.decision !== "candidate_only") fail("agent-output-demo decision drifted");
+if (agentOutput.reviewPacket?.agentTruthfulnessClaim === true) fail("agent-output-demo overclaims truthfulness");
+if (!agentOutput.reviewPacket?.agentTask || !agentOutput.reviewPacket?.agentOutput) {
+  fail("agent-output-demo missing task/output fields");
+}
+if (!agentOutput.nonClaims?.some((claim) => claim.includes("general agent truthfulness"))) {
+  fail("agent-output-demo missing truthfulness non-claim");
 }
 
 console.log("EVIDENCE_COCKPIT_FIXTURE_CHECK_OK");

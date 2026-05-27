@@ -8,7 +8,7 @@
   },
   "decisionCounts": {
     "approved_for_surface": 2,
-    "candidate_only": 2
+    "candidate_only": 3
   },
   "artifacts": [
     {
@@ -169,7 +169,9 @@
           "forge/reports/rescue_obligation_registry_v0_2026_05_26.json",
           "forge/reports/rescue_artifact_approval_v0_2026_05_26.json"
         ]
-      }
+      },
+      "agentTask": null,
+      "agentOutput": null
     },
     {
       "id": "electronics-trainer",
@@ -287,7 +289,9 @@
           "monogate-electronics/evidence/trainer_board_v0/simulated_reflex_packet_2026_05_26/evidence_packet.json",
           "monogate-electronics/evidence/trainer_board_v0/simulated_reflex_packet_2026_05_26/trace.jsonl"
         ]
-      }
+      },
+      "agentTask": null,
+      "agentOutput": null
     },
     {
       "id": "monogate-os-replay",
@@ -429,7 +433,9 @@
           "monogate-engine-moat3-review-2026-05-23/command_center_feeds/monogate_os_m7d_status_card_2026_05_25.json",
           "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
         ]
-      }
+      },
+      "agentTask": null,
+      "agentOutput": null
     },
     {
       "id": "capcard-internal",
@@ -537,7 +543,165 @@
           "capcard/capcard/reports/capcard_marketplace_import_flow_qa_2026_05_25.json",
           "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
         ]
-      }
+      },
+      "agentTask": null,
+      "agentOutput": null
+    },
+    {
+      "id": "agent-output-demo",
+      "title": "Agent Output Evidence Demo",
+      "href": "/evidence/agent-output-demo/packet.json",
+      "color": "blue",
+      "summary": "A bounded agent answer wrapped in validation, replay, claim flags, non-claims, and reviewer decision metadata.",
+      "claimBoundary": "Candidate only; demonstrates claim-governed agent output, not general agent truthfulness or autonomous deployment readiness.",
+      "reviewHighlights": [
+        "The agent output is tied to explicit Monogate source paths.",
+        "Validation checks required fields, claim boundary, non-claims, and unsafe claim flags.",
+        "Replay records the contract, schema, and review-gate sources used by the output."
+      ],
+      "nonClaims": [
+        "No general agent truthfulness claim.",
+        "No autonomous deployment approval.",
+        "No certified safety or production-controller claim."
+      ],
+      "validationCommands": [
+        "python tools/validate_evidence_public_packet.py reports/evidence_cockpit_fixture_v0_2026_05_26.json --fixture"
+      ],
+      "timeline": [
+        {
+          "label": "Task bounded",
+          "status": "pass",
+          "detail": "The agent task asks for a summary and claim boundary from local Monogate evidence docs."
+        },
+        {
+          "label": "Output generated",
+          "status": "candidate",
+          "detail": "The output is accepted only as a reviewable artifact, not as an unqualified truth claim."
+        },
+        {
+          "label": "Validation applied",
+          "status": "pass",
+          "detail": "The packet records required fields, non-claims, and unsafe claim flag checks."
+        },
+        {
+          "label": "Reviewer decision",
+          "status": "candidate_only",
+          "detail": "The artifact is visible as a research packet while broader validator coverage is still being built."
+        }
+      ],
+      "evidencePaths": [
+        "monogate-research/reports/agent_output_evidence_demo_v0_2026_05_26.json",
+        "monogate-research/docs/evidence_packet_v0.md",
+        "monogate-research/schemas/evidence_public_packet_v0.schema.json",
+        "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+      ],
+      "sourceReportPath": "monogate-research/reports/agent_output_evidence_demo_v0_2026_05_26.json",
+      "packetExtras": {
+        "agentTask": "Summarize the current Evidence Packet v0 contract and identify the claim boundary for a public artifact.",
+        "agentOutput": "Evidence Packet v0 requires validation status, replay status, semantic strength, claim flags, claim boundary, non-claims, source paths, and reviewer decision. A public artifact may be surfaced only when the reviewer gate approves it and its claims remain bounded by the packet."
+      },
+      "lane": "agent evidence",
+      "sourceLane": "agent_output",
+      "decision": "candidate_only",
+      "validationStatus": "pass",
+      "replayStatus": "pass",
+      "semanticStrength": "claim_governed_agent_output",
+      "semanticsLabel": "claim governed agent output",
+      "claimFlags": {
+        "public_ready": false,
+        "hardware_observed": false,
+        "live_serial_capture_performed": false,
+        "certified_safety_claim": false,
+        "production_controller_claim": false,
+        "agent_truthfulness_claim": false
+      },
+      "semanticReview": {
+        "task_grounded": true,
+        "source_paths": [
+          "docs/evidence_packet_v0.md",
+          "schemas/evidence_public_packet_v0.schema.json",
+          "reports/evidence_review_gate_v0_2026_05_26.json"
+        ],
+        "reviewer_note": "This packet demonstrates claim-governed agent output. It validates that the output is bounded by cited Monogate artifacts; it does not prove general agent truthfulness."
+      },
+      "reviewReasons": [],
+      "reviewNotes": "Agent output is inspectable and replay-bounded, but remains candidate-only until broader packet-validator coverage exists.",
+      "packetHref": "/evidence/agent-output-demo/packet.json",
+      "reviewPacket": {
+        "schemaVersion": "monogate.evidence_public_packet.v0",
+        "artifactId": "agent-output-demo",
+        "title": "Agent Output Evidence Demo",
+        "reviewDecision": "candidate_only",
+        "validationStatus": "pass",
+        "replayStatus": "pass",
+        "semanticStrength": "claim_governed_agent_output",
+        "semanticReview": {
+          "task_grounded": true,
+          "source_paths": [
+            "docs/evidence_packet_v0.md",
+            "schemas/evidence_public_packet_v0.schema.json",
+            "reports/evidence_review_gate_v0_2026_05_26.json"
+          ],
+          "reviewer_note": "This packet demonstrates claim-governed agent output. It validates that the output is bounded by cited Monogate artifacts; it does not prove general agent truthfulness."
+        },
+        "claimFlags": {
+          "public_ready": false,
+          "hardware_observed": false,
+          "live_serial_capture_performed": false,
+          "certified_safety_claim": false,
+          "production_controller_claim": false,
+          "agent_truthfulness_claim": false
+        },
+        "claimBoundary": "Candidate only; demonstrates claim-governed agent output, not general agent truthfulness or autonomous deployment readiness.",
+        "nonClaims": [
+          "No general agent truthfulness claim.",
+          "No autonomous deployment approval.",
+          "No certified safety or production-controller claim."
+        ],
+        "reviewHighlights": [
+          "The agent output is tied to explicit Monogate source paths.",
+          "Validation checks required fields, claim boundary, non-claims, and unsafe claim flags.",
+          "Replay records the contract, schema, and review-gate sources used by the output."
+        ],
+        "validationCommands": [
+          "python tools/validate_evidence_public_packet.py reports/evidence_cockpit_fixture_v0_2026_05_26.json --fixture"
+        ],
+        "timeline": [
+          {
+            "label": "Task bounded",
+            "status": "pass",
+            "detail": "The agent task asks for a summary and claim boundary from local Monogate evidence docs."
+          },
+          {
+            "label": "Output generated",
+            "status": "candidate",
+            "detail": "The output is accepted only as a reviewable artifact, not as an unqualified truth claim."
+          },
+          {
+            "label": "Validation applied",
+            "status": "pass",
+            "detail": "The packet records required fields, non-claims, and unsafe claim flag checks."
+          },
+          {
+            "label": "Reviewer decision",
+            "status": "candidate_only",
+            "detail": "The artifact is visible as a research packet while broader validator coverage is still being built."
+          }
+        ],
+        "reviewReasons": [],
+        "reviewNotes": "Agent output is inspectable and replay-bounded, but remains candidate-only until broader packet-validator coverage exists.",
+        "sourceReportPath": "monogate-research/reports/agent_output_evidence_demo_v0_2026_05_26.json",
+        "evidencePaths": [
+          "monogate-research/reports/agent_output_evidence_demo_v0_2026_05_26.json",
+          "monogate-research/docs/evidence_packet_v0.md",
+          "monogate-research/schemas/evidence_public_packet_v0.schema.json",
+          "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+        ],
+        "agentTask": "Summarize the current Evidence Packet v0 contract and identify the claim boundary for a public artifact.",
+        "agentOutput": "Evidence Packet v0 requires validation status, replay status, semantic strength, claim flags, claim boundary, non-claims, source paths, and reviewer decision. A public artifact may be surfaced only when the reviewer gate approves it and its claims remain bounded by the packet."
+      },
+      "agentTask": "Summarize the current Evidence Packet v0 contract and identify the claim boundary for a public artifact.",
+      "agentOutput": "Evidence Packet v0 requires validation status, replay status, semantic strength, claim flags, claim boundary, non-claims, source paths, and reviewer decision. A public artifact may be surfaced only when the reviewer gate approves it and its claims remain bounded by the packet."
     }
   ],
   "boundaries": {

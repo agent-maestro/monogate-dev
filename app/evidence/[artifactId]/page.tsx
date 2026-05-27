@@ -39,12 +39,18 @@ function valueRows(values: Record<string, unknown>) {
   ));
 }
 
+function stringField(value: unknown) {
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
 export default function EvidenceArtifactPage({ params }: Props) {
   const artifact = findArtifact(params.artifactId);
   if (!artifact) notFound();
   const accent = artifactColor(artifact);
   const evidencePaths = Array.from(new Set([artifact.sourceReportPath, ...artifact.evidencePaths]));
   const isFlagship = artifact.id === "forge-rescue";
+  const agentTask = stringField(artifact.agentTask ?? artifact.reviewPacket.agentTask);
+  const agentOutput = stringField(artifact.agentOutput ?? artifact.reviewPacket.agentOutput);
 
   return (
     <main style={{ maxWidth: 1040, margin: "0 auto", padding: "28px 16px 72px", background: C.bg }}>
@@ -76,6 +82,23 @@ export default function EvidenceArtifactPage({ params }: Props) {
           {pill(artifact.semanticsLabel, accent)}
         </div>
       </section>
+
+      {agentTask && agentOutput ? (
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16, marginBottom: 16 }}>
+          <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
+            <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+              Agent task
+            </div>
+            <p style={{ color: C.text, fontSize: 12, lineHeight: 1.7, margin: 0 }}>{agentTask}</p>
+          </article>
+          <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
+            <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+              Governed output
+            </div>
+            <p style={{ color: C.text, fontSize: 12, lineHeight: 1.7, margin: 0 }}>{agentOutput}</p>
+          </article>
+        </section>
+      ) : null}
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10, marginBottom: 16 }}>
         {artifact.reviewHighlights.map((highlight) => (

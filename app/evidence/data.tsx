@@ -52,6 +52,8 @@ export type Artifact = {
   reviewReasons: string[];
   reviewNotes: string;
   reviewPacket: Record<string, unknown>;
+  agentTask?: string;
+  agentOutput?: string;
 };
 
 export type EvidenceFixture = {
