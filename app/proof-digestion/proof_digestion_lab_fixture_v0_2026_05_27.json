@@ -70,6 +70,80 @@
       },
       "title": "Forge Rescue Suite Understanding Packet",
       "verificationStatus": "evidence_backed"
+    },
+    {
+      "artifactId": "monogate-os-eml-bridge",
+      "claimBoundary": "This packet digests the candidate Monogate OS EML bridge evidence. It does not promote the bridge to public-ready, Forge compiler output, formal equivalence, or bootable OS status.",
+      "creditLineage": {
+        "aiAssistants": [
+          "Codex"
+        ],
+        "digestionAuthor": "Codex under reviewer approval",
+        "formalDependencies": [
+          "../machlib/foundations/MachLib/HighDimensional.lean"
+        ],
+        "humanAuthors": [
+          "Monogate reviewer"
+        ],
+        "publicExplainer": "monogate.dev/proof-digestion",
+        "reviewer": "Monogate reviewer",
+        "sourceArtifacts": [
+          "../monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json",
+          "../monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8d_bridge_family_result_2026_05_27.json",
+          "../monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8f_obligation_cards_2026_05_27.json",
+          "reports/evidence_review_gate_v0_2026_05_26.json"
+        ]
+      },
+      "digestReview": {
+        "coreIdea": "An EML-shaped kernel can be mirrored into a no_std guest adapter, executed under QEMU, and reviewed through replay and sensitivity evidence without claiming Forge compiler output or a bootable OS.",
+        "failureModes": [
+          "Mistaking mirrored fixture adapters for real Forge compiler outputs.",
+          "Treating QEMU replay and sensitivity evidence as a bootable OS claim.",
+          "Promoting bridge artifacts before a formal equivalence proof exists between spec, adapter, and intended Forge output.",
+          "Collapsing independent kernel review into a single whole-system correctness claim."
+        ],
+        "humanReviewerNote": "This is a strong second digestion artifact because it generalizes the evidence grammar beyond Forge Rescue. Keep it candidate-only until at least one bridge-family proof obligation is discharged.",
+        "minimumExample": "The bridge family currently includes log_domain_lift and guard_clamp fixtures. Each has a spec/adapter digest, QEMU trace evidence, sensitivity evidence, negative fixtures, and M8F proof-obligation cards, while remaining candidate-only.",
+        "openQuestions": [
+          "Which M8F proof obligation should become the first formal bridge theorem?",
+          "What is the smallest useful equivalence claim between an EML spec and a no_std adapter?",
+          "How should replay/sensitivity evidence be weighted against formal proof status in reviewer decisions?",
+          "When does a family of kernel fixtures become enough to justify changing Forge compiler behavior?"
+        ],
+        "reusePaths": [
+          "Use the bridge packet shape for future no_std guest kernels before changing Forge compiler behavior.",
+          "Attach one MachLib or Lean obligation per bridge-family member as proofs become available.",
+          "Feed bridge evidence into command reviewer actions and public candidate-only evidence pages.",
+          "Use the same candidate-only boundary for electronics and agent artifacts that have replay but not full proof."
+        ],
+        "teachableExplanation": "The OS bridge is a rehearsal stage. Instead of promising that Forge compiles an operating system, Monogate records small kernel-shaped fixtures, runs them through mirrored adapters, captures QEMU evidence, and writes down exactly which proof obligations remain. The artifact is valuable because it preserves the path to proof without pretending the proof already exists.",
+        "whyItMatters": "This is the bridge from Monogate as proof/evidence tooling toward Monogate as runtime infrastructure. It proves the evidence grammar can follow a kernel-shaped artifact across spec, adapter, replay, sensitivity, and proof-obligation cards."
+      },
+      "digestionStatus": "partially_digested",
+      "evidencePaths": [
+        "schemas/understanding_packet_v0.schema.json",
+        "reports/understanding_packet_monogate_os_eml_bridge_v0_2026_05_27.json",
+        "reports/understanding_packet_monogate_os_eml_bridge_v0_2026_05_27.md",
+        "reports/proof_digestion_lab_fixture_v0_2026_05_27.json",
+        "reports/evidence_cockpit_fixture_v0_2026_05_26.json"
+      ],
+      "linkedEvidencePacket": "reports/evidence_cockpit_fixture_v0_2026_05_26.json#/artifacts/monogate-os-eml-bridge",
+      "nonClaims": [
+        "No Forge compiler behavior change.",
+        "No Forge OS target claim.",
+        "No formal equivalence proof between Forge output and guest adapters.",
+        "No bootable OS claim.",
+        "No certified safety or production-controller claim.",
+        "No hardware observation claim."
+      ],
+      "schemaVersion": "monogate.understanding_packet.v0",
+      "scores": {
+        "humanDigestNeed": 5,
+        "reusePotential": 5,
+        "teachability": 3
+      },
+      "title": "Monogate OS EML Bridge Understanding Packet",
+      "verificationStatus": "evidence_backed"
     }
   ],
   "boundaries": {
@@ -80,5 +154,9 @@
   "date": "2026-05-27",
   "schemaVersion": "monogate.dev.proof_digestion_lab_fixture.v0",
   "sourcePacket": "reports/understanding_packet_forge_rescue_v0_2026_05_27.json",
+  "sourcePackets": [
+    "reports/understanding_packet_forge_rescue_v0_2026_05_27.json",
+    "reports/understanding_packet_monogate_os_eml_bridge_v0_2026_05_27.json"
+  ],
   "summary": "Public lab fixture for turning evidence-backed artifacts into human-digestible understanding packets."
 }

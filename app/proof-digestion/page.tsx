@@ -42,11 +42,23 @@ type Fixture = {
   date: string;
   summary: string;
   sourcePacket: string;
+  sourcePackets?: string[];
   artifacts: UnderstandingPacket[];
   boundaries: Record<string, boolean>;
 };
 
 const fixture = fixtureJson as unknown as Fixture;
+
+const artifactLinks: Record<string, Array<{ href: string; label: string; color: string }>> = {
+  "forge-rescue": [
+    { href: "/evidence/forge-rescue", label: "Evidence packet", color: C.green },
+    { href: "/explorer/rescue-suite", label: "Rescue Explorer", color: C.orange },
+  ],
+  "monogate-os-eml-bridge": [
+    { href: "/evidence/monogate-os-eml-bridge", label: "Evidence packet", color: C.green },
+    { href: "/case-study/evidence-governed-computation", label: "Case study", color: C.blue },
+  ],
+};
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -81,8 +93,6 @@ function Score({ label, value }: { label: string; value: number }) {
 }
 
 export default function ProofDigestionPage() {
-  const packet = fixture.artifacts[0];
-
   return (
     <div style={{ background: C.bg, minHeight: "100vh" }}>
       <main style={{ maxWidth: 920, margin: "0 auto", padding: "58px 18px 84px" }}>
@@ -98,91 +108,94 @@ export default function ProofDigestionPage() {
             Digestion asks what it teaches, how it can be reused, what can go wrong, and what still needs human judgment.
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {pill(packet.digestionStatus, C.orange)}
-            {pill(packet.verificationStatus, C.green)}
+            {pill(`${fixture.artifacts.length} packets`, C.orange)}
+            {pill("evidence-backed", C.green)}
             {pill(fixture.date, C.blue)}
           </div>
         </header>
 
-        <article style={{ background: C.surface2, border: `1px solid ${C.border}`, borderRadius: 8, padding: 22 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
-            <div>
-              <div style={{ fontSize: 11, color: C.orange, fontFamily: "monospace", marginBottom: 8 }}>
-                {packet.artifactId}
-              </div>
-              <h2 style={{ color: C.text, fontSize: 22, margin: 0, lineHeight: 1.25 }}>{packet.title}</h2>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
-              <a href="/evidence/forge-rescue" style={{ color: C.green, fontSize: 12, textDecoration: "none", border: `1px solid ${C.green}44`, borderRadius: 5, padding: "7px 10px" }}>
-                Evidence packet
-              </a>
-              <a href="/explorer/rescue-suite" style={{ color: C.orange, fontSize: 12, textDecoration: "none", border: `1px solid ${C.orange}44`, borderRadius: 5, padding: "7px 10px" }}>
-                Rescue Explorer
-              </a>
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10, marginBottom: 22 }}>
-            <Score label="Teachability" value={packet.scores.teachability} />
-            <Score label="Reuse potential" value={packet.scores.reusePotential} />
-            <Score label="Human digest need" value={packet.scores.humanDigestNeed} />
-          </div>
-
-          <Section title="Core idea">
-            <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.digestReview.coreIdea}</p>
-          </Section>
-
-          <Section title="Why it matters">
-            <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.digestReview.whyItMatters}</p>
-          </Section>
-
-          <Section title="Minimum example">
-            <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.digestReview.minimumExample}</p>
-          </Section>
-
-          <Section title="Teachable explanation">
-            <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.digestReview.teachableExplanation}</p>
-          </Section>
-
-          <Section title="Failure modes">
-            <List items={packet.digestReview.failureModes} />
-          </Section>
-
-          <Section title="Reuse paths">
-            <List items={packet.digestReview.reusePaths} />
-          </Section>
-
-          <Section title="Open questions">
-            <List items={packet.digestReview.openQuestions} />
-          </Section>
-
-          <Section title="Claim boundary">
-            <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.claimBoundary}</p>
-          </Section>
-
-          <Section title="Non-claims">
-            <List items={packet.nonClaims} />
-          </Section>
-
-          <Section title="Credit lineage">
-            <div style={{ display: "grid", gap: 8 }}>
-              {[
-                ["reviewer", packet.creditLineage.reviewer],
-                ["digestion author", packet.creditLineage.digestionAuthor],
-                ["public explainer", packet.creditLineage.publicExplainer],
-                ["formal dependencies", packet.creditLineage.formalDependencies.join(", ")],
-              ].map(([label, value]) => (
-                <div key={label} style={{ display: "flex", justifyContent: "space-between", gap: 12, borderTop: `1px solid ${C.border}`, paddingTop: 8, fontSize: 12 }}>
-                  <span style={{ color: C.muted }}>{label}</span>
-                  <span style={{ color: C.text, textAlign: "right", overflowWrap: "anywhere" }}>{value}</span>
+        <div style={{ display: "grid", gap: 18 }}>
+          {fixture.artifacts.map((packet) => (
+            <article key={packet.artifactId} style={{ background: C.surface2, border: `1px solid ${C.border}`, borderRadius: 8, padding: 22 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
+                <div>
+                  <div style={{ fontSize: 11, color: C.orange, fontFamily: "monospace", marginBottom: 8 }}>
+                    {packet.artifactId}
+                  </div>
+                  <h2 style={{ color: C.text, fontSize: 22, margin: 0, lineHeight: 1.25 }}>{packet.title}</h2>
                 </div>
-              ))}
-            </div>
-          </Section>
-        </article>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
+                  {(artifactLinks[packet.artifactId] ?? []).map((link) => (
+                    <a key={link.href} href={link.href} style={{ color: link.color, fontSize: 12, textDecoration: "none", border: `1px solid ${link.color}44`, borderRadius: 5, padding: "7px 10px" }}>
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10, marginBottom: 22 }}>
+                <Score label="Teachability" value={packet.scores.teachability} />
+                <Score label="Reuse potential" value={packet.scores.reusePotential} />
+                <Score label="Human digest need" value={packet.scores.humanDigestNeed} />
+              </div>
+
+              <Section title="Core idea">
+                <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.digestReview.coreIdea}</p>
+              </Section>
+
+              <Section title="Why it matters">
+                <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.digestReview.whyItMatters}</p>
+              </Section>
+
+              <Section title="Minimum example">
+                <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.digestReview.minimumExample}</p>
+              </Section>
+
+              <Section title="Teachable explanation">
+                <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.digestReview.teachableExplanation}</p>
+              </Section>
+
+              <Section title="Failure modes">
+                <List items={packet.digestReview.failureModes} />
+              </Section>
+
+              <Section title="Reuse paths">
+                <List items={packet.digestReview.reusePaths} />
+              </Section>
+
+              <Section title="Open questions">
+                <List items={packet.digestReview.openQuestions} />
+              </Section>
+
+              <Section title="Claim boundary">
+                <p style={{ color: C.text, fontSize: 14, lineHeight: 1.75, margin: 0 }}>{packet.claimBoundary}</p>
+              </Section>
+
+              <Section title="Non-claims">
+                <List items={packet.nonClaims} />
+              </Section>
+
+              <Section title="Credit lineage">
+                <div style={{ display: "grid", gap: 8 }}>
+                  {[
+                    ["reviewer", packet.creditLineage.reviewer],
+                    ["digestion author", packet.creditLineage.digestionAuthor],
+                    ["public explainer", packet.creditLineage.publicExplainer],
+                    ["formal dependencies", packet.creditLineage.formalDependencies.join(", ")],
+                  ].map(([label, value]) => (
+                    <div key={label} style={{ display: "flex", justifyContent: "space-between", gap: 12, borderTop: `1px solid ${C.border}`, paddingTop: 8, fontSize: 12 }}>
+                      <span style={{ color: C.muted }}>{label}</span>
+                      <span style={{ color: C.text, textAlign: "right", overflowWrap: "anywhere" }}>{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </Section>
+            </article>
+          ))}
+        </div>
 
         <footer style={{ marginTop: 22, color: C.muted, fontSize: 11, lineHeight: 1.6 }}>
-          Source packet: {fixture.sourcePacket}. Digestion explains evidence; it does not increase proof strength.
+          Source packets: {(fixture.sourcePackets ?? [fixture.sourcePacket]).join(", ")}. Digestion explains evidence; it does not increase proof strength.
         </footer>
       </main>
     </div>

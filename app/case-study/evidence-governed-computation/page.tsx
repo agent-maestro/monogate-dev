@@ -55,8 +55,16 @@ const proofPoints = [
   {
     label: "Proof Digestion Lab",
     href: "/proof-digestion",
-    text: "The first Understanding Packet: core idea, minimum example, reuse paths, failure modes, and open questions.",
+    text: "Understanding Packets for Forge Rescue and the Monogate OS EML Bridge: core ideas, reuse paths, failure modes, and open questions.",
   },
+];
+
+const built = [
+  "Designed an evidence packet flow with validation status, replay status, semantic strength, claim flags, evidence paths, and non-claims.",
+  "Implemented a reviewer-gate pattern that separates private approval decisions from bounded public inspection surfaces.",
+  "Generated public fixtures from internal research artifacts so pages can drift-check against source evidence.",
+  "Built Proof Digestion infrastructure that turns evidence-backed artifacts into teachable explanations, reuse paths, failure modes, and credit lineage.",
+  "Deployed public case-study, evidence, explorer, and digestion surfaces while keeping the private command cockpit out of the public product.",
 ];
 
 const nonClaims = [
@@ -116,6 +124,15 @@ export default function EvidenceGovernedComputationCaseStudy() {
               </article>
             ))}
           </div>
+        </section>
+
+        <section style={{ marginBottom: 44 }}>
+          <SectionTitle eyebrow="What I built" title="Concrete engineering work behind the public surface." />
+          <ul style={{ margin: 0, paddingLeft: 18, color: C.text, fontSize: 13, lineHeight: 1.75 }}>
+            {built.map((item) => (
+              <li key={item} style={{ marginBottom: 8 }}>{item}</li>
+            ))}
+          </ul>
         </section>
 
         <section style={{ marginBottom: 44 }}>
