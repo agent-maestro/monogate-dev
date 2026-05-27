@@ -68,6 +68,28 @@ export type EmlPacketResult = {
     claimBoundary: string;
     nonClaims: string[];
   };
+  obligations: {
+    schemaVersion: string;
+    status: string;
+    cards: Array<{
+      obligationId: string;
+      kind: string;
+      status: string;
+      trigger: string;
+      nodeId?: string;
+      input?: string;
+      description: string;
+      proofTarget: string;
+      nonClaim: string;
+    }>;
+    summary: {
+      count: number;
+      domain_count: number;
+      range_safety_count: number;
+      proved_count: number;
+    };
+    nonClaims: string[];
+  };
 };
 
 export const emlPackets = [

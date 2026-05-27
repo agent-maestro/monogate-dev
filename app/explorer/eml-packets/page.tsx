@@ -30,6 +30,7 @@ export default function EmlPacketGalleryPage() {
           <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
           <a href="/explorer/eml-ir-bridge" style={{ color: C.muted, textDecoration: "none" }}>IR Bridge</a>
+          <a href="/explorer/eml-packets/builder" style={{ color: C.muted, textDecoration: "none" }}>Builder</a>
           <a href="/evidence" style={{ color: C.muted, textDecoration: "none" }}>Evidence</a>
         </nav>
 
@@ -54,6 +55,22 @@ export default function EmlPacketGalleryPage() {
           <Metric label="Replay frames" value={frameCount} color={C.green} />
           <Metric label="Shared nodes" value={reusedNodeCount} color={C.orange} />
           <Metric label="Internal DAG delta" value={internalDelta} color={C.orange} />
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
+                private intake
+              </div>
+              <div style={{ color: C.text, fontSize: 14, lineHeight: 1.5 }}>
+                Create an EML Expression Packet v0 candidate before running the local builder.
+              </div>
+            </div>
+            <a href="/explorer/eml-packets/builder" style={{ color: C.bg, background: C.green, border: `1px solid ${C.green}`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontSize: 12, fontWeight: 800 }}>
+              Open Builder
+            </a>
+          </div>
         </section>
 
         <section style={{ marginBottom: 20 }}>
@@ -95,6 +112,10 @@ export default function EmlPacketGalleryPage() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8, marginBottom: 12 }}>
                 <Metric label="Nodes" value={packet.ir.nodeCount} color={C.blue} />
                 <Metric label="Frames" value={packet.replay.frameCount} color={C.green} />
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                {pill(`${packet.obligations.summary.count} obligations`, C.purple)}
+                {pill(`${packet.obligations.summary.proved_count} proved`, C.green)}
               </div>
               <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>
                 {packet.review.claimBoundary}

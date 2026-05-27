@@ -78,6 +78,7 @@ export default function EmlPacketDetailPage({ params }: Props) {
           <Metric label="Replay frames" value={packet.replay.frameCount} color={C.green} />
           <Metric label="Reused nodes" value={packet.ir.reusedNodes.length} />
           <Metric label="Internal DAG delta" value={packet.costs.internalExtraDagSavingsNodes} />
+          <Metric label="Obligation cards" value={packet.obligations.summary.count} color={C.purple} />
         </div>
 
         <Section title="Expression">
@@ -180,6 +181,28 @@ export default function EmlPacketDetailPage({ params }: Props) {
                 ))}
               </tbody>
             </table>
+          </div>
+        </Section>
+
+        <Section title="Obligation Cards">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 10 }}>
+            {packet.obligations.cards.map((card) => (
+              <article key={card.obligationId} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                  {pill(card.kind, C.purple)}
+                  {pill(card.status, C.orange)}
+                  {pill(card.trigger, C.blue)}
+                </div>
+                <h3 style={{ color: C.text, fontSize: 13, lineHeight: 1.35, margin: "0 0 8px", overflowWrap: "anywhere" }}>
+                  {card.proofTarget}
+                </h3>
+                <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.65, margin: "0 0 10px" }}>{card.description}</p>
+                <code style={{ display: "block", color: C.text, fontSize: 10, lineHeight: 1.55, overflowWrap: "anywhere", marginBottom: 8 }}>
+                  {card.obligationId}
+                </code>
+                <p style={{ color: C.muted, fontSize: 11, lineHeight: 1.6, margin: 0 }}>{card.nonClaim}</p>
+              </article>
+            ))}
           </div>
         </Section>
 
