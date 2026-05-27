@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { C, pill } from "../../evidence/data";
 import annexJson from "./data/eml_atlas_annex_2026_05_27.json";
+import gateJson from "./data/eml_atlas_promotion_gate_2026_05_27.json";
 
 type AnnexEntry = {
   id: string;
@@ -53,6 +54,19 @@ const annex = annexJson as unknown as {
   nonClaims: string[];
 };
 
+const gate = gateJson as unknown as {
+  status: string;
+  bucketCounts: Record<string, number>;
+  checkedWitnesses: Array<{
+    entryId: string;
+    machlibName: string;
+    status: string;
+  }>;
+  policy: {
+    publicPromotionPerformed: boolean;
+  };
+};
+
 export const metadata: Metadata = {
   title: "EML Atlas Evidence Annex",
   description: "Candidate-only evidence annex for selected monogate.org Atlas identities and claim boundaries.",
@@ -98,6 +112,7 @@ export default function EmlAtlasAnnexPage() {
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
             {pill("EML-A1", C.orange)}
             {pill(annex.status, C.green)}
+            {pill("EML-A7 gate", C.blue)}
             {pill("evidence annex", C.blue)}
             {pill("public Atlas remains canonical", C.green)}
           </div>
@@ -117,6 +132,25 @@ export default function EmlAtlasAnnexPage() {
           <Metric label="Review queue" value={annex.reviewQueueSummary.queueCount} color={C.orange} />
           <Metric label="Candidate witnesses" value={annex.reviewQueueSummary.actionCounts.candidate_machlib_witness ?? 0} color={C.green} />
           <Metric label="Public promotions" value={annex.reviewQueueSummary.publicPromotionCount} color={C.red} />
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            promotion gate
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Safe education" value={gate.bucketCounts.safe_public_education_candidate ?? 0} color={C.green} />
+            <Metric label="Proof targets" value={gate.bucketCounts.proof_target ?? 0} color={C.orange} />
+            <Metric label="Reviewer only" value={gate.bucketCounts.internal_reviewer_only ?? 0} color={C.blue} />
+            <Metric label="Blocked" value={gate.bucketCounts.blocked_or_conjectural ?? 0} color={C.red} />
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {pill(gate.status, C.green)}
+            {pill(`public promotion: ${gate.policy.publicPromotionPerformed}`, C.green)}
+            {gate.checkedWitnesses.map((witness) => (
+              <span key={witness.entryId}>{pill(`${witness.entryId}: ${witness.status}`, C.purple)}</span>
+            ))}
+          </div>
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
