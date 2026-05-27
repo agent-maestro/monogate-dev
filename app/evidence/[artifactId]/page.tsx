@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import {
   C,
@@ -41,6 +42,33 @@ function valueRows(values: Record<string, unknown>) {
 
 function stringField(value: unknown) {
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function DetailSection({
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  children: ReactNode;
+  defaultOpen?: boolean;
+}) {
+  return (
+    <details open={defaultOpen} style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
+      <summary
+        style={{
+          color: C.orange,
+          cursor: "pointer",
+          fontSize: 10,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+        }}
+      >
+        {title}
+      </summary>
+      <div style={{ marginTop: 14 }}>{children}</div>
+    </details>
+  );
 }
 
 export default function EvidenceArtifactPage({ params }: Props) {
@@ -183,49 +211,37 @@ export default function EvidenceArtifactPage({ params }: Props) {
           </div>
         </article>
 
-        <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
-          <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
-            Semantic review
-          </div>
+        <DetailSection title="Semantic review">
           <div style={{ display: "grid", gridTemplateColumns: "minmax(120px, 0.8fr) minmax(0, 1.2fr)", gap: "9px 12px" }}>
             {valueRows(artifact.semanticReview)}
           </div>
-        </article>
+        </DetailSection>
       </section>
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
-        <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
-          <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
-            Non-claims
-          </div>
+        <DetailSection title="Non-claims" defaultOpen>
           <div style={{ display: "grid", gap: 8 }}>
             {artifact.nonClaims.map((claim) => (
               <span key={claim}>{pill(claim, C.red)}</span>
             ))}
           </div>
-        </article>
+        </DetailSection>
 
-        <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
-          <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
-            Validation commands
-          </div>
+        <DetailSection title="Validation commands">
           <div style={{ display: "grid", gap: 8 }}>
             {artifact.validationCommands.map((command) => (
               <span key={command}>{pill(command, C.green)}</span>
             ))}
           </div>
-        </article>
+        </DetailSection>
 
-        <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
-          <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
-            Evidence paths
-          </div>
+        <DetailSection title="Evidence paths">
           <div style={{ display: "grid", gap: 8 }}>
             {evidencePaths.map((path) => (
               <span key={path}>{pill(path, C.blue)}</span>
             ))}
           </div>
-        </article>
+        </DetailSection>
       </section>
     </main>
   );
