@@ -12,6 +12,27 @@ type AnnexEntry = {
   validationStatus: string;
   sampleCount: number;
   promoteToPublicAtlas: boolean;
+  reviewAction: {
+    action: string;
+    priority: number;
+    rationale: string;
+  };
+};
+
+type ReviewQueueItem = {
+  id: string;
+  atlasObject: string;
+  classification: string;
+  action: string;
+  priority: number;
+  promoteToPublicAtlas: boolean;
+};
+
+type ProofTarget = {
+  id: string;
+  atlasObject: string;
+  action: string;
+  status: string;
 };
 
 const annex = annexJson as unknown as {
@@ -20,6 +41,14 @@ const annex = annexJson as unknown as {
   annexRole: string;
   entryCount: number;
   classificationCounts: Record<string, number>;
+  reviewQueueSummary: {
+    queueCount: number;
+    actionCounts: Record<string, number>;
+    candidateMachlibWitnessCount: number;
+    publicPromotionCount: number;
+  };
+  reviewQueue: ReviewQueueItem[];
+  nextProofTargets: ProofTarget[];
   entries: AnnexEntry[];
   nonClaims: string[];
 };
@@ -45,6 +74,13 @@ function Metric({ label, value, color = C.orange }: { label: string; value: stri
   );
 }
 
+function actionColor(value: string) {
+  if (value === "candidate_machlib_witness") return C.green;
+  if (value === "keep_private_symbolic_or_numeric_verifier") return C.blue;
+  if (value === "blocked_public_claim") return C.red;
+  return C.orange;
+}
+
 export default function EmlAtlasAnnexPage() {
   return (
     <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
@@ -54,6 +90,7 @@ export default function EmlAtlasAnnexPage() {
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
           <a href="/explorer/eml-language" style={{ color: C.muted, textDecoration: "none" }}>EML Language</a>
           <a href="/explorer/eml-prime-residual" style={{ color: C.muted, textDecoration: "none" }}>Prime Residual</a>
+          <a href="/explorer/eml-symbolic-regression" style={{ color: C.muted, textDecoration: "none" }}>Template Search</a>
           <a href={annex.publicAtlasSource} style={{ color: C.orange, textDecoration: "none" }}>Public Atlas</a>
         </nav>
 
@@ -77,6 +114,9 @@ export default function EmlAtlasAnnexPage() {
           <Metric label="Exact identities" value={annex.classificationCounts.exact_identity ?? 0} color={C.green} />
           <Metric label="Standard rewrites" value={annex.classificationCounts.standard_rewrite ?? 0} color={C.blue} />
           <Metric label="Blocked" value={annex.classificationCounts.conjectural_or_blocked ?? 0} color={C.red} />
+          <Metric label="Review queue" value={annex.reviewQueueSummary.queueCount} color={C.orange} />
+          <Metric label="Candidate witnesses" value={annex.reviewQueueSummary.actionCounts.candidate_machlib_witness ?? 0} color={C.green} />
+          <Metric label="Public promotions" value={annex.reviewQueueSummary.publicPromotionCount} color={C.red} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -88,6 +128,51 @@ export default function EmlAtlasAnnexPage() {
           </p>
         </section>
 
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 12, marginBottom: 24 }}>
+          <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
+            <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+              review queue
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 660, fontSize: 12 }}>
+                <thead>
+                  <tr style={{ color: C.muted, textAlign: "left" }}>
+                    <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Entry</th>
+                    <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Action</th>
+                    <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Priority</th>
+                    <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Promote</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {annex.reviewQueue.slice(0, 14).map((item) => (
+                    <tr key={item.id}>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{item.id}</td>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(item.action, actionColor(item.action))}</td>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{item.priority}</td>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{String(item.promoteToPublicAtlas)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
+            <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+              next proof targets
+            </div>
+            <div style={{ display: "grid", gap: 10 }}>
+              {annex.nextProofTargets.map((target) => (
+                <div key={target.id} style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: 12 }}>
+                  <div style={{ color: C.text, fontFamily: "monospace", fontSize: 12, overflowWrap: "anywhere" }}>{target.id}</div>
+                  <div style={{ color: C.muted, fontSize: 12, lineHeight: 1.5, marginTop: 6 }}>{target.atlasObject}</div>
+                  <div style={{ marginTop: 8 }}>{pill(target.status, C.orange)}</div>
+                </div>
+              ))}
+            </div>
+          </article>
+        </section>
+
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 12, marginBottom: 24 }}>
           {annex.entries.map((entry) => (
             <article key={entry.id} style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
@@ -95,6 +180,7 @@ export default function EmlAtlasAnnexPage() {
                 {pill(entry.classification, classificationColor(entry.classification))}
                 {pill(entry.validationStatus, entry.validationStatus === "pass" ? C.green : C.red)}
                 {pill(`${entry.sampleCount} checks`, C.purple)}
+                {pill(entry.reviewAction.action, actionColor(entry.reviewAction.action))}
               </div>
               <h2 style={{ color: C.text, fontSize: 17, lineHeight: 1.25, margin: "0 0 10px", overflowWrap: "anywhere" }}>
                 {entry.atlasObject}

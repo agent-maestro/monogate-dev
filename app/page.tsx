@@ -182,6 +182,20 @@ const SPOTLIGHTS = [
     text: "Browse candidate EML expression packets generated from the private packet-builder flow.",
     color: C.green,
   },
+  {
+    href: "/explorer/eml-atlas-annex",
+    title: "EML Atlas Annex",
+    eyebrow: "new · review queue",
+    text: "Review Atlas-style identities, claim boundaries, and candidate MachLib witness targets.",
+    color: C.blue,
+  },
+  {
+    href: "/explorer/eml-symbolic-regression",
+    title: "EML Template Search",
+    eyebrow: "new · research frontier",
+    text: "Compare fixed EML, standard, control, and baseline templates on the prime residual fixture.",
+    color: C.orange,
+  },
 ];
 
 export default function LandingPage() {

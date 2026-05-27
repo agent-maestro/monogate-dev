@@ -91,6 +91,7 @@ export default function EmlPrimeResidualPage() {
           <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
           <a href="/explorer/eml-atlas-annex" style={{ color: C.muted, textDecoration: "none" }}>Atlas Annex</a>
+          <a href="/explorer/eml-symbolic-regression" style={{ color: C.muted, textDecoration: "none" }}>Template Search</a>
           <a href="/explorer/eml-language" style={{ color: C.muted, textDecoration: "none" }}>EML Language</a>
         </nav>
 
