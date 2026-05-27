@@ -53,6 +53,7 @@ export default function EmlAtlasAnnexPage() {
           <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
           <a href="/explorer/eml-language" style={{ color: C.muted, textDecoration: "none" }}>EML Language</a>
+          <a href="/explorer/eml-prime-residual" style={{ color: C.muted, textDecoration: "none" }}>Prime Residual</a>
           <a href={annex.publicAtlasSource} style={{ color: C.orange, textDecoration: "none" }}>Public Atlas</a>
         </nav>
 
