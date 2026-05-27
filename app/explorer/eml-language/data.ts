@@ -1,5 +1,6 @@
 import manifestJson from "./data/eml_language_kernel_manifest_2026_05_27.json";
 import comparisonsJson from "./data/eml_language_canonical_comparisons_2026_05_27.json";
+import costLabJson from "./data/eml_language_cost_lab_2026_05_27.json";
 import gaussianEnergyJson from "./data/gaussian_energy_v0_language_2026_05_27.json";
 import guardedEmlSoftplusJson from "./data/guarded_eml_softplus_v0_language_2026_05_27.json";
 import rawEmlPrimitiveJson from "./data/raw_eml_primitive_v0_language_2026_05_27.json";
@@ -55,6 +56,38 @@ export const emlCanonicalComparisons = comparisonsJson as unknown as {
     left: { surfaceExpression: string; expandedExpression: string; canonicalHash: string };
     right: { surfaceExpression: string; expandedExpression: string; canonicalHash: string };
   }>;
+};
+
+export const emlLanguageCostLab = costLabJson as unknown as {
+  status: string;
+  summary: {
+    programCount: number;
+    surfaceOperatorCount: number;
+    expandedOperatorCount: number;
+    dagUniqueOperatorCount: number;
+    expansionDelta: number;
+    repeatedCanonicalSubtreeCount: number;
+    proofObligationCount: number;
+    checkedWitnessCount: number;
+    publicCostClaimChanged: boolean;
+  };
+  programs: Array<{
+    programId: string;
+    family: string;
+    surfaceExpression: string;
+    expandedExpression: string;
+    canonicalHash: string;
+    surfaceOperatorCount: number;
+    expandedOperatorCount: number;
+    canonicalOperatorCount: number;
+    expansionDelta: number;
+    dagUniqueOperatorCount: number;
+    repeatedCanonicalSubtreeCount: number;
+    proofObligationCount: number;
+    checkedWitnessCount: number;
+    publicCostClaimChanged: boolean;
+  }>;
+  nonClaims: string[];
 };
 
 export const emlLanguagePrograms = [

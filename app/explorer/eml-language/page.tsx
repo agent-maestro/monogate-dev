@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { C, pill } from "../../evidence/data";
-import { emlCanonicalComparisons, emlLanguageManifest, emlLanguagePrograms } from "./data";
+import { emlCanonicalComparisons, emlLanguageCostLab, emlLanguageManifest, emlLanguagePrograms } from "./data";
 
 export const metadata: Metadata = {
   title: "EML Language Kernel",
@@ -35,6 +35,7 @@ export default function EmlLanguageKernelPage() {
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
             {pill("EML-L1", C.orange)}
             {pill("EML-L2", C.orange)}
+            {pill("EML-L3", C.orange)}
             {pill("language kernel", C.blue)}
             {pill(emlLanguageManifest.status, C.green)}
             {pill("no compiler change", C.green)}
@@ -54,6 +55,7 @@ export default function EmlLanguageKernelPage() {
           <Metric label="Let bindings" value={letCount} color={C.orange} />
           <Metric label="Expansion tags" value={expansionTagCount} color={C.blue} />
           <Metric label="Canonical pairs" value={emlCanonicalComparisons.summary.equivalent_count} color={C.green} />
+          <Metric label="DAG unique ops" value={emlLanguageCostLab.summary.dagUniqueOperatorCount} color={C.purple} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -76,6 +78,54 @@ export default function EmlLanguageKernelPage() {
                 <p style={{ color: C.muted, fontSize: 11, lineHeight: 1.55, margin: 0 }}>{item.claimBoundary}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
+            <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              internal language cost lab
+            </div>
+            {pill("no public SuperBEST claim change", emlLanguageCostLab.summary.publicCostClaimChanged ? C.red : C.green)}
+          </div>
+          <div style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>
+            Surface syntax, expanded trees, and DAG-style unique operator counts for reviewer inspection.
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Program</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Surface</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Expanded</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Delta</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>DAG unique</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Repeated</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Obligations</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Checked</th>
+                </tr>
+              </thead>
+              <tbody>
+                {emlLanguageCostLab.programs.map((item) => (
+                  <tr key={item.programId} style={{ color: C.text }}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>
+                      {item.programId}
+                    </td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{item.surfaceOperatorCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{item.expandedOperatorCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", color: item.expansionDelta > 0 ? C.orange : C.muted }}>
+                      {item.expansionDelta}
+                    </td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", color: C.purple }}>{item.dagUniqueOperatorCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{item.repeatedCanonicalSubtreeCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{item.proofObligationCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", color: item.checkedWitnessCount ? C.green : C.muted }}>
+                      {item.checkedWitnessCount}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
