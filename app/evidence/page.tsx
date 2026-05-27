@@ -10,9 +10,9 @@ import {
 } from "./data";
 
 export const metadata: Metadata = {
-  title: "Evidence Cockpit",
+  title: "Evidence Browser",
   description:
-    "Review cockpit for Monogate computational evidence: validation, replay, semantic strength, claim flags, and reviewer decisions.",
+    "Public evidence browser for Monogate computational artifacts: validation, replay, semantic strength, claim flags, and reviewer decisions.",
 };
 
 export default function EvidencePage() {
@@ -23,15 +23,14 @@ export default function EvidencePage() {
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 16 }}>
         <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
           <div style={{ color: C.muted, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
-            Evidence Cockpit / v0
+            Evidence Browser / v0
           </div>
           <h1 style={{ color: C.text, fontSize: 28, lineHeight: 1.15, margin: "0 0 10px", letterSpacing: 0 }}>
-            Review computational claims before they become public.
+            Inspect computational claims and their boundaries.
           </h1>
           <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.75, maxWidth: 760, margin: 0 }}>
-            Monogate turns traces, replay logs, proof obligations, semantic tiers, and claim flags into reviewer decisions.
-            The cockpit shows what is approved, what is only candidate evidence, and what remains unsafe to say, including
-            agent outputs that must carry their own evidence before anyone trusts them.
+            Monogate publishes reviewable evidence packets with traces, replay logs, proof obligations, semantic tiers,
+            and claim flags. This page displays what has been approved for a surface and what remains candidate evidence.
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
             {pill("validation")}
@@ -42,7 +41,7 @@ export default function EvidencePage() {
         </div>
         <aside style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
           <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
-            Reviewer decision counts
+            Published decision counts
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "8px 12px", fontSize: 12 }}>
             {(["approved_for_surface", "candidate_only", "blocked", "needs_human_review"] as const).map(decision => (
@@ -88,7 +87,7 @@ export default function EvidencePage() {
 
       <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18, marginBottom: 16 }}>
         <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
-          Review queue
+          Evidence index
         </div>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820 }}>

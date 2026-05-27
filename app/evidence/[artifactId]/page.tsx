@@ -55,7 +55,7 @@ export default function EvidenceArtifactPage({ params }: Props) {
   return (
     <main style={{ maxWidth: 1040, margin: "0 auto", padding: "28px 16px 72px", background: C.bg }}>
       <nav style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
-        <a href="/evidence" style={{ color: C.muted, fontSize: 12 }}>Evidence Cockpit</a>
+        <a href="/evidence" style={{ color: C.muted, fontSize: 12 }}>Evidence Browser</a>
         <span style={{ color: C.muted, fontSize: 12 }}>/</span>
         <span style={{ color: accent, fontSize: 12 }}>{artifact.title}</span>
       </nav>

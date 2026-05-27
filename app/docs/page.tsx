@@ -101,7 +101,7 @@ python -m monogate_evidence intake packet.json --out reports/intake`}</Code>
   --validation-check required_fields_present \\
   --output local-agent-demo.packet.json`}</Code>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <a href="/evidence" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Evidence cockpit</a>
+        <a href="/evidence" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Evidence browser</a>
         <a href="/evidence/agent-output-demo" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Agent packet demo</a>
         <a href="/evidence/agent-output-demo/packet.json" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Agent packet JSON</a>
       </div>

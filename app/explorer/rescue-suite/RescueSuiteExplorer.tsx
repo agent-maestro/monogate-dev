@@ -18,7 +18,7 @@ const C = {
 };
 
 const evidenceLinks = [
-  { href: "/evidence", label: "Evidence cockpit" },
+  { href: "/evidence", label: "Evidence browser" },
   { href: "https://monogate.org/blog/proof-carrying-rescue-status/", label: "Status note" },
   { href: "https://monogate.org/research/frontier/", label: "Frontier map" },
 ];

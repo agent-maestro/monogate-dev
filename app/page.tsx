@@ -69,8 +69,8 @@ const TOOLKIT: { cmd: string; tagline: string; color: string }[] = [
 const SECTIONS = [
   {
     href: "/evidence",
-    label: "Evidence Cockpit",
-    desc: "Review artifacts by validation, replay, semantic strength, claim flags, and reviewer decision.",
+    label: "Evidence Browser",
+    desc: "Inspect artifacts by validation, replay, semantic strength, claim flags, and reviewer decision.",
     color: C.green,
     tag: "review",
   },
@@ -114,9 +114,9 @@ const SECTIONS = [
 const SPOTLIGHTS = [
   {
     href: "/evidence",
-    title: "Evidence Cockpit",
+    title: "Evidence Browser",
     eyebrow: "new · reviewer gate",
-    text: "Inspect approved and candidate evidence packets before claims move onto public surfaces.",
+    text: "Inspect approved and candidate evidence packets without turning the public page into the private operator hub.",
     color: C.green,
   },
   {
