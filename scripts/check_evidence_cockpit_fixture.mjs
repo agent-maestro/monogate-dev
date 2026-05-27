@@ -105,5 +105,24 @@ if (!osBridge.evidencePaths?.some((path) => path.includes("m8b_negative_fixture_
 if (!osBridge.reviewHighlights?.some((highlight) => highlight.includes("Negative fixtures"))) {
   fail("monogate-os-eml-bridge missing negative fixture highlight");
 }
+if (!Array.isArray(osBridge.kernelDetails) || osBridge.kernelDetails.length !== 2) {
+  fail("monogate-os-eml-bridge missing per-kernel bridge details");
+}
+for (const kernelId of ["eml_log_domain_lift_v0", "guard_clamp_v0"]) {
+  const kernel = osBridge.kernelDetails.find((candidate) => candidate.kernelId === kernelId);
+  if (!kernel) fail(`monogate-os-eml-bridge missing kernel detail: ${kernelId}`);
+  if (kernel.proofStatus !== "evidence_backed_stub") {
+    fail(`monogate-os-eml-bridge proof status drifted for ${kernelId}`);
+  }
+  if (kernel.evidenceStatus !== "qemu_replay_and_sensitivity_pass") {
+    fail(`monogate-os-eml-bridge evidence status drifted for ${kernelId}`);
+  }
+}
+if (!osBridge.evidencePaths?.some((path) => path.includes("m8d_bridge_family_result"))) {
+  fail("monogate-os-eml-bridge missing M8D bridge family evidence path");
+}
+if (!osBridge.evidencePaths?.some((path) => path.includes("m8f_obligation_cards"))) {
+  fail("monogate-os-eml-bridge missing M8F obligation evidence path");
+}
 
 console.log("EVIDENCE_COCKPIT_FIXTURE_CHECK_OK");

@@ -713,7 +713,8 @@
       "reviewHighlights": [
         "Bridge registry contains two independent EML-shaped kernels.",
         "Negative fixtures block Forge-output overclaim, missing digests, missing trace kernels, and early public_ready.",
-        "M4C lifecycle and M5A sensitivity traces include the bridge kernels."
+        "M4C lifecycle and M5A sensitivity traces include the bridge kernels.",
+        "Bridge-family review validates each kernel independently and records proof-obligation stubs."
       ],
       "nonClaims": [
         "No Forge compiler behavior change.",
@@ -724,7 +725,7 @@
         "No hardware observation claim."
       ],
       "validationCommands": [
-        "python tools/monogate_os_m8a_eml_forge_kernel_bridge.py --strict --timeout-seconds 8",
+        "python tools/monogate_os_m8_bridge_family.py --strict --timeout-seconds 8",
         "PYTHONPATH=/home/monogate/monogate/monogate-research python -m monogate_evidence validate product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json"
       ],
       "timeline": [
@@ -744,15 +745,23 @@
           "detail": "Unsafe registry examples fail as expected."
         },
         {
-          "label": "QEMU evidence",
+          "label": "Bridge family",
           "status": "pass",
-          "detail": "Lifecycle and sensitivity traces contain the declared bridge kernels."
+          "detail": "M8D validates each bridge kernel as an independently reviewable family member."
+        },
+        {
+          "label": "Diff and obligations",
+          "status": "pass",
+          "detail": "M8E records source-to-adapter boundaries; M8F records proof-obligation cards."
         }
       ],
       "evidencePaths": [
         "monogate-engine-moat3-review-2026-05-23/monogate_os/m8a/bridge_registry_2026_05_27.json",
         "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8b_registry_result_2026_05_27.json",
         "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8b_negative_fixture_result_2026_05_27.json",
+        "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8d_bridge_family_result_2026_05_27.json",
+        "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8e_source_adapter_diff_2026_05_27.json",
+        "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8f_obligation_cards_2026_05_27.json",
         "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json",
         "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
       ],
@@ -773,7 +782,30 @@
       },
       "semanticReview": {
         "adapter_mode": "fixture_mirror_no_compiler_change",
+        "bridge_family_status": "PASS",
         "forge_compiler_behavior_changed": false,
+        "kernel_details": [
+          {
+            "adapter": "monogate_os/m8a/generated/eml_log_domain_lift_adapter_2026_05_27.rs",
+            "evidenceStatus": "qemu_replay_and_sensitivity_pass",
+            "kernelId": "eml_log_domain_lift_v0",
+            "milestone": "MOS-M8A",
+            "nonClaim": "No full exp correctness proof.; No Forge compiler output claim.; No bootable OS or certified-safety claim.",
+            "obligation": "positive_coordinate_obligation.log_domain_lift.fixture_v0",
+            "proofStatus": "evidence_backed_stub",
+            "spec": "monogate_os/m8a/eml_log_domain_lift_kernel_spec_2026_05_27.json"
+          },
+          {
+            "adapter": "monogate_os/m8a/generated/guard_clamp_adapter_2026_05_27.rs",
+            "evidenceStatus": "qemu_replay_and_sensitivity_pass",
+            "kernelId": "guard_clamp_v0",
+            "milestone": "MOS-M8C",
+            "nonClaim": "No certified controller safety claim.; No production-controller claim.; No Forge compiler output claim.",
+            "obligation": "bounded_output_obligation.guard_clamp.fixture_v0",
+            "proofStatus": "evidence_backed_stub",
+            "spec": "monogate_os/m8a/guard_clamp_kernel_spec_2026_05_27.json"
+          }
+        ],
         "kernel_ids": [
           "eml_log_domain_lift_v0",
           "guard_clamp_v0"
@@ -788,8 +820,10 @@
           "guard_clamp_v0": 4
         },
         "m5a_status": "MONOGATE_OS_M5A_SENSITIVITY_PASS",
+        "proof_obligation_card_status": "PASS",
         "registry_status": "PASS",
-        "reviewer_note": "This proves the bridge discipline only: EML-shaped specs to mirrored no_std adapters to QEMU replay/sensitivity evidence."
+        "reviewer_note": "This proves the bridge discipline only: EML-shaped specs to mirrored no_std adapters to QEMU replay/sensitivity evidence.",
+        "source_adapter_diff_status": "PASS"
       },
       "reviewReasons": [],
       "reviewNotes": "EML/Forge-shaped OS bridge fixture remains candidate-only.",
@@ -804,7 +838,30 @@
         "semanticStrength": "eml_shaped_fixture_adapter_qemu_replay_sensitivity",
         "semanticReview": {
           "adapter_mode": "fixture_mirror_no_compiler_change",
+          "bridge_family_status": "PASS",
           "forge_compiler_behavior_changed": false,
+          "kernel_details": [
+            {
+              "adapter": "monogate_os/m8a/generated/eml_log_domain_lift_adapter_2026_05_27.rs",
+              "evidenceStatus": "qemu_replay_and_sensitivity_pass",
+              "kernelId": "eml_log_domain_lift_v0",
+              "milestone": "MOS-M8A",
+              "nonClaim": "No full exp correctness proof.; No Forge compiler output claim.; No bootable OS or certified-safety claim.",
+              "obligation": "positive_coordinate_obligation.log_domain_lift.fixture_v0",
+              "proofStatus": "evidence_backed_stub",
+              "spec": "monogate_os/m8a/eml_log_domain_lift_kernel_spec_2026_05_27.json"
+            },
+            {
+              "adapter": "monogate_os/m8a/generated/guard_clamp_adapter_2026_05_27.rs",
+              "evidenceStatus": "qemu_replay_and_sensitivity_pass",
+              "kernelId": "guard_clamp_v0",
+              "milestone": "MOS-M8C",
+              "nonClaim": "No certified controller safety claim.; No production-controller claim.; No Forge compiler output claim.",
+              "obligation": "bounded_output_obligation.guard_clamp.fixture_v0",
+              "proofStatus": "evidence_backed_stub",
+              "spec": "monogate_os/m8a/guard_clamp_kernel_spec_2026_05_27.json"
+            }
+          ],
           "kernel_ids": [
             "eml_log_domain_lift_v0",
             "guard_clamp_v0"
@@ -819,8 +876,10 @@
             "guard_clamp_v0": 4
           },
           "m5a_status": "MONOGATE_OS_M5A_SENSITIVITY_PASS",
+          "proof_obligation_card_status": "PASS",
           "registry_status": "PASS",
-          "reviewer_note": "This proves the bridge discipline only: EML-shaped specs to mirrored no_std adapters to QEMU replay/sensitivity evidence."
+          "reviewer_note": "This proves the bridge discipline only: EML-shaped specs to mirrored no_std adapters to QEMU replay/sensitivity evidence.",
+          "source_adapter_diff_status": "PASS"
         },
         "claimFlags": {
           "public_ready": false,
@@ -841,10 +900,11 @@
         "reviewHighlights": [
           "Bridge registry contains two independent EML-shaped kernels.",
           "Negative fixtures block Forge-output overclaim, missing digests, missing trace kernels, and early public_ready.",
-          "M4C lifecycle and M5A sensitivity traces include the bridge kernels."
+          "M4C lifecycle and M5A sensitivity traces include the bridge kernels.",
+          "Bridge-family review validates each kernel independently and records proof-obligation stubs."
         ],
         "validationCommands": [
-          "python tools/monogate_os_m8a_eml_forge_kernel_bridge.py --strict --timeout-seconds 8",
+          "python tools/monogate_os_m8_bridge_family.py --strict --timeout-seconds 8",
           "PYTHONPATH=/home/monogate/monogate/monogate-research python -m monogate_evidence validate product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json"
         ],
         "timeline": [
@@ -864,9 +924,14 @@
             "detail": "Unsafe registry examples fail as expected."
           },
           {
-            "label": "QEMU evidence",
+            "label": "Bridge family",
             "status": "pass",
-            "detail": "Lifecycle and sensitivity traces contain the declared bridge kernels."
+            "detail": "M8D validates each bridge kernel as an independently reviewable family member."
+          },
+          {
+            "label": "Diff and obligations",
+            "status": "pass",
+            "detail": "M8E records source-to-adapter boundaries; M8F records proof-obligation cards."
           }
         ],
         "reviewReasons": [],
@@ -876,12 +941,59 @@
           "monogate-engine-moat3-review-2026-05-23/monogate_os/m8a/bridge_registry_2026_05_27.json",
           "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8b_registry_result_2026_05_27.json",
           "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8b_negative_fixture_result_2026_05_27.json",
+          "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8d_bridge_family_result_2026_05_27.json",
+          "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8e_source_adapter_diff_2026_05_27.json",
+          "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8f_obligation_cards_2026_05_27.json",
           "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json",
           "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+        ],
+        "kernelDetails": [
+          {
+            "adapter": "monogate_os/m8a/generated/eml_log_domain_lift_adapter_2026_05_27.rs",
+            "evidenceStatus": "qemu_replay_and_sensitivity_pass",
+            "kernelId": "eml_log_domain_lift_v0",
+            "milestone": "MOS-M8A",
+            "nonClaim": "No full exp correctness proof.; No Forge compiler output claim.; No bootable OS or certified-safety claim.",
+            "obligation": "positive_coordinate_obligation.log_domain_lift.fixture_v0",
+            "proofStatus": "evidence_backed_stub",
+            "spec": "monogate_os/m8a/eml_log_domain_lift_kernel_spec_2026_05_27.json"
+          },
+          {
+            "adapter": "monogate_os/m8a/generated/guard_clamp_adapter_2026_05_27.rs",
+            "evidenceStatus": "qemu_replay_and_sensitivity_pass",
+            "kernelId": "guard_clamp_v0",
+            "milestone": "MOS-M8C",
+            "nonClaim": "No certified controller safety claim.; No production-controller claim.; No Forge compiler output claim.",
+            "obligation": "bounded_output_obligation.guard_clamp.fixture_v0",
+            "proofStatus": "evidence_backed_stub",
+            "spec": "monogate_os/m8a/guard_clamp_kernel_spec_2026_05_27.json"
+          }
         ]
       },
       "agentTask": null,
-      "agentOutput": null
+      "agentOutput": null,
+      "kernelDetails": [
+        {
+          "adapter": "monogate_os/m8a/generated/eml_log_domain_lift_adapter_2026_05_27.rs",
+          "evidenceStatus": "qemu_replay_and_sensitivity_pass",
+          "kernelId": "eml_log_domain_lift_v0",
+          "milestone": "MOS-M8A",
+          "nonClaim": "No full exp correctness proof.; No Forge compiler output claim.; No bootable OS or certified-safety claim.",
+          "obligation": "positive_coordinate_obligation.log_domain_lift.fixture_v0",
+          "proofStatus": "evidence_backed_stub",
+          "spec": "monogate_os/m8a/eml_log_domain_lift_kernel_spec_2026_05_27.json"
+        },
+        {
+          "adapter": "monogate_os/m8a/generated/guard_clamp_adapter_2026_05_27.rs",
+          "evidenceStatus": "qemu_replay_and_sensitivity_pass",
+          "kernelId": "guard_clamp_v0",
+          "milestone": "MOS-M8C",
+          "nonClaim": "No certified controller safety claim.; No production-controller claim.; No Forge compiler output claim.",
+          "obligation": "bounded_output_obligation.guard_clamp.fixture_v0",
+          "proofStatus": "evidence_backed_stub",
+          "spec": "monogate_os/m8a/guard_clamp_kernel_spec_2026_05_27.json"
+        }
+      ]
     }
   ],
   "boundaries": {

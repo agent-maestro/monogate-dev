@@ -54,6 +54,16 @@ export type Artifact = {
   reviewPacket: Record<string, unknown>;
   agentTask?: string;
   agentOutput?: string;
+  kernelDetails?: Array<{
+    kernelId: string;
+    milestone: string;
+    spec: string;
+    adapter: string;
+    obligation: string;
+    proofStatus: string;
+    evidenceStatus: string;
+    nonClaim: string;
+  }>;
 };
 
 export type EvidenceFixture = {
@@ -70,7 +80,7 @@ export type EvidenceFixture = {
   reviewerContract: Record<string, boolean | string>;
 };
 
-export const fixture = fixtureJson as EvidenceFixture;
+export const fixture = fixtureJson as unknown as EvidenceFixture;
 export const artifacts = fixture.artifacts;
 
 export const decisionColors: Record<Decision, string> = {

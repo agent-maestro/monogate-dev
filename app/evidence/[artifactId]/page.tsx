@@ -111,6 +111,32 @@ export default function EvidenceArtifactPage({ params }: Props) {
         ))}
       </section>
 
+      {artifact.kernelDetails?.length ? (
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18, marginBottom: 16 }}>
+          <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
+            Bridge kernels
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 12 }}>
+            {artifact.kernelDetails.map((kernel) => (
+              <article key={kernel.kernelId} style={{ border: `1px solid ${C.border}`, background: C.surface2, borderRadius: 8, padding: 14 }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10, marginBottom: 10 }}>
+                  <strong style={{ color: C.text, fontSize: 13, overflowWrap: "anywhere" }}>{kernel.kernelId}</strong>
+                  {pill(kernel.milestone, accent)}
+                </div>
+                <div style={{ display: "grid", gap: 8 }}>
+                  {pill(kernel.proofStatus, C.orange)}
+                  {pill(kernel.evidenceStatus, C.green)}
+                  <code style={{ color: C.text, fontSize: 11, lineHeight: 1.55, overflowWrap: "anywhere" }}>
+                    {kernel.obligation}
+                  </code>
+                  <p style={{ color: C.muted, fontSize: 11, lineHeight: 1.6, margin: 0 }}>{kernel.nonClaim}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 16 }}>
         <article style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 18 }}>
           <div style={{ color: C.orange, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>
