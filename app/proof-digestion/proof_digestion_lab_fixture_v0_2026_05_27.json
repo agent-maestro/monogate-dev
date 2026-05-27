@@ -1,0 +1,84 @@
+{
+  "artifacts": [
+    {
+      "artifactId": "forge-rescue",
+      "claimBoundary": "This packet digests the current Forge rescue evidence and explains what it means. It does not add new proof strength beyond the linked evidence packet.",
+      "creditLineage": {
+        "aiAssistants": [
+          "Codex"
+        ],
+        "digestionAuthor": "Codex under reviewer approval",
+        "formalDependencies": [
+          "../machlib/foundations/MachLib/HighDimensional.lean"
+        ],
+        "humanAuthors": [
+          "Monogate reviewer"
+        ],
+        "publicExplainer": "monogate.dev/proof-digestion",
+        "reviewer": "Monogate reviewer",
+        "sourceArtifacts": [
+          "../forge/reports/rescue_artifact_approval_v0_2026_05_26.json",
+          "../forge/reports/rescue_obligation_registry_v0_2026_05_26.json",
+          "reports/evidence_review_gate_v0_2026_05_26.json"
+        ]
+      },
+      "digestReview": {
+        "coreIdea": "A boundary failure in optimization can be converted into a named, replayable rescue event with an explicit semantic tier and claim boundary.",
+        "failureModes": [
+          "Treating a restricted semantic rewrite as a full optimizer correctness theorem.",
+          "Surfacing a rescue packet without replay JSON or fixture-manifest agreement.",
+          "Confusing concrete MachLib witness theorems with proofs of every rescue lane.",
+          "Using public fixtures as hardware or production-controller evidence."
+        ],
+        "humanReviewerNote": "This is useful enough to surface publicly as a lab artifact, but it is intentionally marked partially_digested: the core idea is clear, while the reusable theory of rescue lanes still needs more proofs and examples.",
+        "minimumExample": "For log_domain_lift, an invalid raw coordinate is moved into a positive internal coordinate through exp(theta). The packet records the failed boundary, the rescue lane, the replay frame, and the MachLib witness status instead of claiming the whole optimizer is correct.",
+        "openQuestions": [
+          "Which rescue lane should receive the next restricted semantic theorem after log_domain_lift?",
+          "How should digestion scores be calibrated when an artifact is correct but hard to teach?",
+          "What is the right credit line when a human reviewer, Codex, Forge, and MachLib all contribute different parts?",
+          "Can the same packet shape help students learn from failure without outsourcing the struggle too early?"
+        ],
+        "reusePaths": [
+          "Monogate OS bridge packets can reuse the same evidence grammar for QEMU replay and sensitivity traces.",
+          "Agent-output packets can use the same claim-boundary structure before answers are surfaced.",
+          "Electronics physical packets can enter the reviewer gate without inventing a separate evidence language.",
+          "Command reviewer actions can rank artifacts by what still needs human digestion."
+        ],
+        "teachableExplanation": "Rescuing is not hiding a failure. It is naming the failure, routing it through a constrained transformation, replaying what happened, and attaching only the proof strength that currently exists. The understanding packet adds the missing human layer: what the artifact teaches, how it can be reused, and what would be dangerous to overclaim.",
+        "whyItMatters": "In an era of proof abundance, Monogate needs artifacts that can be understood and reused, not merely generated or verified. The rescue packet shows how failure becomes inspectable evidence instead of an unreviewed claim."
+      },
+      "digestionStatus": "partially_digested",
+      "evidencePaths": [
+        "schemas/understanding_packet_v0.schema.json",
+        "reports/understanding_packet_forge_rescue_v0_2026_05_27.json",
+        "reports/understanding_packet_forge_rescue_v0_2026_05_27.md",
+        "reports/proof_digestion_lab_fixture_v0_2026_05_27.json",
+        "reports/evidence_cockpit_fixture_v0_2026_05_26.json"
+      ],
+      "linkedEvidencePacket": "reports/evidence_cockpit_fixture_v0_2026_05_26.json#/artifacts/forge-rescue",
+      "nonClaims": [
+        "No claim that all rescue obligations are formally proved.",
+        "No claim that Forge compiler behavior changed.",
+        "No hardware, production-controller, or certified-safety claim.",
+        "No claim that the public explanation replaces expert review."
+      ],
+      "schemaVersion": "monogate.understanding_packet.v0",
+      "scores": {
+        "humanDigestNeed": 4,
+        "reusePotential": 5,
+        "teachability": 4
+      },
+      "title": "Forge Rescue Suite Understanding Packet",
+      "verificationStatus": "evidence_backed"
+    }
+  ],
+  "boundaries": {
+    "digestion_does_not_increase_proof_strength": true,
+    "human_reviewer_required_for_promotion": true,
+    "public_lab_not_command_cockpit": true
+  },
+  "date": "2026-05-27",
+  "schemaVersion": "monogate.dev.proof_digestion_lab_fixture.v0",
+  "sourcePacket": "reports/understanding_packet_forge_rescue_v0_2026_05_27.json",
+  "summary": "Public lab fixture for turning evidence-backed artifacts into human-digestible understanding packets."
+}

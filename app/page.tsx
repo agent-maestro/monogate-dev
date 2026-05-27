@@ -82,6 +82,13 @@ const SECTIONS = [
     tag: "tool",
   },
   {
+    href: "/proof-digestion",
+    label: "Proof Digestion",
+    desc: "Turn evidence-backed artifacts into core ideas, minimum examples, reuse paths, failure modes, and open questions.",
+    color: C.orange,
+    tag: "lab",
+  },
+  {
     href: "/electronics",
     label: "Electronics Lab",
     desc: "Trainer Board v0 simulator: wire the pot-to-guarded-LED loop, emit simulated traces, and learn the evidence packet path.",
@@ -118,6 +125,13 @@ const SPOTLIGHTS = [
     eyebrow: "new · reviewer gate",
     text: "Inspect approved and candidate evidence packets without turning the public page into the private operator hub.",
     color: C.green,
+  },
+  {
+    href: "/proof-digestion",
+    title: "Proof Digestion Lab",
+    eyebrow: "new · understanding packet",
+    text: "Follow the first Understanding Packet: what the Forge Rescue Suite teaches, where it can be reused, and what it does not claim.",
+    color: C.orange,
   },
   {
     href: "/electronics",
