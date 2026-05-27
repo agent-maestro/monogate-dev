@@ -41,6 +41,14 @@ export type Artifact = {
   color: keyof typeof C;
   claimFlags: Record<string, boolean | null>;
   semanticReview: Record<string, unknown>;
+  nonClaims: string[];
+  reviewHighlights: string[];
+  validationCommands: string[];
+  timeline: Array<{
+    label: string;
+    status: string;
+    detail: string;
+  }>;
   reviewReasons: string[];
   reviewNotes: string;
   reviewPacket: Record<string, unknown>;

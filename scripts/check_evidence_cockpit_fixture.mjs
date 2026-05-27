@@ -33,6 +33,17 @@ for (const artifact of artifacts) {
   if (artifact.claimFlags?.production_controller_claim === true) {
     fail(`${artifact.id} flipped production_controller_claim`);
   }
+  if (artifact.reviewPacket?.schemaVersion !== "monogate.evidence_public_packet.v0") {
+    fail(`${artifact.id} packet schema drifted`);
+  }
+  for (const field of ["nonClaims", "reviewHighlights", "validationCommands", "timeline"]) {
+    if (!Array.isArray(artifact[field]) || artifact[field].length === 0) {
+      fail(`${artifact.id} missing ${field}`);
+    }
+    if (!Array.isArray(artifact.reviewPacket?.[field]) || artifact.reviewPacket[field].length === 0) {
+      fail(`${artifact.id} review packet missing ${field}`);
+    }
+  }
   if (artifact.decision === "approved_for_surface") {
     if (artifact.validationStatus !== "pass") fail(`${artifact.id} approved without validation pass`);
     if (artifact.replayStatus !== "pass") fail(`${artifact.id} approved without replay pass`);
@@ -52,6 +63,22 @@ if (
 }
 if (!rescue.evidencePaths?.some((path) => path.includes("rescue_obligation_registry"))) {
   fail("forge-rescue missing obligation registry path");
+}
+if (!rescue.nonClaims?.some((claim) => claim.includes("unrestricted optimizer"))) {
+  fail("forge-rescue missing unrestricted semantic non-claim");
+}
+
+const osReplay = artifacts.find((artifact) => artifact.id === "monogate-os-replay");
+if (!osReplay) fail("monogate-os-replay missing");
+if (osReplay.decision !== "candidate_only") fail("monogate-os-replay decision drifted");
+if (!osReplay.reviewHighlights?.some((highlight) => highlight.includes("24 replay frames"))) {
+  fail("monogate-os-replay missing identity CI highlight");
+}
+if (!osReplay.nonClaims?.some((claim) => claim.includes("bootable OS"))) {
+  fail("monogate-os-replay missing bootable OS non-claim");
+}
+if (!osReplay.evidencePaths?.some((path) => path.includes("m7d_replay_identity_ci_result"))) {
+  fail("monogate-os-replay missing M7D result evidence path");
 }
 
 console.log("EVIDENCE_COCKPIT_FIXTURE_CHECK_OK");
