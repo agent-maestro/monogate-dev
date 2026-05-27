@@ -15,14 +15,14 @@ if (fixture.schemaVersion !== "monogate.dev.evidence_cockpit_fixture.v0") {
 
 const artifacts = fixture.artifacts ?? [];
 const ids = new Set(artifacts.map((artifact) => artifact.id));
-for (const id of ["forge-rescue", "electronics-trainer", "monogate-os-replay", "capcard-internal", "agent-output-demo"]) {
+for (const id of ["forge-rescue", "electronics-trainer", "monogate-os-replay", "capcard-internal", "agent-output-demo", "monogate-os-eml-bridge"]) {
   if (!ids.has(id)) fail(`missing artifact: ${id}`);
 }
 
 if (fixture.decisionCounts?.approved_for_surface !== 2) {
   fail("approved_for_surface count drifted");
 }
-if (fixture.decisionCounts?.candidate_only !== 3) {
+if (fixture.decisionCounts?.candidate_only !== 4) {
   fail("candidate_only count drifted");
 }
 
@@ -90,6 +90,20 @@ if (!agentOutput.reviewPacket?.agentTask || !agentOutput.reviewPacket?.agentOutp
 }
 if (!agentOutput.nonClaims?.some((claim) => claim.includes("general agent truthfulness"))) {
   fail("agent-output-demo missing truthfulness non-claim");
+}
+
+const osBridge = artifacts.find((artifact) => artifact.id === "monogate-os-eml-bridge");
+if (!osBridge) fail("monogate-os-eml-bridge missing");
+if (osBridge.decision !== "candidate_only") fail("monogate-os-eml-bridge decision drifted");
+if (osBridge.claimFlags?.public_ready === true) fail("monogate-os-eml-bridge public_ready flipped");
+if (!osBridge.nonClaims?.some((claim) => claim.includes("Forge compiler behavior change"))) {
+  fail("monogate-os-eml-bridge missing Forge compiler non-claim");
+}
+if (!osBridge.evidencePaths?.some((path) => path.includes("m8b_negative_fixture_result"))) {
+  fail("monogate-os-eml-bridge missing negative fixture evidence path");
+}
+if (!osBridge.reviewHighlights?.some((highlight) => highlight.includes("Negative fixtures"))) {
+  fail("monogate-os-eml-bridge missing negative fixture highlight");
 }
 
 console.log("EVIDENCE_COCKPIT_FIXTURE_CHECK_OK");

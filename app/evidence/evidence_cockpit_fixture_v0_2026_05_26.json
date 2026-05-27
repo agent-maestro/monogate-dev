@@ -8,7 +8,7 @@
   },
   "decisionCounts": {
     "approved_for_surface": 2,
-    "candidate_only": 3
+    "candidate_only": 4
   },
   "artifacts": [
     {
@@ -702,6 +702,186 @@
       },
       "agentTask": "Summarize the current Evidence Packet v0 contract and identify the claim boundary for a public artifact.",
       "agentOutput": "Evidence Packet v0 requires validation status, replay status, semantic strength, claim flags, claim boundary, non-claims, source paths, and reviewer decision. A public artifact may be surfaced only when the reviewer gate approves it and its claims remain bounded by the packet."
+    },
+    {
+      "id": "monogate-os-eml-bridge",
+      "title": "Monogate OS EML Bridge",
+      "href": "/evidence/monogate-os-eml-bridge",
+      "color": "blue",
+      "summary": "Candidate EML/Forge-shaped OS bridge fixture set: log-domain lift and guard-clamp kernels run through mirrored no_std adapters with QEMU replay and sensitivity evidence.",
+      "claimBoundary": "Candidate only; these are fixture adapters, not Forge compiler outputs, not a Forge OS target, and not a bootable OS claim.",
+      "reviewHighlights": [
+        "Bridge registry contains two independent EML-shaped kernels.",
+        "Negative fixtures block Forge-output overclaim, missing digests, missing trace kernels, and early public_ready.",
+        "M4C lifecycle and M5A sensitivity traces include the bridge kernels."
+      ],
+      "nonClaims": [
+        "No Forge compiler behavior change.",
+        "No Forge OS target claim.",
+        "No formal equivalence proof between Forge output and guest adapters.",
+        "No bootable OS claim.",
+        "No certified safety or production-controller claim.",
+        "No hardware observation claim."
+      ],
+      "validationCommands": [
+        "python tools/monogate_os_m8a_eml_forge_kernel_bridge.py --strict --timeout-seconds 8",
+        "PYTHONPATH=/home/monogate/monogate/monogate-research python -m monogate_evidence validate product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json"
+      ],
+      "timeline": [
+        {
+          "label": "Bridge registry",
+          "status": "pass",
+          "detail": "M8B registry records spec and adapter digests for both bridge kernels."
+        },
+        {
+          "label": "Second kernel",
+          "status": "pass",
+          "detail": "M8C adds guard_clamp_v0 as an independent EML-shaped fixture adapter."
+        },
+        {
+          "label": "Negative fixtures",
+          "status": "pass",
+          "detail": "Unsafe registry examples fail as expected."
+        },
+        {
+          "label": "QEMU evidence",
+          "status": "pass",
+          "detail": "Lifecycle and sensitivity traces contain the declared bridge kernels."
+        }
+      ],
+      "evidencePaths": [
+        "monogate-engine-moat3-review-2026-05-23/monogate_os/m8a/bridge_registry_2026_05_27.json",
+        "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8b_registry_result_2026_05_27.json",
+        "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8b_negative_fixture_result_2026_05_27.json",
+        "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json",
+        "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+      ],
+      "sourceReportPath": "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json",
+      "lane": "runtime evidence",
+      "sourceLane": "monogate_os_eml_bridge",
+      "decision": "candidate_only",
+      "validationStatus": "pass",
+      "replayStatus": "pass",
+      "semanticStrength": "eml_shaped_fixture_adapter_qemu_replay_sensitivity",
+      "semanticsLabel": "eml shaped fixture adapter qemu replay sensitivity",
+      "claimFlags": {
+        "public_ready": false,
+        "hardware_observed": false,
+        "live_serial_capture_performed": false,
+        "certified_safety_claim": false,
+        "production_controller_claim": false
+      },
+      "semanticReview": {
+        "adapter_mode": "fixture_mirror_no_compiler_change",
+        "forge_compiler_behavior_changed": false,
+        "kernel_ids": [
+          "eml_log_domain_lift_v0",
+          "guard_clamp_v0"
+        ],
+        "m4c_kernel_frame_counts": {
+          "eml_log_domain_lift_v0": 4,
+          "guard_clamp_v0": 1
+        },
+        "m4c_status": "MONOGATE_OS_M4C_QEMU_LIFECYCLE_PASS",
+        "m5a_kernel_frame_counts": {
+          "eml_log_domain_lift_v0": 4,
+          "guard_clamp_v0": 4
+        },
+        "m5a_status": "MONOGATE_OS_M5A_SENSITIVITY_PASS",
+        "registry_status": "PASS",
+        "reviewer_note": "This proves the bridge discipline only: EML-shaped specs to mirrored no_std adapters to QEMU replay/sensitivity evidence."
+      },
+      "reviewReasons": [],
+      "reviewNotes": "EML/Forge-shaped OS bridge fixture remains candidate-only.",
+      "packetHref": "/evidence/monogate-os-eml-bridge/packet.json",
+      "reviewPacket": {
+        "schemaVersion": "monogate.evidence_public_packet.v0",
+        "artifactId": "monogate-os-eml-bridge",
+        "title": "Monogate OS EML Bridge",
+        "reviewDecision": "candidate_only",
+        "validationStatus": "pass",
+        "replayStatus": "pass",
+        "semanticStrength": "eml_shaped_fixture_adapter_qemu_replay_sensitivity",
+        "semanticReview": {
+          "adapter_mode": "fixture_mirror_no_compiler_change",
+          "forge_compiler_behavior_changed": false,
+          "kernel_ids": [
+            "eml_log_domain_lift_v0",
+            "guard_clamp_v0"
+          ],
+          "m4c_kernel_frame_counts": {
+            "eml_log_domain_lift_v0": 4,
+            "guard_clamp_v0": 1
+          },
+          "m4c_status": "MONOGATE_OS_M4C_QEMU_LIFECYCLE_PASS",
+          "m5a_kernel_frame_counts": {
+            "eml_log_domain_lift_v0": 4,
+            "guard_clamp_v0": 4
+          },
+          "m5a_status": "MONOGATE_OS_M5A_SENSITIVITY_PASS",
+          "registry_status": "PASS",
+          "reviewer_note": "This proves the bridge discipline only: EML-shaped specs to mirrored no_std adapters to QEMU replay/sensitivity evidence."
+        },
+        "claimFlags": {
+          "public_ready": false,
+          "hardware_observed": false,
+          "live_serial_capture_performed": false,
+          "certified_safety_claim": false,
+          "production_controller_claim": false
+        },
+        "claimBoundary": "Candidate only; these are fixture adapters, not Forge compiler outputs, not a Forge OS target, and not a bootable OS claim.",
+        "nonClaims": [
+          "No Forge compiler behavior change.",
+          "No Forge OS target claim.",
+          "No formal equivalence proof between Forge output and guest adapters.",
+          "No bootable OS claim.",
+          "No certified safety or production-controller claim.",
+          "No hardware observation claim."
+        ],
+        "reviewHighlights": [
+          "Bridge registry contains two independent EML-shaped kernels.",
+          "Negative fixtures block Forge-output overclaim, missing digests, missing trace kernels, and early public_ready.",
+          "M4C lifecycle and M5A sensitivity traces include the bridge kernels."
+        ],
+        "validationCommands": [
+          "python tools/monogate_os_m8a_eml_forge_kernel_bridge.py --strict --timeout-seconds 8",
+          "PYTHONPATH=/home/monogate/monogate/monogate-research python -m monogate_evidence validate product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json"
+        ],
+        "timeline": [
+          {
+            "label": "Bridge registry",
+            "status": "pass",
+            "detail": "M8B registry records spec and adapter digests for both bridge kernels."
+          },
+          {
+            "label": "Second kernel",
+            "status": "pass",
+            "detail": "M8C adds guard_clamp_v0 as an independent EML-shaped fixture adapter."
+          },
+          {
+            "label": "Negative fixtures",
+            "status": "pass",
+            "detail": "Unsafe registry examples fail as expected."
+          },
+          {
+            "label": "QEMU evidence",
+            "status": "pass",
+            "detail": "Lifecycle and sensitivity traces contain the declared bridge kernels."
+          }
+        ],
+        "reviewReasons": [],
+        "reviewNotes": "EML/Forge-shaped OS bridge fixture remains candidate-only.",
+        "sourceReportPath": "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json",
+        "evidencePaths": [
+          "monogate-engine-moat3-review-2026-05-23/monogate_os/m8a/bridge_registry_2026_05_27.json",
+          "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8b_registry_result_2026_05_27.json",
+          "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/m8b_negative_fixture_result_2026_05_27.json",
+          "monogate-engine-moat3-review-2026-05-23/product_readiness/monogate_os_m8a_eml_forge_kernel_bridge_2026_05_27/evidence_packet.json",
+          "monogate-research/reports/evidence_review_gate_v0_2026_05_26.json"
+        ]
+      },
+      "agentTask": null,
+      "agentOutput": null
     }
   ],
   "boundaries": {
