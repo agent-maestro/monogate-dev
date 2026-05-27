@@ -90,7 +90,8 @@ n = count_nodes(tree)`}</Code>
       </p>
       <Code>{`python -m monogate_evidence validate packet.json
 python -m monogate_evidence review packet.json
-python -m monogate_evidence export fixture.json --fixture --artifact-id agent-output-demo`}</Code>
+python -m monogate_evidence export fixture.json --fixture --artifact-id agent-output-demo
+python -m monogate_evidence intake packet.json --out reports/intake`}</Code>
       <Code>{`python -m monogate_evidence agent-adapter \\
   --artifact-id local-agent-demo \\
   --title "Local Agent Demo" \\
@@ -104,6 +105,18 @@ python -m monogate_evidence export fixture.json --fixture --artifact-id agent-ou
         <a href="/evidence/agent-output-demo" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Agent packet demo</a>
         <a href="/evidence/agent-output-demo/packet.json" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Agent packet JSON</a>
       </div>
+
+      <H2>Bring Your Own Packet</H2>
+      <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
+        Local intake accepts a packet, validates reviewer rules, writes a normalized packet, emits a review result,
+        and blocks unsafe packets. There is no public upload form in v0.
+      </p>
+      <Code>{`python -m monogate_evidence intake packet.json --out reports/intake
+python tools/build_intake_gallery.py`}</Code>
+      <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.7 }}>
+        Expected blocked examples include approved packets without replay, safety claims set true, hardware observation
+        without live capture, and candidate packets without non-claims.
+      </p>
 
       <footer style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20, marginTop: 48, fontSize: 10, color: C.muted }}>
         <a href="/" style={{ color: C.muted }}>← monogate.dev</a>
