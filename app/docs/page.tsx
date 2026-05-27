@@ -83,6 +83,28 @@ n = count_nodes(tree)`}</Code>
         ))}
       </div>
 
+      <H2>Evidence SDK</H2>
+      <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
+        Evidence Packet v0 wraps computational and agent outputs in validation, replay, semantic strength, claim flags,
+        reviewer decisions, and explicit non-claims.
+      </p>
+      <Code>{`python -m monogate_evidence validate packet.json
+python -m monogate_evidence review packet.json
+python -m monogate_evidence export fixture.json --fixture --artifact-id agent-output-demo`}</Code>
+      <Code>{`python -m monogate_evidence agent-adapter \\
+  --artifact-id local-agent-demo \\
+  --title "Local Agent Demo" \\
+  --task "Summarize Evidence Packet v0." \\
+  --output-text "Evidence Packet v0 wraps claims in validation, replay, flags, and non-claims." \\
+  --source docs/evidence_packet_v0.md \\
+  --validation-check required_fields_present \\
+  --output local-agent-demo.packet.json`}</Code>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <a href="/evidence" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Evidence cockpit</a>
+        <a href="/evidence/agent-output-demo" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Agent packet demo</a>
+        <a href="/evidence/agent-output-demo/packet.json" style={{ color: C.blue, textDecoration: "none", fontSize: 13 }}>Agent packet JSON</a>
+      </div>
+
       <footer style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20, marginTop: 48, fontSize: 10, color: C.muted }}>
         <a href="/" style={{ color: C.muted }}>← monogate.dev</a>
       </footer>
