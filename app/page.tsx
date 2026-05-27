@@ -89,6 +89,13 @@ const SECTIONS = [
     tag: "lab",
   },
   {
+    href: "/case-study/evidence-governed-computation",
+    label: "Case Study",
+    desc: "A concise public framing of Monogate as evidence-governed AI and formal-methods infrastructure.",
+    color: C.blue,
+    tag: "portfolio",
+  },
+  {
     href: "/electronics",
     label: "Electronics Lab",
     desc: "Trainer Board v0 simulator: wire the pot-to-guarded-LED loop, emit simulated traces, and learn the evidence packet path.",
@@ -132,6 +139,13 @@ const SPOTLIGHTS = [
     eyebrow: "new · understanding packet",
     text: "Follow the first Understanding Packet: what the Forge Rescue Suite teaches, where it can be reused, and what it does not claim.",
     color: C.orange,
+  },
+  {
+    href: "/case-study/evidence-governed-computation",
+    title: "Evidence-Governed Computation",
+    eyebrow: "case study · portfolio",
+    text: "A shareable overview of the artifact-to-evidence-to-review-to-understanding pipeline.",
+    color: C.blue,
   },
   {
     href: "/electronics",
