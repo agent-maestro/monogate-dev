@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import PacketBuilderClient from "./PacketBuilderClient";
 
 export const metadata: Metadata = {
-  title: "EML Packet Builder",
+  title: "Evidence Packet Builder | Monogate",
   description:
-    "Private client-side EML Expression Packet v0 builder for candidate intake before local IR/replay generation.",
+    "Client-side Monogate evidence packet builder for AI answers, proof notes, traces, hardware packets, compiler artifacts, and EML expressions.",
 };
 
 export default function EmlPacketBuilderPage() {
