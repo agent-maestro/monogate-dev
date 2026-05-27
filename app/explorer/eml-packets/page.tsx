@@ -22,6 +22,8 @@ export default function EmlPacketGalleryPage() {
   const frameCount = emlPackets.reduce((sum, packet) => sum + packet.replay.frameCount, 0);
   const reusedNodeCount = emlPackets.reduce((sum, packet) => sum + packet.ir.reusedNodes.length, 0);
   const internalDelta = emlPackets.reduce((sum, packet) => sum + packet.costs.internalExtraDagSavingsNodes, 0);
+  const domainRequirementCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.domain_requirement_count, 0);
+  const blockedClaimCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.blocked_public_claim_count, 0);
 
   return (
     <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
@@ -39,6 +41,7 @@ export default function EmlPacketGalleryPage() {
             {pill("EML-R3", C.orange)}
             {pill("candidate gallery", C.orange)}
             {pill("generated from EML-R2", C.blue)}
+            {pill("R6 safety lens", C.purple)}
             {pill("no public savings claim", C.green)}
           </div>
           <h1 style={{ color: C.orange, fontSize: 34, lineHeight: 1.1, margin: "0 0 12px", fontFamily: "monospace" }}>
@@ -55,6 +58,8 @@ export default function EmlPacketGalleryPage() {
           <Metric label="Replay frames" value={frameCount} color={C.green} />
           <Metric label="Shared nodes" value={reusedNodeCount} color={C.orange} />
           <Metric label="Internal DAG delta" value={internalDelta} color={C.orange} />
+          <Metric label="Domain reqs" value={domainRequirementCount} color={C.red} />
+          <Metric label="Blocked claims" value={blockedClaimCount} color={C.purple} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -115,6 +120,8 @@ export default function EmlPacketGalleryPage() {
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
                 {pill(`${packet.obligations.summary.count} obligations`, C.purple)}
+                {pill(`${packet.domainSafety.summary.domain_requirement_count} domain reqs`, C.red)}
+                {pill(`${packet.domainSafety.summary.blocked_public_claim_count} blocked claims`, C.orange)}
                 {pill(`${packet.obligations.summary.proved_count} proved`, C.green)}
               </div>
               <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>

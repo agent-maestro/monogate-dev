@@ -79,6 +79,8 @@ export default function EmlPacketDetailPage({ params }: Props) {
           <Metric label="Reused nodes" value={packet.ir.reusedNodes.length} />
           <Metric label="Internal DAG delta" value={packet.costs.internalExtraDagSavingsNodes} />
           <Metric label="Obligation cards" value={packet.obligations.summary.count} color={C.purple} />
+          <Metric label="Domain requirements" value={packet.domainSafety.summary.domain_requirement_count} color={C.red} />
+          <Metric label="Blocked claims" value={packet.domainSafety.summary.blocked_public_claim_count} color={C.orange} />
         </div>
 
         <Section title="Expression">
@@ -181,6 +183,59 @@ export default function EmlPacketDetailPage({ params }: Props) {
                 ))}
               </tbody>
             </table>
+          </div>
+        </Section>
+
+        <Section title="Domain Safety Lens">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Unresolved obligations" value={packet.domainSafety.summary.unresolved_obligation_count} color={C.orange} />
+            <Metric label="Safe rewrite candidates" value={packet.domainSafety.summary.safe_rewrite_candidate_count} color={C.blue} />
+            <Metric label="Proved by lens" value={packet.domainSafety.summary.proved_count} color={C.green} />
+          </div>
+
+          {packet.domainSafety.domainRequirements.length ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 10, marginBottom: 14 }}>
+              {packet.domainSafety.domainRequirements.map((requirement) => (
+                <article key={requirement.requirementId} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                    {pill(requirement.trigger, C.blue)}
+                    {pill(requirement.status, C.orange)}
+                  </div>
+                  <h3 style={{ color: C.text, fontSize: 13, lineHeight: 1.35, margin: "0 0 8px", overflowWrap: "anywhere" }}>
+                    {requirement.requirement}
+                  </h3>
+                  <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.65, margin: "0 0 8px" }}>{requirement.blockedPublicClaim}</p>
+                  <p style={{ color: C.blue, fontSize: 12, lineHeight: 1.65, margin: 0 }}>{requirement.possibleSafeRewrite}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.7 }}>No operator-level domain requirements were classified for this packet.</p>
+          )}
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 10, marginBottom: 14 }}>
+            {packet.domainSafety.rangeAssumptions.map((range) => (
+              <article key={range.input} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: 14 }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                  {pill("range", C.purple)}
+                  {pill(range.status, C.orange)}
+                </div>
+                <h3 style={{ color: C.text, fontSize: 13, lineHeight: 1.35, margin: "0 0 8px", overflowWrap: "anywhere" }}>
+                  {range.input}: {range.min} .. {range.max}
+                </h3>
+                <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.65, margin: "0 0 8px" }}>{range.blockedPublicClaim}</p>
+                <p style={{ color: C.blue, fontSize: 12, lineHeight: 1.65, margin: 0 }}>{range.possibleSafeRewrite}</p>
+              </article>
+            ))}
+          </div>
+
+          <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 14 }}>
+            <div style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+              Blocked public claims
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {packet.domainSafety.blockedPublicClaims.map((claim) => pill(claim, C.red))}
+            </div>
           </div>
         </Section>
 

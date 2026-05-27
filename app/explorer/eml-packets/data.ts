@@ -22,6 +22,45 @@ export type EmlReplayFrame = {
   replay_hash_prev: string | null;
 };
 
+export type EmlDomainSafety = {
+  schemaVersion: string;
+  status: string;
+  domainRequirements: Array<{
+    requirementId: string;
+    nodeId?: string;
+    trigger: string;
+    requirement: string;
+    status: string;
+    blockedPublicClaim: string;
+    possibleSafeRewrite: string;
+  }>;
+  rangeAssumptions: Array<{
+    input: string;
+    min: number;
+    max: number;
+    status: string;
+    blockedPublicClaim: string;
+    possibleSafeRewrite: string;
+  }>;
+  unresolvedObligations: Array<{
+    obligationId: string;
+    kind: string;
+    proofTarget: string;
+    reason: string;
+  }>;
+  possibleSafeRewrites: string[];
+  blockedPublicClaims: string[];
+  summary: {
+    domain_requirement_count: number;
+    range_assumption_count: number;
+    unresolved_obligation_count: number;
+    safe_rewrite_candidate_count: number;
+    blocked_public_claim_count: number;
+    proved_count: number;
+  };
+  nonClaims: string[];
+};
+
 export type EmlPacketResult = {
   schemaVersion: string;
   artifactId: string;
@@ -90,6 +129,7 @@ export type EmlPacketResult = {
     };
     nonClaims: string[];
   };
+  domainSafety: EmlDomainSafety;
 };
 
 export const emlPackets = [
