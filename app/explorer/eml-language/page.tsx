@@ -29,6 +29,7 @@ export default function EmlLanguageKernelPage() {
           <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
           <a href="/explorer/eml-packets" style={{ color: C.muted, textDecoration: "none" }}>EML Packets</a>
+          <a href="/explorer/eml-atlas-annex" style={{ color: C.muted, textDecoration: "none" }}>Atlas Annex</a>
         </nav>
 
         <header style={{ marginBottom: 28 }}>
