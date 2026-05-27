@@ -105,6 +105,7 @@ export default function EmlIrBridgePage() {
         <nav style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28, fontSize: 12 }}>
           <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
+          <a href="/explorer/eml-packets" style={{ color: C.muted, textDecoration: "none" }}>EML Packets</a>
           <a href="/evidence" style={{ color: C.muted, textDecoration: "none" }}>Evidence</a>
           <a href="/proof-digestion" style={{ color: C.muted, textDecoration: "none" }}>Proof Digestion</a>
         </nav>

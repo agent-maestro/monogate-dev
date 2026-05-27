@@ -175,6 +175,13 @@ const SPOTLIGHTS = [
     text: "Inspect one EML expression as a shared DAG, replay packet, and explicit non-claim boundary.",
     color: C.orange,
   },
+  {
+    href: "/explorer/eml-packets",
+    title: "EML Packet Gallery",
+    eyebrow: "new · generated packets",
+    text: "Browse candidate EML expression packets generated from the private packet-builder flow.",
+    color: C.green,
+  },
 ];
 
 export default function LandingPage() {
