@@ -9,6 +9,7 @@ import deepTreeJson from "./data/eml_a8_5_deep_tree_holdout_2026_05_27.json";
 import guardRuleJson from "./data/eml_a9_compiler_guard_rules_2026_05_27.json";
 import guardFixtureJson from "./data/eml_a9_1_guard_rule_fixtures_2026_05_27.json";
 import guardDecisionJson from "./data/eml_a9_2_guard_decision_analyzer_2026_05_27.json";
+import mockCompilerHoldoutJson from "./data/eml_a11_1_mock_compiler_holdouts_2026_05_27.json";
 
 type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
 
@@ -94,6 +95,14 @@ type GuardDecisionPacket = {
   expectedDecisionMatched: boolean;
   expectedRulesMatched: boolean;
   reason: string;
+};
+
+type MockCompilerHoldoutDecision = {
+  programId: string;
+  guardDecision: string;
+  compilerDecision: string;
+  runtimeTarget: string | null;
+  matchedRuleIds: string[];
 };
 
 const lab = labJson as unknown as {
@@ -224,6 +233,20 @@ const guardDecisions = guardDecisionJson as unknown as {
   nonClaims: string[];
 };
 
+const mockCompilerHoldouts = mockCompilerHoldoutJson as unknown as {
+  status: string;
+  summary: {
+    holdoutCount: number;
+    protectedRuntimeLoweringCount: number;
+    blockedRequiresEvidenceCount: number;
+    proofShapeOnlyCount: number;
+    realCompilerBehaviorChanged: boolean;
+    compilerCorrectnessClaim: boolean;
+  };
+  decisionPackets: MockCompilerHoldoutDecision[];
+  nonClaims: string[];
+};
+
 export const metadata: Metadata = {
   title: "EML Advantage Lab",
   description: "Bounded EML-vs-standard comparison across compression, runtime, stability, lowering, proof, and search evidence.",
@@ -286,6 +309,7 @@ export default function EmlAdvantagePage() {
             {pill("A8.5 depth", C.orange)}
             {pill("A9 guards", C.blue)}
             {pill("A9.2 decisions", C.green)}
+            {pill("A11.1 holdouts", C.purple)}
             {pill("bounded comparison", C.blue)}
             {pill("general superiority: false", C.green)}
             {pill("compiler correctness: false", C.green)}
@@ -312,6 +336,7 @@ export default function EmlAdvantagePage() {
           <Metric label="Blocked deep trees" value={deepTrees.summary.blockedCount} color={C.red} />
           <Metric label="Guard rules" value={guardRules.summary.ruleCount} color={C.blue} />
           <Metric label="Guard decisions" value={guardDecisions.summary.decisionCount} color={C.green} />
+          <Metric label="Mock holdouts" value={mockCompilerHoldouts.summary.holdoutCount} color={C.purple} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -404,6 +429,46 @@ export default function EmlAdvantagePage() {
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.matchedRuleIds.join(", ")}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.expectedDecisionMatched && packet.expectedRulesMatched ? "yes" : "no", packet.expectedDecisionMatched && packet.expectedRulesMatched ? C.green : C.red)}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.reason}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A11.1 mock compiler holdouts
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            Holdout expression packets now exercise the mock compiler decision layer outside the seed set. This is still a reviewer artifact, not real compiler behavior.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Holdouts" value={mockCompilerHoldouts.summary.holdoutCount} color={C.purple} />
+            <Metric label="Protected lowerings" value={mockCompilerHoldouts.summary.protectedRuntimeLoweringCount} color={C.blue} />
+            <Metric label="Blocked" value={mockCompilerHoldouts.summary.blockedRequiresEvidenceCount} color={C.red} />
+            <Metric label="Proof-shape only" value={mockCompilerHoldouts.summary.proofShapeOnlyCount} color={C.green} />
+            <Metric label="Compiler changed" value={String(mockCompilerHoldouts.summary.realCompilerBehaviorChanged)} color={C.green} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Program</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Guard</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Mock compiler</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Runtime target</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Rules</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockCompilerHoldouts.decisionPackets.map((packet) => (
+                  <tr key={packet.programId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.programId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.guardDecision, packet.guardDecision.startsWith("block") ? C.red : packet.guardDecision.includes("lowering") ? C.blue : C.green)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.compilerDecision, packet.compilerDecision.startsWith("blocked") ? C.red : packet.compilerDecision.includes("protected") ? C.blue : C.green)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.runtimeTarget ?? "none"}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.matchedRuleIds.join(", ")}</td>
                   </tr>
                 ))}
               </tbody>
