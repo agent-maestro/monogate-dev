@@ -10,6 +10,7 @@ import guardRuleJson from "./data/eml_a9_compiler_guard_rules_2026_05_27.json";
 import guardFixtureJson from "./data/eml_a9_1_guard_rule_fixtures_2026_05_27.json";
 import guardDecisionJson from "./data/eml_a9_2_guard_decision_analyzer_2026_05_27.json";
 import mockCompilerHoldoutJson from "./data/eml_a11_1_mock_compiler_holdouts_2026_05_27.json";
+import protectedLoweringJson from "./data/eml_a11_2_protected_lowering_benchmark_2026_05_27.json";
 
 type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
 
@@ -103,6 +104,18 @@ type MockCompilerHoldoutDecision = {
   compilerDecision: string;
   runtimeTarget: string | null;
   matchedRuleIds: string[];
+};
+
+type ProtectedLoweringCase = {
+  caseId: string;
+  recommendedLowering: string;
+  sampleCount: number;
+  protectedBetterCount: number;
+  protectedNoWorseCount: number;
+  naiveNonFiniteCount: number;
+  protectedNonFiniteCount: number;
+  maxNaiveAbsError: number | string;
+  maxProtectedAbsError: number;
 };
 
 const lab = labJson as unknown as {
@@ -247,6 +260,22 @@ const mockCompilerHoldouts = mockCompilerHoldoutJson as unknown as {
   nonClaims: string[];
 };
 
+const protectedLowerings = protectedLoweringJson as unknown as {
+  status: string;
+  summary: {
+    caseCount: number;
+    sampleCount: number;
+    protectedBetterCount: number;
+    protectedNoWorseCount: number;
+    naiveNonFiniteCount: number;
+    protectedNonFiniteCount: number;
+    runtimePerformanceClaim: boolean;
+    compilerImplementationClaim: boolean;
+  };
+  cases: ProtectedLoweringCase[];
+  nonClaims: string[];
+};
+
 export const metadata: Metadata = {
   title: "EML Advantage Lab",
   description: "Bounded EML-vs-standard comparison across compression, runtime, stability, lowering, proof, and search evidence.",
@@ -310,6 +339,7 @@ export default function EmlAdvantagePage() {
             {pill("A9 guards", C.blue)}
             {pill("A9.2 decisions", C.green)}
             {pill("A11.1 holdouts", C.purple)}
+            {pill("A11.2 stability", C.blue)}
             {pill("bounded comparison", C.blue)}
             {pill("general superiority: false", C.green)}
             {pill("compiler correctness: false", C.green)}
@@ -337,6 +367,7 @@ export default function EmlAdvantagePage() {
           <Metric label="Guard rules" value={guardRules.summary.ruleCount} color={C.blue} />
           <Metric label="Guard decisions" value={guardDecisions.summary.decisionCount} color={C.green} />
           <Metric label="Mock holdouts" value={mockCompilerHoldouts.summary.holdoutCount} color={C.purple} />
+          <Metric label="Protected samples" value={protectedLowerings.summary.sampleCount} color={C.blue} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -469,6 +500,51 @@ export default function EmlAdvantagePage() {
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.compilerDecision, packet.compilerDecision.startsWith("blocked") ? C.red : packet.compilerDecision.includes("protected") ? C.blue : C.green)}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.runtimeTarget ?? "none"}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.matchedRuleIds.join(", ")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A11.2 protected lowering stability
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            Protected lowering recommendations now have deterministic numeric edge-grid evidence. This records stability behavior only; speed and compiler-correctness claims stay blocked.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Cases" value={protectedLowerings.summary.caseCount} color={C.blue} />
+            <Metric label="Samples" value={protectedLowerings.summary.sampleCount} color={C.green} />
+            <Metric label="Protected better" value={protectedLowerings.summary.protectedBetterCount} color={C.green} />
+            <Metric label="Protected no worse" value={protectedLowerings.summary.protectedNoWorseCount} color={C.green} />
+            <Metric label="Naive non-finite" value={protectedLowerings.summary.naiveNonFiniteCount} color={C.red} />
+            <Metric label="Runtime claim" value={String(protectedLowerings.summary.runtimePerformanceClaim)} color={C.green} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Case</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Lowering</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Samples</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Better</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>No worse</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Naive non-finite</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Max protected error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {protectedLowerings.cases.map((packet) => (
+                  <tr key={packet.caseId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.caseId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.recommendedLowering, C.blue)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.sampleCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.protectedBetterCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.protectedNoWorseCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.naiveNonFiniteCount}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.maxProtectedAbsError}</td>
                   </tr>
                 ))}
               </tbody>
