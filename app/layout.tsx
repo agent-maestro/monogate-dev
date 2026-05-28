@@ -7,24 +7,23 @@ const siteUrl = "https://monogate.dev";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "monogate.dev — The EML Challenge Board",
+    default: "monogate.dev — Developer Playground",
     template: "%s — monogate.dev",
   },
   description:
-    "Canonical validator and leaderboard for open problems in the EML operator. " +
-    "eml(x,y) = exp(x) − ln(y) · arXiv:2603.21852 · Odrzywołek 2026. " +
-    "Submit a construction for sin, cos, π, or i. Get credited permanently.",
+    "Developer playground for Monogate artifacts: EML explorers, evidence " +
+    "packets, rescue traces, packet builders, simulators, and bounded demos.",
   keywords: [
     "EML operator", "elementary functions", "exp minus log", "arXiv:2603.21852",
-    "mathematics", "open problems", "monogate", "sin cos pi i",
+    "developer playground", "evidence packets", "rescue traces", "monogate",
   ],
   authors: [{ name: "monogate.dev" }],
   openGraph: {
     type: "website",
     siteName: "monogate.dev",
-    title: "monogate.dev — The EML Challenge Board",
+    title: "monogate.dev — Developer Playground",
     description:
-      "Open problems in the EML operator: construct sin, cos, π, i from eml(x,y) = exp(x) − ln(y). Submit a construction. Get credited permanently.",
+      "Try Monogate tools: inspect evidence packets, run EML explorers, open rescue traces, draft packet JSON, and use bounded simulators.",
     url: siteUrl,
     images: [
       {
@@ -37,9 +36,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "monogate.dev — The EML Challenge Board",
+    title: "monogate.dev — Developer Playground",
     description:
-      "Open problems in eml(x,y) = exp(x) − ln(y). Construct sin, cos, π, or i from a single binary operator. arXiv:2603.21852",
+      "A developer playground for Monogate artifacts, evidence packets, EML explorers, and bounded simulators.",
     images: ["/og-image.jpg"],
   },
   icons: {
@@ -58,9 +57,9 @@ function Footer() {
       fontFamily: "monospace", fontSize: 11, color: "#4e5168",
       maxWidth: 900, margin: "0 auto",
     }}>
-      Monogate Research ·{" "}
+      Monogate Dev Playground ·{" "}
       <a href="https://arxiv.org/abs/2603.21852" style={{ color: "#4facfe" }}>arXiv:2603.21852</a>
-      {" "}· 50 Lean theorems · 265 equations · EML Cost Conjecture (in development) ·{" "}
+      {" "}· Workbench surfaces · Evidence packets · EML explorers ·{" "}
       <a href="https://monogate.org" style={{ color: "#4facfe" }}>monogate.org</a> ·{" "}
       <a href="https://monogate.dev" style={{ color: "#4facfe" }}>monogate.dev</a> ·{" "}
       <a href="https://github.com/agent-maestro/monogate" style={{ color: "#4facfe" }}>GitHub</a> ·{" "}
@@ -71,12 +70,13 @@ function Footer() {
 
 const projectLd = {
   "@context": "https://schema.org",
-  "@type": "ResearchProject",
+  "@type": "SoftwareApplication",
   name: "Monogate",
-  alternateName: "monogate.dev — The EML Challenge Board",
+  alternateName: "monogate.dev — Developer Playground",
   description:
-    "Open problems in the EML operator: construct sin, cos, π, i from eml(x,y) = exp(x) − ln(y). Interactive lab, leaderboard, and symbolic tools.",
+    "Developer playground for Monogate artifacts: EML explorers, evidence packets, rescue traces, packet builders, simulators, and bounded demos.",
   url: siteUrl,
+  applicationCategory: "DeveloperApplication",
   sameAs: [
     "https://monogate.org",
     "https://github.com/agent-maestro/monogate",
@@ -85,7 +85,7 @@ const projectLd = {
     "https://arxiv.org/abs/2603.21852",
   ],
   codeRepository: "https://github.com/agent-maestro/monogate",
-  author: { "@type": "Organization", name: "Monogate Research" },
+  author: { "@type": "Organization", name: "Monogate" },
   license: "https://opensource.org/licenses/MIT",
 };
 

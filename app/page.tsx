@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "monogate — One operator. All of mathematics.",
+  title: "monogate.dev — Developer Playground",
   description:
-    "The research layer behind Monogate Forge and MachLib. Profile, measure, " +
-    "and optimize EML expressions — pip install eml-cost.",
+    "A developer playground for Monogate artifacts: inspect evidence packets, " +
+    "run EML explorers, draft packet JSON, and try bounded simulators.",
 };
 
 const C = {
@@ -20,53 +20,60 @@ const C = {
   purple: "#a78bfa",
 };
 
-const FLOW_STEPS: { n: string; text: string; sub: string; highlight?: boolean }[] = [
+const FLOW_STEPS: { n: string; text: string; sub: string }[] = [
   {
     n: "01",
-    text: "Engineer writes equation (.eml)",
-    sub: "Single source of truth — the math itself.",
+    text: "Open a live tool",
+    sub: "Start with a packet builder, explorer, simulator, evidence browser, or replay fixture.",
   },
   {
     n: "02",
-    text: "Forge compiles to 36 targets",
-    sub: "13 Free targets plus 23 Pro targets, from Python/C/Rust to HDL, EDA, and proof artifacts.",
+    text: "Inspect the artifact",
+    sub: "Read the expression, trace, replay frames, guard decisions, supporting evidence, and non-claims.",
   },
   {
     n: "03",
-    text: "Lean output imports MachLib (not Mathlib)",
-    sub: "~500 lines of axiomatic foundations. No external library.",
+    text: "Export or follow the packet",
+    sub: "Use generated JSON and reports as reviewable handoff material, not automatic approval.",
   },
   {
     n: "04",
-    text: "MachLib core builds in under 5 minutes",
-    sub: "Cold build, core foundations. Laptop. Every time.",
+    text: "Check the boundary",
+    sub: "Every surface marks what is simulated, candidate-only, blocked, checked, or public-ready.",
   },
   {
     n: "05",
-    text: "Proof verified. Zero external dependencies.",
-    sub: "Lean kernel says yes. Nothing else needed.",
+    text: "Go deeper on monogate.org",
+    sub: "The public research story, Atlas, and essays live on the .org site.",
   },
 ];
 
 const TOOLKIT: { cmd: string; tagline: string; color: string }[] = [
   {
-    cmd: "pip install eml-cost",
-    tagline: "Profile any equation — chain order, drift, cost class.",
+    cmd: "Inspect",
+    tagline: "Open generated EML, rescue, evidence, and proof-digestion artifacts.",
     color: C.blue,
   },
   {
-    cmd: "pip install monogate-forge",
-    tagline: "Compile to 36 targets — 13 Free, 23 Pro.",
+    cmd: "Build",
+    tagline: "Draft candidate evidence packets and EML expression packets in the browser.",
     color: C.orange,
   },
   {
-    cmd: "import MachLib",
-    tagline: "Verify against MachLib core in under 5 minutes — zero Mathlib dependency.",
+    cmd: "Export",
+    tagline: "Copy packet JSON and carry bounded claims into private review.",
     color: C.green,
   },
 ];
 
 const SECTIONS = [
+  {
+    href: "/explorer/eml-packets/builder",
+    label: "Packet Builder",
+    desc: "Draft candidate Evidence Packet v0 JSON from AI answers, proof notes, traces, hardware packets, compiler artifacts, or EML expressions.",
+    color: C.orange,
+    tag: "build",
+  },
   {
     href: "/evidence",
     label: "Evidence Browser",
@@ -77,9 +84,9 @@ const SECTIONS = [
   {
     href: "/explorer",
     label: "Explorer",
-    desc: "Build and optimize EML expression trees interactively.",
+    desc: "Browse the current Explorer surfaces: EML language, packet gallery, rescue suite, advantage lab, Atlas annex, and symbolic-regression fixtures.",
     color: C.blue,
-    tag: "tool",
+    tag: "index",
   },
   {
     href: "/proof-digestion",
@@ -91,14 +98,14 @@ const SECTIONS = [
   {
     href: "/case-study/evidence-governed-computation",
     label: "Case Study",
-    desc: "A concise public framing of Monogate as evidence-governed AI and formal-methods infrastructure.",
+    desc: "A concise public framing for the artifact-to-evidence-to-review-to-understanding pipeline.",
     color: C.blue,
-    tag: "portfolio",
+    tag: "overview",
   },
   {
     href: "/electronics",
     label: "Electronics Lab",
-    desc: "Trainer Board v0 simulator: wire the pot-to-guarded-LED loop, emit simulated traces, and learn the evidence packet path.",
+    desc: "Laptop-agent-owned electronics surface for simulated trainer boards and physical-evidence-ready packets.",
     color: C.green,
     tag: "sim lab",
   },
@@ -119,7 +126,7 @@ const SECTIONS = [
   {
     href: "/docs",
     label: "Docs",
-    desc: "API reference, quickstart, and tutorial for the monogate library.",
+    desc: "Reference material and developer notes for the current Monogate surfaces.",
     color: C.blue,
     tag: "docs",
   },
@@ -127,45 +134,45 @@ const SECTIONS = [
 
 const SPOTLIGHTS = [
   {
-    href: "/evidence",
-    title: "Evidence Browser",
-    eyebrow: "new · reviewer gate",
-    text: "Inspect approved and candidate evidence packets without turning the public page into the private operator hub.",
+    href: "/explorer/rescue-suite",
+    title: "Rescue Suite",
+    eyebrow: "inspect · replay",
+    text: "Open optimization-failure rescue packets, replay status, trace frames, and MachLib obligation routing.",
     color: C.green,
   },
   {
-    href: "/proof-digestion",
-    title: "Proof Digestion Lab",
-    eyebrow: "new · understanding packet",
-    text: "Follow the first Understanding Packet: what the Forge Rescue Suite teaches, where it can be reused, and what it does not claim.",
+    href: "/explorer/eml-packets/builder",
+    title: "Packet Builder",
+    eyebrow: "build · export",
+    text: "Draft candidate Evidence Packet v0 JSON and EML Expression Packet v0 JSON from pasted artifacts.",
     color: C.orange,
   },
   {
-    href: "/case-study/evidence-governed-computation",
-    title: "Evidence-Governed Computation",
-    eyebrow: "case study · portfolio",
-    text: "A shareable overview of the artifact-to-evidence-to-review-to-understanding pipeline.",
+    href: "/explorer/eml-advantage",
+    title: "EML Advantage Lab",
+    eyebrow: "compare · guard",
+    text: "See where EML helps, where protected standard math wins, and which claims stay blocked.",
     color: C.blue,
   },
   {
     href: "/electronics",
     title: "Electronics Lab",
-    eyebrow: "new · simulated trainer board",
-    text: "A guided low-voltage bench simulator for threshold_reflex_v0: ground, 3V3, potentiometer, resistor, LED, guard clamp, trace.",
+    eyebrow: "simulate · export",
+    text: "Open the laptop-agent electronics surface for simulated trainer board work and physical-evidence-ready packets.",
     color: C.green,
   },
   {
-    href: "/explorer/rescue-suite",
-    title: "Rescue Suite",
-    eyebrow: "new · replay contract",
-    text: "Inspect Forge boundary-event rescue packets, replay status, trace frames, and MachLib obligation routing.",
+    href: "/evidence",
+    title: "Evidence Browser",
+    eyebrow: "review · packets",
+    text: "Inspect candidate and approved evidence packets by validation, replay, semantic strength, and claim flags.",
     color: C.orange,
   },
   {
-    href: "/explorer?tab=field",
-    title: "Complex Field",
-    eyebrow: "visual EML",
-    text: "Domain coloring for complex EML slices, including the modular-symmetry-inspired visual grammar.",
+    href: "/proof-digestion",
+    title: "Proof Digestion Lab",
+    eyebrow: "explain · reuse",
+    text: "Turn evidence-backed artifacts into minimum examples, failure modes, reuse paths, and open questions.",
     color: C.blue,
   },
   {
@@ -178,21 +185,14 @@ const SPOTLIGHTS = [
   {
     href: "/explorer/eml-packets",
     title: "EML Packet Gallery",
-    eyebrow: "new · generated packets",
+    eyebrow: "inspect · packets",
     text: "Browse candidate EML expression packets generated from the private packet-builder flow.",
     color: C.green,
   },
   {
-    href: "/explorer/eml-advantage",
-    title: "EML Advantage Lab",
-    eyebrow: "new · comparison spine",
-    text: "See where EML helps, where standard math wins, and which claims remain blocked.",
-    color: C.purple,
-  },
-  {
     href: "/explorer/eml-atlas-annex",
     title: "EML Atlas Annex",
-    eyebrow: "new · review queue",
+    eyebrow: "review · atlas",
     text: "Review Atlas-style identities, claim boundaries, and candidate MachLib witness targets.",
     color: C.blue,
   },
@@ -212,31 +212,35 @@ export default function LandingPage() {
       {/* Hero */}
       <section style={{ marginBottom: 56 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>
-          monogate.dev — research layer
+          monogate.dev — developer playground
         </div>
         <h1 style={{ fontSize: 36, fontWeight: 700, color: C.orange, fontFamily: "monospace", marginBottom: 16, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
-          One operator.<br />All of mathematics.
+          Open the tool.<br />Inspect the packet.
         </h1>
         <p style={{ fontSize: 15, color: C.text, lineHeight: 1.8, maxWidth: 640, marginBottom: 24 }}>
-          The research layer that powers Monogate Forge and MachLib. Profile,
-          measure, and optimize EML expressions before the compiler ever sees
-          them. Built on Odrzywołek (2026) — every elementary function as a
-          finite binary tree of <code style={{ color: C.orange, fontFamily: "monospace" }}>eml(x, y) = exp(x) − ln(y)</code>.
+          This is the public workbench for Monogate artifacts: EML explorers,
+          evidence packets, rescue traces, packet builders, proof-digestion
+          views, and bounded simulators. The deeper research story lives on{" "}
+          <a href="https://monogate.org" style={{ color: C.blue }}>monogate.org</a>;
+          this site is for trying the tools.
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
           <code style={{ fontSize: 12, color: C.blue, background: "rgba(106,176,245,0.07)", border: `1px solid rgba(106,176,245,0.2)`, borderRadius: 4, padding: "6px 12px" }}>
-            pip install eml-cost
+            inspect artifacts
           </code>
           <code style={{ fontSize: 12, color: C.green, background: "rgba(74,222,128,0.07)", border: `1px solid rgba(74,222,128,0.2)`, borderRadius: 4, padding: "6px 12px" }}>
-            npm install monogate
+            export candidate JSON
           </code>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <a href="/explorer" style={{ fontSize: 12, color: C.bg, background: C.orange, border: `1px solid ${C.orange}`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
-            Open Explorer
+          <a href="/explorer/rescue-suite" style={{ fontSize: 12, color: C.bg, background: C.orange, border: `1px solid ${C.orange}`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
+            Start With Rescue Suite
+          </a>
+          <a href="/explorer/eml-packets/builder" style={{ fontSize: 12, color: C.blue, background: "rgba(106,176,245,0.07)", border: `1px solid rgba(106,176,245,0.28)`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
+            Open Packet Builder
           </a>
           <a href="/electronics" style={{ fontSize: 12, color: C.green, background: "rgba(74,222,128,0.07)", border: `1px solid rgba(74,222,128,0.28)`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
-            Try Electronics Lab
+            Try Electronics
           </a>
         </div>
       </section>
@@ -244,7 +248,7 @@ export default function LandingPage() {
       {/* Spotlight workbenches */}
       <section style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
-          Workbenches
+          Start here
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
           {SPOTLIGHTS.map(({ href, title, eyebrow, text, color }) => (
@@ -262,7 +266,7 @@ export default function LandingPage() {
       {/* Toolkit row */}
       <section style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
-          The complete toolkit
+          Playground contract
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
           {TOOLKIT.map(({ cmd, tagline, color }) => (
@@ -278,16 +282,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How it works — full-stack flow */}
+      {/* How it works */}
       <section style={{ marginBottom: 56 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
           How it works
         </div>
         <h2 style={{ fontSize: 20, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.3 }}>
-          From equation to silicon to proof.
+          Use the dev site as a workbench, not a claim engine.
         </h2>
         <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.7, marginBottom: 24 }}>
-          One chain. No vendors. No external library. No 45-minute builds.
+          The useful move is always the same: try a tool, inspect the evidence,
+          export a packet, and keep unsupported claims blocked.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {FLOW_STEPS.map((step, i) => (
@@ -314,8 +319,9 @@ export default function LandingPage() {
           ))}
         </div>
         <div style={{ marginTop: 24, padding: "16px 20px", background: "rgba(232,160,32,0.08)", border: `1px solid rgba(232,160,32,0.18)`, borderRadius: 6, fontFamily: "monospace", fontSize: 12, color: C.text, lineHeight: 1.6 }}>
-          You own every line from <strong style={{ color: C.orange }}>equation</strong> to{" "}
-          <strong style={{ color: C.orange }}>silicon</strong> to <strong style={{ color: C.orange }}>proof</strong>.
+          Surface split: <strong style={{ color: C.orange }}>monogate.dev</strong> is the workbench,{" "}
+          <strong style={{ color: C.orange }}>monogate.org</strong> is the research record, and{" "}
+          <strong style={{ color: C.orange }}>1.op/io</strong> is for games and visualization.
         </div>
       </section>
 

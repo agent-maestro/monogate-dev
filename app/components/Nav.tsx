@@ -3,8 +3,9 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
-  { href: "/explorer",          label: "Explorer" },
+  { href: "/explorer",          label: "Tools" },
   { href: "/evidence",          label: "Evidence" },
+  { href: "/explorer/eml-packets/builder", label: "Builder" },
   { href: "/proof-digestion",   label: "Digestion" },
   { href: "/challenge",         label: "Challenge" },
   { href: "/lab",               label: "Lab" },
