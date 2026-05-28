@@ -7,6 +7,8 @@ import trialJson from "./data/eml_a8_3_candidate_trial_runner_2026_05_27.json";
 import negativeControlJson from "./data/eml_a8_4_negative_control_discipline_2026_05_27.json";
 import deepTreeJson from "./data/eml_a8_5_deep_tree_holdout_2026_05_27.json";
 import guardRuleJson from "./data/eml_a9_compiler_guard_rules_2026_05_27.json";
+import guardFixtureJson from "./data/eml_a9_1_guard_rule_fixtures_2026_05_27.json";
+import guardDecisionJson from "./data/eml_a9_2_guard_decision_analyzer_2026_05_27.json";
 
 type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
 
@@ -75,6 +77,23 @@ type GuardRulePacket = {
   evidenceStatus: string;
   trigger: string;
   guardAction: string;
+};
+
+type GuardFixturePacket = {
+  fixtureId: string;
+  expression: string;
+  expectedDecision: string;
+  expectedRuleIds: string[];
+};
+
+type GuardDecisionPacket = {
+  fixtureId: string;
+  decision: string;
+  matchedRuleIds: string[];
+  recommendedLowering: string | null;
+  expectedDecisionMatched: boolean;
+  expectedRulesMatched: boolean;
+  reason: string;
 };
 
 const lab = labJson as unknown as {
@@ -180,6 +199,31 @@ const guardRules = guardRuleJson as unknown as {
   nonClaims: string[];
 };
 
+const guardFixtures = guardFixtureJson as unknown as {
+  status: string;
+  summary: {
+    fixtureCount: number;
+    compilerBehaviorChanged: boolean;
+    guardAnalyzerImplemented: boolean;
+  };
+  fixturePackets: GuardFixturePacket[];
+  nonClaims: string[];
+};
+
+const guardDecisions = guardDecisionJson as unknown as {
+  status: string;
+  summary: {
+    decisionCount: number;
+    expectedDecisionMatchCount: number;
+    expectedRuleMatchCount: number;
+    allFixturesMatched: boolean;
+    compilerBehaviorChanged: boolean;
+    productionReady: boolean;
+  };
+  decisionPackets: GuardDecisionPacket[];
+  nonClaims: string[];
+};
+
 export const metadata: Metadata = {
   title: "EML Advantage Lab",
   description: "Bounded EML-vs-standard comparison across compression, runtime, stability, lowering, proof, and search evidence.",
@@ -241,6 +285,7 @@ export default function EmlAdvantagePage() {
             {pill("A8.4 controls", C.red)}
             {pill("A8.5 depth", C.orange)}
             {pill("A9 guards", C.blue)}
+            {pill("A9.2 decisions", C.green)}
             {pill("bounded comparison", C.blue)}
             {pill("general superiority: false", C.green)}
             {pill("compiler correctness: false", C.green)}
@@ -266,6 +311,7 @@ export default function EmlAdvantagePage() {
           <Metric label="Negative controls" value={negativeControls.summary.controlCount} color={C.red} />
           <Metric label="Blocked deep trees" value={deepTrees.summary.blockedCount} color={C.red} />
           <Metric label="Guard rules" value={guardRules.summary.ruleCount} color={C.blue} />
+          <Metric label="Guard decisions" value={guardDecisions.summary.decisionCount} color={C.green} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -316,6 +362,48 @@ export default function EmlAdvantagePage() {
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.axisTested}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.profiles.length}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.interpretation}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A9.1 / A9.2 guard decision view
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            Guard fixtures now run through a deterministic analyzer. This is still review infrastructure, not compiler behavior.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Fixtures" value={guardFixtures.summary.fixtureCount} color={C.blue} />
+            <Metric label="Decisions" value={guardDecisions.summary.decisionCount} color={C.green} />
+            <Metric label="Decision matches" value={guardDecisions.summary.expectedDecisionMatchCount} color={C.green} />
+            <Metric label="Rule matches" value={guardDecisions.summary.expectedRuleMatchCount} color={C.green} />
+            <Metric label="Compiler changed" value={String(guardDecisions.summary.compilerBehaviorChanged)} color={C.green} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 980, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Fixture</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Decision</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Lowering</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Rules</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Matched</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {guardDecisions.decisionPackets.map((packet) => (
+                  <tr key={packet.fixtureId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.fixtureId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.decision, packet.decision.startsWith("block") ? C.red : packet.decision.includes("lowering") ? C.blue : C.green)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.recommendedLowering ?? "none"}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.matchedRuleIds.join(", ")}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.expectedDecisionMatched && packet.expectedRulesMatched ? "yes" : "no", packet.expectedDecisionMatched && packet.expectedRulesMatched ? C.green : C.red)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.reason}</td>
                   </tr>
                 ))}
               </tbody>
@@ -608,6 +696,12 @@ export default function EmlAdvantagePage() {
             ))}
             {guardRules.nonClaims.map((item) => (
               <li key={`guard-rule-${item}`}>{item}</li>
+            ))}
+            {guardFixtures.nonClaims.map((item) => (
+              <li key={`guard-fixture-${item}`}>{item}</li>
+            ))}
+            {guardDecisions.nonClaims.map((item) => (
+              <li key={`guard-decision-${item}`}>{item}</li>
             ))}
           </ul>
         </section>
