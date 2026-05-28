@@ -2,7 +2,7 @@ import model from "../data/eml_ir_inspector_model.json";
 import polynomialEvidence from "../data/machlib_polynomial_evidence_internal_card.json";
 import finiteZeroPacket from "../data/machlib_finite_zero_packet_internal_card.json";
 import { useMemo, useState } from "react";
-import { buildEvidencePacket, validateEvidencePacket } from "monogate/ir";
+import { buildEvidencePacket, validateEvidencePacket } from "../eml-ir.js";
 
 const C = {
   bg: "#07080f",

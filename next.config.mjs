@@ -3,6 +3,9 @@ const nextConfig = {
   transpilePackages: ["monogate"],
   async rewrites() {
     return [
+      // The public electronics section is owned by monogate-electronics and
+      // served from the synced Vite artifact in public/electronics-lab.
+      // Do not add an app/electronics route here; it will shadow these rewrites.
       { source: "/electronics", destination: "/electronics-lab/index.html" },
       { source: "/electronics/trainer-board-v0", destination: "/electronics-lab/index.html" },
       { source: "/electronics/trainer-board-v0/:path*", destination: "/electronics-lab/index.html" },
