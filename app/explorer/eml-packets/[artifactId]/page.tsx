@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { C, pill } from "../../../evidence/data";
-import { emlPackets, findEmlPacket } from "../data";
+import { emlPackets, findEmlPacket, findGuardLensByProgramId, guardLensColor } from "../data";
 
 type Props = {
   params: {
@@ -47,6 +47,7 @@ export default function EmlPacketDetailPage({ params }: Props) {
   const frames = packet.replay.frames.slice(0, 14);
   const claimRows = Object.entries(packet.sourcePacket.claim_flags);
   const rangeRows = Object.entries(packet.sourcePacket.safe_ranges);
+  const guardLens = findGuardLensByProgramId(packet.sourcePacket.program_id);
 
   return (
     <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
@@ -63,6 +64,7 @@ export default function EmlPacketDetailPage({ params }: Props) {
             {pill(packet.review.validationStatus, C.green)}
             {pill(packet.review.replayStatus, C.green)}
             {pill(packet.sourcePacket.family, C.blue)}
+            {guardLens ? pill(guardLens.decision, guardLensColor(guardLens.decision, C)) : null}
             {pill("no public savings claim", C.green)}
           </div>
           <h1 style={{ color: C.orange, fontSize: 34, lineHeight: 1.1, margin: "0 0 12px", fontFamily: "monospace", overflowWrap: "anywhere" }}>
@@ -94,6 +96,39 @@ export default function EmlPacketDetailPage({ params }: Props) {
             </div>
           </div>
         </Section>
+
+        {guardLens ? (
+          <Section title="Guard Lens">
+            <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                {pill(guardLens.decision, guardLensColor(guardLens.decision, C))}
+                {guardLens.recommendedLowering ? pill(guardLens.recommendedLowering, C.blue) : null}
+                {pill(`depth ${guardLens.estimatedTreeDepth}`, C.purple)}
+              </div>
+              <p style={{ color: C.text, fontSize: 13, lineHeight: 1.65, margin: "0 0 14px" }}>
+                {guardLens.reason}
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
+                <div>
+                  <div style={{ color: C.muted, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+                    matched rules
+                  </div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {guardLens.matchedRuleIds.map((rule) => pill(rule, C.blue))}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ color: C.muted, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+                    blocked claims
+                  </div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    {guardLens.blockedClaims.map((claim) => pill(claim, C.red))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Section>
+        ) : null}
 
         <Section title="Tree vs DAG Boundary">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 10 }}>

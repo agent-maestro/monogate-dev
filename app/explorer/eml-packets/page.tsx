@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { C, pill } from "../../evidence/data";
-import { emlPackets, families } from "./data";
+import { emlGuardLensPackets, emlPackets, families, findGuardLensByProgramId, guardLensColor } from "./data";
 
 export const metadata: Metadata = {
   title: "EML Packet Gallery",
@@ -24,6 +24,8 @@ export default function EmlPacketGalleryPage() {
   const internalDelta = emlPackets.reduce((sum, packet) => sum + packet.costs.internalExtraDagSavingsNodes, 0);
   const domainRequirementCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.domain_requirement_count, 0);
   const blockedClaimCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.blocked_public_claim_count, 0);
+  const guardBlockCount = emlGuardLensPackets.filter((packet) => packet.decision.startsWith("block")).length;
+  const protectedLoweringCount = emlGuardLensPackets.filter((packet) => packet.decision === "recommend_protected_lowering").length;
   const checkedWitnessCount = emlPackets.reduce((sum, packet) => sum + packet.domainSafety.summary.checked_obligation_count, 0);
   const obligationCount = emlPackets.reduce((sum, packet) => sum + packet.obligations.summary.count, 0);
   const unresolvedObligations = emlPackets.flatMap((packet) =>
@@ -74,6 +76,8 @@ export default function EmlPacketGalleryPage() {
           <Metric label="Checked witnesses" value={checkedWitnessCount} color={C.green} />
           <Metric label="Unresolved" value={unresolvedObligations.length} color={C.orange} />
           <Metric label="Blocked claims" value={blockedClaimCount} color={C.purple} />
+          <Metric label="Guard blocks" value={guardBlockCount} color={C.red} />
+          <Metric label="Protected lowerings" value={protectedLoweringCount} color={C.blue} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -127,48 +131,53 @@ export default function EmlPacketGalleryPage() {
         </section>
 
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
-          {emlPackets.map((packet) => (
-            <a
-              key={packet.artifactId}
-              href={`/explorer/eml-packets/${packet.artifactId}`}
-              style={{
-                display: "block",
-                color: "inherit",
-                textDecoration: "none",
-                border: `1px solid ${C.border}`,
-                background: C.surface,
-                borderRadius: 8,
-                padding: 16,
-                minHeight: 260,
-              }}
-            >
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-                {pill(packet.review.decision, C.orange)}
-                {pill(packet.review.replayStatus, C.green)}
-                {pill(packet.sourcePacket.family, C.blue)}
-              </div>
-              <h2 style={{ color: C.text, fontSize: 18, lineHeight: 1.25, margin: "0 0 10px", overflowWrap: "anywhere" }}>
-                {packet.sourcePacket.program_id}
-              </h2>
-              <pre style={{ color: C.muted, fontSize: 11, lineHeight: 1.55, whiteSpace: "pre-wrap", overflowWrap: "anywhere", margin: "0 0 14px" }}>
-                {packet.sourcePacket.expression}
-              </pre>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8, marginBottom: 12 }}>
-                <Metric label="Nodes" value={packet.ir.nodeCount} color={C.blue} />
-                <Metric label="Frames" value={packet.replay.frameCount} color={C.green} />
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-                {pill(`${packet.obligations.summary.count} obligations`, C.purple)}
-                {pill(`${packet.domainSafety.summary.domain_requirement_count} domain reqs`, C.red)}
-                {pill(`${packet.domainSafety.summary.checked_obligation_count} checked`, C.green)}
-                {pill(`${packet.domainSafety.summary.blocked_public_claim_count} blocked claims`, C.orange)}
-                {pill(`${packet.obligations.summary.proved_count} proved`, C.green)}
-              </div>
-              <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>
-                {packet.review.claimBoundary}
-              </p>
-            </a>
-          ))}
+          {emlPackets.map((packet) => {
+            const guard = findGuardLensByProgramId(packet.sourcePacket.program_id);
+            return (
+              <a
+                key={packet.artifactId}
+                href={`/explorer/eml-packets/${packet.artifactId}`}
+                style={{
+                  display: "block",
+                  color: "inherit",
+                  textDecoration: "none",
+                  border: `1px solid ${C.border}`,
+                  background: C.surface,
+                  borderRadius: 8,
+                  padding: 16,
+                  minHeight: 260,
+                }}
+              >
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                  {pill(packet.review.decision, C.orange)}
+                  {pill(packet.review.replayStatus, C.green)}
+                  {pill(packet.sourcePacket.family, C.blue)}
+                  {guard ? pill(guard.decision, guardLensColor(guard.decision, C)) : null}
+                </div>
+                <h2 style={{ color: C.text, fontSize: 18, lineHeight: 1.25, margin: "0 0 10px", overflowWrap: "anywhere" }}>
+                  {packet.sourcePacket.program_id}
+                </h2>
+                <pre style={{ color: C.muted, fontSize: 11, lineHeight: 1.55, whiteSpace: "pre-wrap", overflowWrap: "anywhere", margin: "0 0 14px" }}>
+                  {packet.sourcePacket.expression}
+                </pre>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 8, marginBottom: 12 }}>
+                  <Metric label="Nodes" value={packet.ir.nodeCount} color={C.blue} />
+                  <Metric label="Frames" value={packet.replay.frameCount} color={C.green} />
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                  {pill(`${packet.obligations.summary.count} obligations`, C.purple)}
+                  {pill(`${packet.domainSafety.summary.domain_requirement_count} domain reqs`, C.red)}
+                  {pill(`${packet.domainSafety.summary.checked_obligation_count} checked`, C.green)}
+                  {pill(`${packet.domainSafety.summary.blocked_public_claim_count} blocked claims`, C.orange)}
+                  {pill(`${packet.obligations.summary.proved_count} proved`, C.green)}
+                  {guard?.recommendedLowering ? pill(guard.recommendedLowering, C.blue) : null}
+                </div>
+                <p style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+                  {guard ? guard.reason : packet.review.claimBoundary}
+                </p>
+              </a>
+            );
+          })}
         </section>
       </div>
     </main>
