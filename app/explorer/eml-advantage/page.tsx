@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { C, pill } from "../../evidence/data";
 import labJson from "./data/eml_advantage_lab_2026_05_27.json";
+import holdoutJson from "./data/eml_a8_1_holdout_advantage_benchmark_2026_05_27.json";
 
 type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
 
@@ -22,6 +23,14 @@ type AdvantagePacket = {
   blockedClaims: string[];
 };
 
+type HoldoutPacket = {
+  caseId: string;
+  sourceAdvantageClass: string;
+  holdoutClass: string;
+  holdoutConfidence: string;
+  profiles: Array<Record<string, unknown>>;
+};
+
 const lab = labJson as unknown as {
   status: string;
   labId: string;
@@ -36,6 +45,22 @@ const lab = labJson as unknown as {
     compilerCorrectnessClaim: boolean;
   };
   advantagePackets: AdvantagePacket[];
+  nonClaims: string[];
+};
+
+const holdout = holdoutJson as unknown as {
+  status: string;
+  summary: {
+    holdoutPacketCount: number;
+    byHoldoutClass: Record<string, number>;
+    retainedCount: number;
+    weakenedCount: number;
+    blockedCount: number;
+    negativeControlPassCount: number;
+    emlAdvantageProved: boolean;
+    generalEmlSuperiorityClaim: boolean;
+  };
+  holdoutPackets: HoldoutPacket[];
   nonClaims: string[];
 };
 
@@ -94,6 +119,7 @@ export default function EmlAdvantagePage() {
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
             {pill("EML Advantage Lab", C.orange)}
             {pill(lab.status, C.green)}
+            {pill("A8.1 holdout", C.purple)}
             {pill("bounded comparison", C.blue)}
             {pill("general superiority: false", C.green)}
             {pill("compiler correctness: false", C.green)}
@@ -112,6 +138,8 @@ export default function EmlAdvantagePage() {
           <Metric label="Mixed" value={lab.summary.mixedCount} color={C.orange} />
           <Metric label="Standard wins" value={lab.summary.standardWinCount} color={C.blue} />
           <Metric label="Research-only" value={lab.summary.researchOnlyCount} color={C.purple} />
+          <Metric label="Holdout retained" value={holdout.summary.retainedCount} color={C.green} />
+          <Metric label="Controls passed" value={holdout.summary.negativeControlPassCount} color={C.blue} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -125,6 +153,46 @@ export default function EmlAdvantagePage() {
             {Object.entries(lab.summary.byAdvantageClass).map(([name, count]) => (
               pill(`${name}: ${count}`, classColor(name as AdvantageClass))
             ))}
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A8.1 holdout layer
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            The holdout benchmark reruns the initial labels on shifted, edge, and stress profiles, then checks negative controls where EML should not win.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Holdout packets" value={holdout.summary.holdoutPacketCount} color={C.blue} />
+            <Metric label="Retained" value={holdout.summary.retainedCount} color={C.green} />
+            <Metric label="Weakened" value={holdout.summary.weakenedCount} color={C.orange} />
+            <Metric label="Blocked" value={holdout.summary.blockedCount} color={C.red} />
+            <Metric label="Negative controls" value={holdout.summary.negativeControlPassCount} color={C.purple} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 780, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Case</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Source</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Holdout</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Confidence</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Profiles</th>
+                </tr>
+              </thead>
+              <tbody>
+                {holdout.holdoutPackets.map((packet) => (
+                  <tr key={packet.caseId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.caseId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.sourceAdvantageClass}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.holdoutClass, packet.holdoutClass.includes("standard") ? C.blue : packet.holdoutClass.includes("eml") ? C.green : C.orange)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.holdoutConfidence, packet.holdoutConfidence === "retained" ? C.green : packet.holdoutConfidence === "control_pass" ? C.blue : C.orange)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.profiles.length}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
@@ -196,6 +264,9 @@ export default function EmlAdvantagePage() {
           <ul style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: 0, paddingLeft: 18 }}>
             {lab.nonClaims.map((item) => (
               <li key={item}>{item}</li>
+            ))}
+            {holdout.nonClaims.map((item) => (
+              <li key={`holdout-${item}`}>{item}</li>
             ))}
           </ul>
         </section>
