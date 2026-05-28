@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { C, pill } from "../../../evidence/data";
+import guardLensJson from "../data/eml_a10_expression_guard_lens_2026_05_27.json";
 
 const falseClaimFlags = {
   public_ready: false,
@@ -61,6 +62,60 @@ function parseUnits(value: string, inputNames: string[]) {
     if (name && unit) units[name.trim()] = unit.trim();
   }
   return units;
+}
+
+function estimateDepth(expression: string) {
+  return Math.max((expression.match(/\(/g) || []).length, 1);
+}
+
+function guardDecision(expression: string, validationStatus: string) {
+  const lower = expression.toLowerCase();
+  if (validationStatus === "pass") {
+    return {
+      decision: "block_claim_until_evidence",
+      rule: "require_trial_packet_before_advantage_claim_v0",
+      lowering: "none",
+      reason: "A pass-strength draft needs attached validator, trial, and reviewer evidence before surfacing.",
+    };
+  }
+  if (estimateDepth(expression) >= 10) {
+    return {
+      decision: "block_unstable_deep_tree",
+      rule: "block_unstable_deep_tree_v0",
+      lowering: "none",
+      reason: "Deep EML trees need holdout evidence before runtime or public advantage claims.",
+    };
+  }
+  if (expression.trim() === "eml(x,e)" || lower.includes("exp(x)-1") || lower.includes("exp(x) - 1")) {
+    return {
+      decision: "recommend_protected_lowering",
+      rule: "lower_expm1_near_zero_v0",
+      lowering: "expm1(x)",
+      reason: "Near-zero exp-minus-one shapes should lower to protected expm1 at runtime.",
+    };
+  }
+  if (lower.includes("ln(exp") || lower.includes("log(exp")) {
+    return {
+      decision: "recommend_protected_lowering",
+      rule: "lower_logaddexp_softplus_v0",
+      lowering: "logaddexp-style protected lowering",
+      reason: "Log-sum-exp shapes should use protected runtime lowering.",
+    };
+  }
+  if (expression.includes("/") || lower.includes("eml(x,y)")) {
+    return {
+      decision: "block_missing_domain_guard",
+      rule: "require_positive_log_domain_guard_v0",
+      lowering: "none",
+      reason: "Division/log-domain shapes need explicit positive/nonzero guard evidence.",
+    };
+  }
+  return {
+    decision: "allow_proof_shape",
+    rule: "prefer_eml_for_proof_shape_v0",
+    lowering: "none",
+    reason: "Allowed as proof/search/teaching shape only; no runtime advantage claim.",
+  };
 }
 
 function TextInput({
@@ -201,6 +256,11 @@ export default function PacketBuilderClient() {
     [artifactText, expression, family, inputNames, programId, ranges, sourcePath, units]
   );
 
+  const guard = useMemo(() => guardDecision(expression, validationStatus), [expression, validationStatus]);
+  const knownLens = guardLensJson as unknown as {
+    summary: { packetCount: number; protectedLoweringCount: number; blockedCount: number };
+  };
+
   const evidenceJson = JSON.stringify(evidencePacket, null, 2);
   const expressionJson = JSON.stringify(expressionPacket, null, 2);
   const encodedEvidence = `data:application/json;charset=utf-8,${encodeURIComponent(evidenceJson)}`;
@@ -270,6 +330,21 @@ export default function PacketBuilderClient() {
                 {hints.map(([ok, label]) => (
                   <span key={label}>{pill(`${label}: ${ok ? "ok" : "check"}`, ok ? C.green : C.orange)}</span>
                 ))}
+              </div>
+            </section>
+
+            <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
+              <div style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+                EML guard lens
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                {pill(guard.decision, guard.decision.startsWith("block") ? C.red : guard.decision.includes("lowering") ? C.blue : C.green)}
+                {pill(guard.rule, C.purple)}
+                {pill(`known packets: ${knownLens.summary.packetCount}`, C.blue)}
+              </div>
+              <div style={{ color: C.text, fontSize: 12, lineHeight: 1.7 }}>
+                <div><span style={{ color: C.muted }}>recommended lowering:</span> <span style={{ fontFamily: "monospace" }}>{guard.lowering}</span></div>
+                <div style={{ marginTop: 6, color: C.muted }}>{guard.reason}</div>
               </div>
             </section>
 
