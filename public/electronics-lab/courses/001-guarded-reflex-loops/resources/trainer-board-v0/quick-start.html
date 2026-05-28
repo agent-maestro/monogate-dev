@@ -98,18 +98,19 @@
     <main>
       <p class="eyebrow">Monogate Electronics / Trainer Board v0</p>
       <h1>Reflex Lab 01 Quick Start</h1>
-      <p>One EML kernel -> verifiable decisions -> physical output. Start with a potentiometer, LED, and ESP32.</p>
+      <p>One EML kernel -> verifiable decisions -> physical output. Start with the ESP32/GVS trainer board, potentiometer, LED, and buzzer.</p>
 
-      <p class="loop">potentiometer -> threshold_reflex_v0 -> guard clamp -> LED -> trace -> replay</p>
+      <p class="loop">potentiometer -> threshold_reflex_v0 -> guard clamp -> LED/buzzer -> trace -> replay</p>
 
       <div class="grid">
         <section class="card">
           <h2>Parts</h2>
           <ul>
-            <li>ESP32 DevKit or ESP32 ESP-32S breakout</li>
+            <li>ESP32 ESP-32S + GVS shield/mount, matching the simulator</li>
             <li>Breadboard and jumper wires</li>
             <li>10k potentiometer</li>
-            <li>LED plus 220/330 ohm resistor</li>
+            <li>LED plus 330 ohm resistor</li>
+            <li>Lab 01B: piezo buzzer plus 110 ohm resistor</li>
             <li>USB data cable</li>
           </ul>
         </section>
@@ -120,13 +121,29 @@
             <li>ESP32 GND -> blue/- rail</li>
             <li>ESP32 3V3 -> red/+ rail</li>
             <li>Pot outer -> red/+ rail</li>
-            <li>Pot wiper -> GPIO34</li>
+            <li>Pot wiper -> D34 / GPIO34</li>
             <li>Pot outer -> blue/- rail</li>
-            <li>GPIO25 -> resistor -> LED anode</li>
+            <li>D25 / GPIO25 -> resistor -> LED anode</li>
             <li>LED cathode -> blue/- rail</li>
           </ol>
         </section>
       </div>
+
+      <section class="card">
+        <h2>Lab 01B Buzzer Upgrade</h2>
+        <p>Disconnect USB before changing the breadboard.</p>
+        <ol>
+          <li>D26 / GPIO26 -> 110 ohm resistor</li>
+          <li>Other side of 110 ohm resistor -> buzzer +</li>
+          <li>Buzzer - -> blue/- rail</li>
+        </ol>
+        <p>110 ohm color bands: brown-brown-black-black-brown.</p>
+      </section>
+
+      <section class="card">
+        <h2>Base Board Direction</h2>
+        <p>Trainer Board v0 is the reusable control hub. Later labs pair this same board with a motor-driver add-on, BME280 sensor add-on, and display add-on instead of soldering high-current loads directly to the base board.</p>
+      </section>
 
       <h2>Validate Before Hardware</h2>
       <pre>python tools\validate_kernel_spec.py kernels\threshold_reflex_v0

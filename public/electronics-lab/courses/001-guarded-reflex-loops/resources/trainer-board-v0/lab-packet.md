@@ -4,7 +4,9 @@
 
 ### Threshold Reflex - Your First Verifiable EML Hardware Demo
 
-**Status:** Ready for your bench
+**Status:** Built and tested on a breadboard; ready for your bench
+
+**Current hardware target:** ESP32 ESP-32S on the GVS shield/mount shown in the simulator. Older ESP32 DevKit notes are still useful, but new physical builds should follow the simulator board labels: D34/POT, D25/LED, D26/BUZZ, 3V3, and GND.
 
 **Goal:** Prove the full Monogate loop on real hardware in one fun session
 
@@ -51,30 +53,51 @@ By the end of this lab you will be able to:
 Please read this before wiring:
 
 - Use only 3.3V, never 5V, for this demo
-- Always use the 220 ohm or 330 ohm resistor with the LED
+- Always use the 330 ohm resistor with the LED
 - Never connect the potentiometer to 5V or VIN
 - If anything gets warm, unplug immediately
-- Do not add motors, relays, buzzers, or high-current parts yet
+- Add the buzzer only after the LED demo works and USB is disconnected
+- Do not add motors, relays, or high-current parts to Trainer Board v0 without a separate driver module
 
 ## What You Need
 
 Required for this first demo:
 
-- ESP32 DevKit V1 or very similar
+- ESP32 ESP-32S with GVS shield/mount, matching the simulator
 - USB data cable, not just a power cable
 - Breadboard
 - Jumper wires, male-to-male
 - 10 kOhm potentiometer
 - One LED, any color
-- 220 ohm or 330 ohm resistor
+- 330 ohm resistor
+- Piezo buzzer
+- 110 ohm resistor for the buzzer path, color bands brown-brown-black-black-brown
 - Laptop with power
 
-Nice-to-have for later demos, not needed today:
+Reserved add-ons for later demos, not needed on the base Trainer Board v0 build:
 
-- Piezo buzzer
 - Momentary button
 - SSD1306 OLED
 - BME280 sensor
+- Motor plus driver board
+
+## Board Role
+
+Trainer Board v0 is the reusable control hub. This first populated build uses
+the potentiometer, LED, and buzzer because they prove input, guarded output,
+audible feedback, dashboard, and replay without leaving low-current logic.
+
+Future labs should plug add-on modules into the same base board:
+
+```text
+Trainer Board v0 + motor driver/fan add-on
+Trainer Board v0 + BME280 sensor add-on
+Trainer Board v0 + BME280 + display add-on
+```
+
+Do not solder motors or high-current loads directly onto the base board. Keep
+them on driver/protection modules that plug into the Trainer Board signal,
+power, and ground headers.
 
 ## Software Prerequisites
 
@@ -188,10 +211,18 @@ For people who already know breadboards:
 ESP32 GND -> blue/- rail
 ESP32 3V3 -> red/+ rail
 Pot outer leg 1 -> red/+ rail
-Pot middle/wiper -> ESP32 GPIO34
+Pot middle/wiper -> ESP32 D34/GPIO34
 Pot outer leg 2 -> blue/- rail
-ESP32 GPIO25 -> 220/330 ohm resistor -> LED long leg
+ESP32 D25/GPIO25 -> 330 ohm resistor -> LED long leg
 LED short leg -> blue/- rail
+```
+
+Lab 01B adds the buzzer only after the LED reflex demo is working and USB is
+disconnected:
+
+```text
+ESP32 D26/GPIO26 -> 110 ohm resistor -> buzzer + lead
+Buzzer - lead -> blue/- rail
 ```
 
 ### Beginner Step-By-Step
@@ -219,7 +250,7 @@ Wire:
 
 ```text
 Left outer leg -> red/+ rail
-Middle leg/wiper -> ESP32 GPIO34
+Middle leg/wiper -> ESP32 D34/GPIO34
 Right outer leg -> blue/- rail
 ```
 
@@ -237,7 +268,7 @@ middle leg off GPIO34.
 Wire:
 
 ```text
-ESP32 GPIO25 -> one end of resistor
+ESP32 D25/GPIO25 -> one end of resistor
 Other end of resistor -> LED long leg/anode
 LED short leg/cathode -> blue/- rail
 ```
@@ -250,6 +281,31 @@ Final safety check before power:
 - No extra parts are connected yet
 
 Take a photo of your finished breadboard.
+
+#### 2D. Optional Next Upgrade: Add The Buzzer
+
+Do this only after the LED demo has run once. Disconnect USB before changing the
+breadboard.
+
+Wire:
+
+```text
+ESP32 D26/GPIO26 -> one end of 110 ohm resistor
+Other end of 110 ohm resistor -> buzzer + lead
+Buzzer - lead -> blue/- rail
+```
+
+The 110 ohm resistor color bands are:
+
+```text
+brown - brown - black - black - brown
+```
+
+Check:
+
+- The buzzer positive lead is not connected directly to GPIO26/D26
+- The 110 ohm resistor is in series between GPIO26/D26 and buzzer +
+- The buzzer negative lead returns to the same GND rail as the ESP32
 
 ## Step 3: Upload The Firmware
 
@@ -406,9 +462,11 @@ This is the Monogate way.
 
 Next steps, when you're ready:
 
-- Add the buzzer or button
+- Pair this base board with a motor-driver add-on
+- Pair this base board with a BME280 sensor add-on
+- Pair this base board with BME280 plus a display add-on
 - Try other EML kernels
-- Move to a soldered Trainer Board in a future lesson
+- Move to a soldered Trainer Board once the breadboard layout is checked
 
 Drop your findings, photos, or questions in the Monogate group. I would love to
 see your demo.

@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-05-26T11:44:19.025924+00:00",
+  "generated_at": "2026-05-28T01:45:43.771245+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "6dfc4132a868fbab775ba47455d1357d8fbfb901",
+  "source_commit": "7c0bab75f26814bdc6ceb01909297127c34fc2b1",
   "source_dirty": false,
   "source_status": [],
   "build_command": "npm ci && npm run build:monogate-dev",
@@ -25,29 +25,79 @@
   },
   "artifacts": [
     {
-      "path": "assets/index-BO71ow_j.css",
-      "bytes": 66506,
-      "sha256": "babf3a7f43f8b15ec65ffc64f0079fef48123a78b0ea3d7aecdbe82e10d084e4"
+      "path": "assets/CoursePanel-WCg8ynW9.js",
+      "bytes": 8095,
+      "sha256": "856309aecf01dfd13a8d39551a57bd903b0d769a8869f41f66f81f3fadd66e81"
     },
     {
-      "path": "assets/index-DWmAXE-Z.js",
-      "bytes": 1248176,
-      "sha256": "723cc6fcf1c20fa90caa89f02ef760adddcd0074eb7740c6745fe1278c3cd9e2"
+      "path": "assets/icons-CScAvHjm.js",
+      "bytes": 14575,
+      "sha256": "755785b94462c3baf9e24954b7407aa437dbb1292ffc01eb6742eb1cb5a31457"
+    },
+    {
+      "path": "assets/index-CAdTF8N3.css",
+      "bytes": 84283,
+      "sha256": "16126ba77eb52640a53936b9c1ff82f4c28eea8c932cb16eef939d6e2e335d92"
+    },
+    {
+      "path": "assets/index-CDqsq2Gy.js",
+      "bytes": 38954,
+      "sha256": "08e3a6fb9ba16b6aee06a5fa55271b3b32878de4070057c37bcc5db4b96e38c6"
+    },
+    {
+      "path": "assets/optimizationBoundary-B7GZTj9-.js",
+      "bytes": 2339,
+      "sha256": "702292d17edc77204aadf130b0cc6560995027a653f47f188372efa4ee92aee9"
+    },
+    {
+      "path": "assets/OptimizationBoundaryLab-Co1xFsBk.js",
+      "bytes": 13246,
+      "sha256": "ff8a2a4d677bbed0a5ecf7504c354e03c37413107da2843256e2ebe5220cf67e"
+    },
+    {
+      "path": "assets/PhysicalBuildPanel-BKXWTVTV.js",
+      "bytes": 3960,
+      "sha256": "9ca0d577444611f1b79e1056ffb1c5fabc7a16ded641ddeb7e07a360cd41fa4d"
+    },
+    {
+      "path": "assets/react-BGrcABR8.js",
+      "bytes": 142956,
+      "sha256": "65d2e1399c43d7850ee04cc7b910ac5e3f6ce988c00621622ae9e75bc56b8ca8"
+    },
+    {
+      "path": "assets/react-three-BCRssCv1.js",
+      "bytes": 41427,
+      "sha256": "243a7e64c4686ee9959e7d36a36c9fa1f5868b69c843ac378799913dcb9a0164"
+    },
+    {
+      "path": "assets/SimulatorBench-DxyFVM6Z.js",
+      "bytes": 111999,
+      "sha256": "6b1a24c39af8afb7be037de79de766b73f5120936196f333d7ab33042d9b3230"
+    },
+    {
+      "path": "assets/three-CgggyWJi.js",
+      "bytes": 689547,
+      "sha256": "09dba49439abce12dde26aea29f560fbac02929fc65b575c780c7234685c1be3"
+    },
+    {
+      "path": "assets/vendor-DvmwXwOO.js",
+      "bytes": 235709,
+      "sha256": "6bf5611e60556c4786eb39345b2e0872a5cd5ce64fca8c13bb924a82bdc1b3b7"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/electrocookie-build-guide.md",
-      "bytes": 4633,
-      "sha256": "7ad9f86c4b33f5589d08566294b935c30d089b3414a49446404de36dbc862b87"
+      "bytes": 6736,
+      "sha256": "ff29e61128f2403d6451ddb8d0d1a7e23d6e1357c18a7a078235a04c657a1d95"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/lab-packet.md",
-      "bytes": 9563,
-      "sha256": "22292a6441a2a6a5b417b92462f65b131a87eeeff3101a7f2782666c698190a4"
+      "bytes": 11727,
+      "sha256": "e4c3c9a5cdefe0d4cb5b1c0aedb3f9d2e4b44bf096642aebe1e782357c52433f"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/quick-start.html",
-      "bytes": 4315,
-      "sha256": "27116deac937a757598c7e0ceaa888465ff68056457c34ff9a3f121d713c3c5e"
+      "bytes": 5173,
+      "sha256": "0581064e0a5fc7aa9c471d7b8d11f7118bb5c0be91b440a244e1fdd39f90ed72"
     },
     {
       "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/quick-start.pdf",
@@ -56,8 +106,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 446,
-      "sha256": "bcc0bd924a28efebbbc695448c5e1019c8400026d0cf3a2b30e69bdbb86e5b78"
+      "bytes": 913,
+      "sha256": "91426cb0b0ce10fa2e69d864a589666412402130679a9ba4848632a6c22b65c1"
     }
   ]
 }

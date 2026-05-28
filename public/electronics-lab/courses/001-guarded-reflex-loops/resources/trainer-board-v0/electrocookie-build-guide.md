@@ -1,12 +1,12 @@
 # Monogate Trainer Board v0: ElectroCookie Layout
 
-Status: planned solder build.
+Status: planned solder build; base board scope locked for the first ElectroCookie build.
 
 This board is the reusable trainer/control panel for Reflex Lab 01 through the
 Field Capsule project. It should prove the low-risk loop first:
 
 ```text
-pot/button -> ESP32 -> EML kernel -> guard -> LED/buzzer/OLED -> telemetry
+pot -> ESP32 -> EML kernel -> guard -> LED/buzzer -> dashboard/telemetry
 ```
 
 The tutorial-facing behavior plan is in
@@ -17,8 +17,27 @@ trace/replay/evidence habit every time.
 For the first hands-on tutorial, use
 `courses/001-guarded-reflex-loops/resources/trainer-board-v0/first-demo-runbook.md` before soldering.
 
-Do not add coils, electromagnets, motors, or other high-current loads to this
-first trainer board.
+Do not add coils, electromagnets, motors, or other high-current loads directly
+to this first trainer board. Treat Trainer Board v0 as the signal/control hub.
+Motor, BME280, and display labs should plug into it as add-on modules.
+
+## Current ESP32 Target
+
+New physical builds should use the ESP32 ESP-32S + GVS shield/mount represented
+in the simulator. This is the board that just arrived for the bench build.
+Older ESP32 DevKit notes remain useful for Arduino setup, but the physical
+pin labels and jumper plan should follow the simulator board:
+
+```text
+D34 / GPIO34 -> potentiometer wiper
+D25 / GPIO25 -> 330R -> LED anode
+D26 / GPIO26 -> 110R -> buzzer +
+3V3 -> trainer power rail
+GND -> trainer ground rail
+```
+
+Only label the pins used by Trainer Board v0 on the build: D34, D25, D26, 3V3,
+and GND. Leave the rest of the shield available for future modules.
 
 ## Board Assumption
 
@@ -82,6 +101,31 @@ E15-A17    buzzer output
 
 Adjust exact holes after the physical board and parts are photographed.
 
+## Base Board Versatility Plan
+
+Trainer Board v0 should stay small and reusable. Populate the base board with:
+
+```text
+10K potentiometer input
+330R LED output path
+110R piezo buzzer output path
+3V3/GND rails and test points
+short labeled ESP32/GVS jumper header
+reserved add-on headers
+```
+
+Then build later labs as add-ons:
+
+```text
+Motor add-on: D/PWM signal -> driver board -> fan/motor, separate load power
+BME add-on: 3V3, GND, SDA, SCL to BME280 module
+Display add-on: 3V3, GND, SDA, SCL to OLED/GM12864-style display module
+Combined add-on: sensor + display + driver-protected output
+```
+
+The base board should expose signals cleanly, not carry every future load
+directly.
+
 ## ESP32 Signal Plan
 
 Use this as the first pin map unless the specific ESP32 board requires changes:
@@ -90,12 +134,12 @@ Use this as the first pin map unless the specific ESP32 board requires changes:
 | --- | --- | --- |
 | 3V3 | 3V3 | Logic/sensor supply only |
 | GND | GND | Shared logic ground |
-| I2C SDA | GPIO21 | BME280/OLED data |
-| I2C SCL | GPIO22 | BME280/OLED clock |
-| Potentiometer wiper | GPIO34 | ADC input, input-only pin |
-| LED output | GPIO25 | Use 220 ohm or 330 ohm series resistor |
-| Buzzer output | GPIO26 | Use a transistor driver if buzzer current is not tiny |
-| Button input | GPIO27 | Use internal pullup; button closes to GND |
+| I2C SDA | GPIO21 | Reserved add-on header for BME/display |
+| I2C SCL | GPIO22 | Reserved add-on header for BME/display |
+| Potentiometer wiper | D34 / GPIO34 | ADC input, input-only pin |
+| LED output | D25 / GPIO25 | Use 330 ohm series resistor |
+| Buzzer output | D26 / GPIO26 | Route through 110 ohm series resistor to buzzer +; use a transistor driver if buzzer current is not tiny |
+| Button input | GPIO27 | Reserved; use later with internal pullup |
 
 ## Headers To Build
 
@@ -106,11 +150,29 @@ ESP32 jumper header:
 GND
 GPIO21 SDA
 GPIO22 SCL
-GPIO34 POT
-GPIO25 LED
-GPIO26 BUZZER
+D34 / GPIO34 POT
+D25 / GPIO25 LED
+D26 / GPIO26 BUZZER
 GPIO27 BUTTON
 ```
+
+## Buzzer Output Path
+
+The breadboard-tested buzzer path is:
+
+```text
+ESP32 D26 / GPIO26 -> 110 ohm resistor -> buzzer +
+buzzer - -> shared GND rail
+```
+
+Use a 110 ohm resistor with color bands:
+
+```text
+brown - brown - black - black - brown
+```
+
+Do not connect the buzzer positive lead directly to GPIO26/D26 in the Trainer
+Board v0 lab. Disconnect USB before adding or moving the buzzer path.
 
 I2C sensor/display header:
 
@@ -140,10 +202,10 @@ implemented.
 
 Before soldering:
 
-- breadboard the LED, button, potentiometer, buzzer, BME280, and OLED;
+- breadboard the potentiometer, LED, and buzzer paths;
+- leave BME280, display, and motor as add-on headers/modules for later labs;
 - read `docs/bench-arrival-checklist.md`;
 - read `docs/portable-power-plan.md`;
-- confirm I2C device addresses;
 - run the Reflex Lab 01 EML and trace validators;
 - label each ESP32 jumper;
 - photograph the board and confirm exact hole placement.
@@ -153,8 +215,8 @@ After soldering:
 - check continuity for 3V3 and GND;
 - check that 3V3 is not shorted to GND;
 - test LED output first;
-- test button and potentiometer next;
-- test I2C devices before enabling buzzer;
+- test potentiometer next;
+- disconnect USB before adding/enabling buzzer;
 - capture a short validation note in the lesson evidence folder.
 
 ## Safety Boundary
