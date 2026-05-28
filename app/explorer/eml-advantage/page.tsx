@@ -1,0 +1,205 @@
+import type { Metadata } from "next";
+import { C, pill } from "../../evidence/data";
+import labJson from "./data/eml_advantage_lab_2026_05_27.json";
+
+type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
+
+type AdvantagePacket = {
+  caseId: string;
+  family: string;
+  standardForm: string;
+  emlForm: string;
+  advantageClass: AdvantageClass;
+  axes: {
+    compression: Record<string, string | number | boolean>;
+    runtime: Record<string, string | number | boolean>;
+    stability: Record<string, string | number | boolean>;
+    lowering: Record<string, string | number | boolean>;
+    proof: Record<string, string | number | boolean>;
+    search: Record<string, string | number | boolean>;
+    teaching: Record<string, string | number | boolean>;
+  };
+  blockedClaims: string[];
+};
+
+const lab = labJson as unknown as {
+  status: string;
+  labId: string;
+  summary: {
+    packetCount: number;
+    byAdvantageClass: Record<string, number>;
+    emlWinCount: number;
+    standardWinCount: number;
+    mixedCount: number;
+    researchOnlyCount: number;
+    generalEmlSuperiorityClaim: boolean;
+    compilerCorrectnessClaim: boolean;
+  };
+  advantagePackets: AdvantagePacket[];
+  nonClaims: string[];
+};
+
+export const metadata: Metadata = {
+  title: "EML Advantage Lab",
+  description: "Bounded EML-vs-standard comparison across compression, runtime, stability, lowering, proof, and search evidence.",
+};
+
+function classColor(value: AdvantageClass) {
+  if (value === "eml_win") return C.green;
+  if (value === "standard_win") return C.blue;
+  if (value === "research_only") return C.purple;
+  if (value === "blocked") return C.red;
+  return C.orange;
+}
+
+function Metric({ label, value, color = C.orange }: { label: string; value: string | number; color?: string }) {
+  return (
+    <div style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 14, minHeight: 78 }}>
+      <div style={{ color: C.muted, fontSize: 11, lineHeight: 1.4 }}>{label}</div>
+      <div style={{ color, fontSize: 22, fontWeight: 800, fontFamily: "monospace", marginTop: 8 }}>{value}</div>
+    </div>
+  );
+}
+
+function axisLabel(packet: AdvantagePacket, axis: keyof AdvantagePacket["axes"]) {
+  const label = packet.axes[axis].label;
+  return typeof label === "string" ? label : "n/a";
+}
+
+export default function EmlAdvantagePage() {
+  const ordered = [...lab.advantagePackets].sort((a, b) => {
+    const rank: Record<AdvantageClass, number> = {
+      eml_win: 0,
+      mixed: 1,
+      standard_win: 2,
+      research_only: 3,
+      blocked: 4,
+    };
+    return rank[a.advantageClass] - rank[b.advantageClass] || a.caseId.localeCompare(b.caseId);
+  });
+
+  return (
+    <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
+      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "32px 18px 72px" }}>
+        <nav style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28, fontSize: 12 }}>
+          <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
+          <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
+          <a href="/explorer/eml-packets" style={{ color: C.muted, textDecoration: "none" }}>EML Packets</a>
+          <a href="/explorer/eml-language" style={{ color: C.muted, textDecoration: "none" }}>Language Kernel</a>
+          <a href="/explorer/eml-symbolic-regression" style={{ color: C.muted, textDecoration: "none" }}>Template Search</a>
+          <a href="/explorer/eml-atlas-annex" style={{ color: C.muted, textDecoration: "none" }}>Atlas Annex</a>
+        </nav>
+
+        <header style={{ marginBottom: 28 }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+            {pill("EML Advantage Lab", C.orange)}
+            {pill(lab.status, C.green)}
+            {pill("bounded comparison", C.blue)}
+            {pill("general superiority: false", C.green)}
+            {pill("compiler correctness: false", C.green)}
+          </div>
+          <h1 style={{ color: C.orange, fontSize: 34, lineHeight: 1.1, margin: "0 0 12px", fontFamily: "monospace" }}>
+            EML Advantage Lab
+          </h1>
+          <p style={{ color: C.text, fontSize: 16, lineHeight: 1.75, maxWidth: 880, margin: 0 }}>
+            Compare EML-native and standard representations across compression, runtime, stability, lowering, proof, and search evidence.
+          </p>
+        </header>
+
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 24 }}>
+          <Metric label="Packets" value={lab.summary.packetCount} color={C.blue} />
+          <Metric label="EML wins" value={lab.summary.emlWinCount} color={C.green} />
+          <Metric label="Mixed" value={lab.summary.mixedCount} color={C.orange} />
+          <Metric label="Standard wins" value={lab.summary.standardWinCount} color={C.blue} />
+          <Metric label="Research-only" value={lab.summary.researchOnlyCount} color={C.purple} />
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            current finding
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            This run does not say EML wins everywhere. It shows the useful terrain: scoped identities and symbolic-search structures are promising, while several runtime and stability cases still favor standard or protected math.
+          </p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {Object.entries(lab.summary.byAdvantageClass).map(([name, count]) => (
+              pill(`${name}: ${count}`, classColor(name as AdvantageClass))
+            ))}
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            advantage packets
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 980, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Case</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Class</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Compression</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Runtime</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Stability</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Lowering</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Proof</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Clarity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ordered.map((packet) => (
+                  <tr key={packet.caseId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.caseId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.advantageClass, classColor(packet.advantageClass))}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{axisLabel(packet, "compression")}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{axisLabel(packet, "runtime")}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{axisLabel(packet, "stability")}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{axisLabel(packet, "lowering")}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{axisLabel(packet, "proof")}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{axisLabel(packet, "teaching")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 12, marginBottom: 24 }}>
+          {ordered.map((packet) => (
+            <article key={packet.caseId} style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                {pill(packet.advantageClass, classColor(packet.advantageClass))}
+                {pill(packet.family, C.blue)}
+              </div>
+              <h2 style={{ color: C.text, fontSize: 16, lineHeight: 1.25, margin: "0 0 10px", overflowWrap: "anywhere" }}>
+                {packet.caseId}
+              </h2>
+              <div style={{ color: C.muted, fontSize: 11, lineHeight: 1.6, marginBottom: 10 }}>
+                <div style={{ color: C.green }}>EML</div>
+                <pre style={{ margin: "4px 0 10px", whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{packet.emlForm}</pre>
+                <div style={{ color: C.blue }}>Standard</div>
+                <pre style={{ margin: "4px 0 0", whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{packet.standardForm}</pre>
+              </div>
+              <ul style={{ color: C.muted, fontSize: 12, lineHeight: 1.6, margin: 0, paddingLeft: 18 }}>
+                {packet.blockedClaims.slice(0, 3).map((claim) => (
+                  <li key={claim}>{claim}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            non-claims
+          </div>
+          <ul style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: 0, paddingLeft: 18 }}>
+            {lab.nonClaims.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    </main>
+  );
+}

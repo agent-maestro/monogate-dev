@@ -183,6 +183,13 @@ const SPOTLIGHTS = [
     color: C.green,
   },
   {
+    href: "/explorer/eml-advantage",
+    title: "EML Advantage Lab",
+    eyebrow: "new · comparison spine",
+    text: "See where EML helps, where standard math wins, and which claims remain blocked.",
+    color: C.purple,
+  },
+  {
     href: "/explorer/eml-atlas-annex",
     title: "EML Atlas Annex",
     eyebrow: "new · review queue",

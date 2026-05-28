@@ -84,6 +84,7 @@ export default function EmlSymbolicRegressionPage() {
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
           <a href="/explorer/eml-atlas-annex" style={{ color: C.muted, textDecoration: "none" }}>Atlas Annex</a>
           <a href="/explorer/eml-prime-residual" style={{ color: C.muted, textDecoration: "none" }}>Prime Residual</a>
+          <a href="/explorer/eml-advantage" style={{ color: C.muted, textDecoration: "none" }}>Advantage Lab</a>
           <a href="/explorer/eml-language" style={{ color: C.muted, textDecoration: "none" }}>EML Language</a>
         </nav>
 

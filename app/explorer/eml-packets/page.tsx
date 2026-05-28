@@ -41,6 +41,7 @@ export default function EmlPacketGalleryPage() {
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
           <a href="/explorer/eml-language" style={{ color: C.muted, textDecoration: "none" }}>Language Kernel</a>
           <a href="/explorer/eml-ir-bridge" style={{ color: C.muted, textDecoration: "none" }}>IR Bridge</a>
+          <a href="/explorer/eml-advantage" style={{ color: C.muted, textDecoration: "none" }}>Advantage Lab</a>
           <a href="/explorer/eml-packets/builder" style={{ color: C.muted, textDecoration: "none" }}>Builder</a>
           <a href="/evidence" style={{ color: C.muted, textDecoration: "none" }}>Evidence</a>
         </nav>
