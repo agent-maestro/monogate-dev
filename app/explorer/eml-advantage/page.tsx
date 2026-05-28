@@ -5,6 +5,8 @@ import holdoutJson from "./data/eml_a8_1_holdout_advantage_benchmark_2026_05_27.
 import candidateJson from "./data/eml_a8_2_discovery_candidate_queue_2026_05_27.json";
 import trialJson from "./data/eml_a8_3_candidate_trial_runner_2026_05_27.json";
 import negativeControlJson from "./data/eml_a8_4_negative_control_discipline_2026_05_27.json";
+import deepTreeJson from "./data/eml_a8_5_deep_tree_holdout_2026_05_27.json";
+import guardRuleJson from "./data/eml_a9_compiler_guard_rules_2026_05_27.json";
 
 type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
 
@@ -58,6 +60,21 @@ type NegativeControlPacket = {
   expectedWinner: string;
   evidenceStatus: string;
   reason: string;
+};
+
+type DeepTreePacket = {
+  caseId: string;
+  treeDepth: number;
+  holdoutClass: string;
+  profiles: Array<Record<string, unknown>>;
+};
+
+type GuardRulePacket = {
+  ruleId: string;
+  ruleClass: string;
+  evidenceStatus: string;
+  trigger: string;
+  guardAction: string;
 };
 
 const lab = labJson as unknown as {
@@ -135,6 +152,34 @@ const negativeControls = negativeControlJson as unknown as {
   nonClaims: string[];
 };
 
+const deepTrees = deepTreeJson as unknown as {
+  status: string;
+  summary: {
+    packetCount: number;
+    blockedCount: number;
+    standardRuntimeWinCount: number;
+    mixedIdentitySupportedCount: number;
+    emlStructureSupportedCount: number;
+    maxTreeDepth: number;
+    deepTreeStabilityClaim: boolean;
+  };
+  holdoutPackets: DeepTreePacket[];
+  nonClaims: string[];
+};
+
+const guardRules = guardRuleJson as unknown as {
+  status: string;
+  summary: {
+    ruleCount: number;
+    readyForCompilerFixtureCount: number;
+    compilerBehaviorChanged: boolean;
+    compilerCorrectnessClaim: boolean;
+    guardRulesComplete: boolean;
+  };
+  rulePackets: GuardRulePacket[];
+  nonClaims: string[];
+};
+
 export const metadata: Metadata = {
   title: "EML Advantage Lab",
   description: "Bounded EML-vs-standard comparison across compression, runtime, stability, lowering, proof, and search evidence.",
@@ -194,6 +239,8 @@ export default function EmlAdvantagePage() {
             {pill("A8.2 candidates", C.blue)}
             {pill("A8.3 trials", C.green)}
             {pill("A8.4 controls", C.red)}
+            {pill("A8.5 depth", C.orange)}
+            {pill("A9 guards", C.blue)}
             {pill("bounded comparison", C.blue)}
             {pill("general superiority: false", C.green)}
             {pill("compiler correctness: false", C.green)}
@@ -217,6 +264,8 @@ export default function EmlAdvantagePage() {
           <Metric label="Discovery candidates" value={candidates.summary.candidateCount} color={C.purple} />
           <Metric label="Candidate trials" value={trials.summary.trialCount} color={C.green} />
           <Metric label="Negative controls" value={negativeControls.summary.controlCount} color={C.red} />
+          <Metric label="Blocked deep trees" value={deepTrees.summary.blockedCount} color={C.red} />
+          <Metric label="Guard rules" value={guardRules.summary.ruleCount} color={C.blue} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -267,6 +316,83 @@ export default function EmlAdvantagePage() {
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.axisTested}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.profiles.length}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.interpretation}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A8.5 deep-tree holdout
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            Depth is the practical stress point. This holdout blocks unstable trees, confirms protected runtime lowering where needed, and prevents deep EML trees from becoming public advantage claims without evidence.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Deep-tree packets" value={deepTrees.summary.packetCount} color={C.blue} />
+            <Metric label="Max depth" value={deepTrees.summary.maxTreeDepth} color={C.orange} />
+            <Metric label="Blocked" value={deepTrees.summary.blockedCount} color={C.red} />
+            <Metric label="Standard wins" value={deepTrees.summary.standardRuntimeWinCount} color={C.blue} />
+            <Metric label="EML structure wins" value={deepTrees.summary.emlStructureSupportedCount} color={C.green} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 760, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Case</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Depth</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Class</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Profiles</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deepTrees.holdoutPackets.map((packet) => (
+                  <tr key={packet.caseId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.caseId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.treeDepth}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.holdoutClass, packet.holdoutClass.includes("blocked") ? C.red : packet.holdoutClass.includes("standard") ? C.blue : C.orange)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.profiles.length}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A9 compiler guard rules
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            A9 turns the lab evidence into conservative compiler/runtime policy. These are rule packets only; compiler behavior is not changed here.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Rules" value={guardRules.summary.ruleCount} color={C.blue} />
+            <Metric label="Fixture-ready" value={guardRules.summary.readyForCompilerFixtureCount} color={C.green} />
+            <Metric label="Compiler changed" value={String(guardRules.summary.compilerBehaviorChanged)} color={C.green} />
+            <Metric label="Rules complete" value={String(guardRules.summary.guardRulesComplete)} color={C.orange} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 980, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Rule</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Class</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Status</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Trigger</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {guardRules.rulePackets.map((packet) => (
+                  <tr key={packet.ruleId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.ruleId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.ruleClass, C.purple)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.evidenceStatus, packet.evidenceStatus === "ready_for_compiler_fixture" ? C.green : C.orange)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.trigger}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.guardAction}</td>
                   </tr>
                 ))}
               </tbody>
@@ -476,6 +602,12 @@ export default function EmlAdvantagePage() {
             ))}
             {negativeControls.nonClaims.map((item) => (
               <li key={`negative-control-${item}`}>{item}</li>
+            ))}
+            {deepTrees.nonClaims.map((item) => (
+              <li key={`deep-tree-${item}`}>{item}</li>
+            ))}
+            {guardRules.nonClaims.map((item) => (
+              <li key={`guard-rule-${item}`}>{item}</li>
             ))}
           </ul>
         </section>
