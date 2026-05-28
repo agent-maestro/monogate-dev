@@ -11,6 +11,7 @@ import guardFixtureJson from "./data/eml_a9_1_guard_rule_fixtures_2026_05_27.jso
 import guardDecisionJson from "./data/eml_a9_2_guard_decision_analyzer_2026_05_27.json";
 import mockCompilerHoldoutJson from "./data/eml_a11_1_mock_compiler_holdouts_2026_05_27.json";
 import protectedLoweringJson from "./data/eml_a11_2_protected_lowering_benchmark_2026_05_27.json";
+import builderFeedbackJson from "./data/eml_a11_3_builder_export_feedback_2026_05_27.json";
 
 type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
 
@@ -116,6 +117,13 @@ type ProtectedLoweringCase = {
   protectedNonFiniteCount: number;
   maxNaiveAbsError: number | string;
   maxProtectedAbsError: number;
+};
+
+type BuilderFeedbackValidation = {
+  programId: string;
+  decision: string;
+  recommendedLowering: string | null;
+  supportingEvidenceArtifacts: Array<{ artifactId: string; caseId: string }>;
 };
 
 const lab = labJson as unknown as {
@@ -276,6 +284,20 @@ const protectedLowerings = protectedLoweringJson as unknown as {
   nonClaims: string[];
 };
 
+const builderFeedback = builderFeedbackJson as unknown as {
+  status: string;
+  summary: {
+    draftCount: number;
+    protectedLoweringDraftCount: number;
+    supportingEvidenceCitationCount: number;
+    allProtectedLoweringsCiteA11_2: boolean;
+    runtimePerformanceClaim: boolean;
+    compilerImplementationClaim: boolean;
+  };
+  validationPackets: BuilderFeedbackValidation[];
+  nonClaims: string[];
+};
+
 export const metadata: Metadata = {
   title: "EML Advantage Lab",
   description: "Bounded EML-vs-standard comparison across compression, runtime, stability, lowering, proof, and search evidence.",
@@ -340,6 +362,7 @@ export default function EmlAdvantagePage() {
             {pill("A9.2 decisions", C.green)}
             {pill("A11.1 holdouts", C.purple)}
             {pill("A11.2 stability", C.blue)}
+            {pill("A11.3 builder feedback", C.green)}
             {pill("bounded comparison", C.blue)}
             {pill("general superiority: false", C.green)}
             {pill("compiler correctness: false", C.green)}
@@ -368,6 +391,7 @@ export default function EmlAdvantagePage() {
           <Metric label="Guard decisions" value={guardDecisions.summary.decisionCount} color={C.green} />
           <Metric label="Mock holdouts" value={mockCompilerHoldouts.summary.holdoutCount} color={C.purple} />
           <Metric label="Protected samples" value={protectedLowerings.summary.sampleCount} color={C.blue} />
+          <Metric label="Builder citations" value={builderFeedback.summary.supportingEvidenceCitationCount} color={C.green} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -545,6 +569,46 @@ export default function EmlAdvantagePage() {
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.protectedNoWorseCount}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.naiveNonFiniteCount}</td>
                     <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.maxProtectedAbsError}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A11.3 builder export feedback
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            Builder-style exports now cite A11.2 when a protected lowering is recommended. The citation supports stability evidence only; speed and compiler claims remain blocked.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Drafts" value={builderFeedback.summary.draftCount} color={C.blue} />
+            <Metric label="Protected drafts" value={builderFeedback.summary.protectedLoweringDraftCount} color={C.green} />
+            <Metric label="Evidence citations" value={builderFeedback.summary.supportingEvidenceCitationCount} color={C.green} />
+            <Metric label="All cite A11.2" value={String(builderFeedback.summary.allProtectedLoweringsCiteA11_2)} color={C.green} />
+            <Metric label="Runtime claim" value={String(builderFeedback.summary.runtimePerformanceClaim)} color={C.green} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Program</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Decision</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Lowering</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Evidence</th>
+                </tr>
+              </thead>
+              <tbody>
+                {builderFeedback.validationPackets.map((packet) => (
+                  <tr key={packet.programId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.programId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.decision, packet.decision.includes("lowering") ? C.blue : C.green)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.recommendedLowering ?? "none"}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>
+                      {packet.supportingEvidenceArtifacts.map((evidence) => `${evidence.artifactId}/${evidence.caseId}`).join(", ") || "none"}
+                    </td>
                   </tr>
                 ))}
               </tbody>

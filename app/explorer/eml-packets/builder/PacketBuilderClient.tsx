@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { C, pill } from "../../../evidence/data";
 import guardLensJson from "../data/eml_a10_expression_guard_lens_2026_05_27.json";
+import protectedLoweringJson from "../data/eml_a11_2_protected_lowering_benchmark_2026_05_27.json";
 
 const falseClaimFlags = {
   public_ready: false,
@@ -75,6 +76,7 @@ function guardDecision(expression: string, validationStatus: string) {
       decision: "block_claim_until_evidence",
       rule: "require_trial_packet_before_advantage_claim_v0",
       lowering: "none",
+      evidence: null,
       reason: "A pass-strength draft needs attached validator, trial, and reviewer evidence before surfacing.",
     };
   }
@@ -83,6 +85,7 @@ function guardDecision(expression: string, validationStatus: string) {
       decision: "block_unstable_deep_tree",
       rule: "block_unstable_deep_tree_v0",
       lowering: "none",
+      evidence: null,
       reason: "Deep EML trees need holdout evidence before runtime or public advantage claims.",
     };
   }
@@ -90,7 +93,12 @@ function guardDecision(expression: string, validationStatus: string) {
     return {
       decision: "recommend_protected_lowering",
       rule: "lower_expm1_near_zero_v0",
-      lowering: "expm1(x)",
+      lowering: "expm1-style protected lowering",
+      evidence: {
+        artifactId: "eml-a11-2-protected-lowering-benchmark",
+        caseId: "expm1_near_zero",
+        evidenceKind: "deterministic_numeric_stability_fixture",
+      },
       reason: "Near-zero exp-minus-one shapes should lower to protected expm1 at runtime.",
     };
   }
@@ -99,6 +107,11 @@ function guardDecision(expression: string, validationStatus: string) {
       decision: "recommend_protected_lowering",
       rule: "lower_logaddexp_softplus_v0",
       lowering: "logaddexp-style protected lowering",
+      evidence: {
+        artifactId: "eml-a11-2-protected-lowering-benchmark",
+        caseId: "logsumexp_edge_grid",
+        evidenceKind: "deterministic_numeric_stability_fixture",
+      },
       reason: "Log-sum-exp shapes should use protected runtime lowering.",
     };
   }
@@ -107,6 +120,7 @@ function guardDecision(expression: string, validationStatus: string) {
       decision: "block_missing_domain_guard",
       rule: "require_positive_log_domain_guard_v0",
       lowering: "none",
+      evidence: null,
       reason: "Division/log-domain shapes need explicit positive/nonzero guard evidence.",
     };
   }
@@ -114,6 +128,7 @@ function guardDecision(expression: string, validationStatus: string) {
     decision: "allow_proof_shape",
     rule: "prefer_eml_for_proof_shape_v0",
     lowering: "none",
+    evidence: null,
     reason: "Allowed as proof/search/teaching shape only; no runtime advantage claim.",
   };
 }
@@ -205,6 +220,27 @@ export default function PacketBuilderClient() {
   const [ranges, setRanges] = useState("vin:0..3.3\nr1:100..100000\nr2:100..100000");
 
   const inputNames = useMemo(() => parseInputs(inputs), [inputs]);
+  const guard = useMemo(() => guardDecision(expression, validationStatus), [expression, validationStatus]);
+  const guardFeedback = useMemo(
+    () => ({
+      decision: guard.decision,
+      matchedRuleIds: [guard.rule],
+      recommendedLowering: guard.lowering === "none" ? null : guard.lowering,
+      supportingEvidenceArtifacts: guard.evidence ? [guard.evidence] : [],
+      blockedClaims: [
+        "runtime performance",
+        "compiler correctness",
+        "production readiness",
+        "general EML superiority",
+      ],
+      nonClaims: [
+        "Builder guard feedback is draft-only.",
+        "A11.2 evidence supports numeric stability on recorded edge grids only.",
+        "A11.2 evidence does not prove speed, compiler correctness, or production readiness.",
+      ],
+    }),
+    [guard]
+  );
   const evidencePacket = useMemo(() => {
     const artifactId = slug(title);
     return {
@@ -220,6 +256,7 @@ export default function PacketBuilderClient() {
         artifact_preview: artifactText.slice(0, 320),
         source_path: sourcePath,
         generated_in: "monogate.dev packet builder v1",
+        eml_guard_feedback: artifactType === "EML expression" ? guardFeedback : undefined,
       },
       claimBoundary:
         "Candidate packet only. A local validator/replay/proof step must run before any public strengthening.",
@@ -237,7 +274,7 @@ export default function PacketBuilderClient() {
         "review claim flags before surfacing publicly",
       ],
     };
-  }, [artifactText, artifactType, replayStatus, sourcePath, title, validationStatus]);
+  }, [artifactText, artifactType, guardFeedback, replayStatus, sourcePath, title, validationStatus]);
 
   const expressionPacket = useMemo(
     () => ({
@@ -251,14 +288,17 @@ export default function PacketBuilderClient() {
       physical_meaning: artifactText,
       source_repo: sourcePath.split("/")[0] || "monogate",
       simulated_trace_samples: [],
+      builder_guard_feedback: guardFeedback,
       claim_flags: falseClaimFlags,
     }),
-    [artifactText, expression, family, inputNames, programId, ranges, sourcePath, units]
+    [artifactText, expression, family, guardFeedback, inputNames, programId, ranges, sourcePath, units]
   );
 
-  const guard = useMemo(() => guardDecision(expression, validationStatus), [expression, validationStatus]);
   const knownLens = guardLensJson as unknown as {
     summary: { packetCount: number; protectedLoweringCount: number; blockedCount: number };
+  };
+  const protectedLowering = protectedLoweringJson as unknown as {
+    summary: { caseCount: number; sampleCount: number; runtimePerformanceClaim: boolean };
   };
 
   const evidenceJson = JSON.stringify(evidencePacket, null, 2);
@@ -341,9 +381,11 @@ export default function PacketBuilderClient() {
                 {pill(guard.decision, guard.decision.startsWith("block") ? C.red : guard.decision.includes("lowering") ? C.blue : C.green)}
                 {pill(guard.rule, C.purple)}
                 {pill(`known packets: ${knownLens.summary.packetCount}`, C.blue)}
+                {pill(`stability samples: ${protectedLowering.summary.sampleCount}`, C.green)}
               </div>
               <div style={{ color: C.text, fontSize: 12, lineHeight: 1.7 }}>
                 <div><span style={{ color: C.muted }}>recommended lowering:</span> <span style={{ fontFamily: "monospace" }}>{guard.lowering}</span></div>
+                <div><span style={{ color: C.muted }}>supporting evidence:</span> <span style={{ fontFamily: "monospace" }}>{guard.evidence ? `${guard.evidence.artifactId}/${guard.evidence.caseId}` : "none"}</span></div>
                 <div style={{ marginTop: 6, color: C.muted }}>{guard.reason}</div>
               </div>
             </section>
