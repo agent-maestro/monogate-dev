@@ -3,6 +3,8 @@ import { C, pill } from "../../evidence/data";
 import labJson from "./data/eml_advantage_lab_2026_05_27.json";
 import holdoutJson from "./data/eml_a8_1_holdout_advantage_benchmark_2026_05_27.json";
 import candidateJson from "./data/eml_a8_2_discovery_candidate_queue_2026_05_27.json";
+import trialJson from "./data/eml_a8_3_candidate_trial_runner_2026_05_27.json";
+import negativeControlJson from "./data/eml_a8_4_negative_control_discipline_2026_05_27.json";
 
 type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
 
@@ -39,6 +41,23 @@ type CandidatePacket = {
   queueClass: string;
   priorityScore: number;
   whyEmlMightHelp: string;
+};
+
+type TrialPacket = {
+  candidateId: string;
+  trialId: string;
+  trialClass: string;
+  axisTested: string;
+  interpretation: string;
+  profiles: Array<Record<string, unknown>>;
+};
+
+type NegativeControlPacket = {
+  controlId: string;
+  controlClass: string;
+  expectedWinner: string;
+  evidenceStatus: string;
+  reason: string;
 };
 
 const lab = labJson as unknown as {
@@ -85,6 +104,34 @@ const candidates = candidateJson as unknown as {
     candidateProved: boolean;
   };
   candidatePackets: CandidatePacket[];
+  nonClaims: string[];
+};
+
+const trials = trialJson as unknown as {
+  status: string;
+  summary: {
+    trialCount: number;
+    byTrialClass: Record<string, number>;
+    proofShapeSupportedCount: number;
+    mixedIdentitySupportedCount: number;
+    standardRuntimeWinConfirmedCount: number;
+    blockedCount: number;
+    candidateProved: boolean;
+    emlAdvantageProved: boolean;
+  };
+  trialPackets: TrialPacket[];
+  nonClaims: string[];
+};
+
+const negativeControls = negativeControlJson as unknown as {
+  status: string;
+  summary: {
+    controlCount: number;
+    confirmedControlCount: number;
+    registeredForNextHoldoutCount: number;
+    negativeControlsExhaustive: boolean;
+  };
+  controlPackets: NegativeControlPacket[];
   nonClaims: string[];
 };
 
@@ -145,6 +192,8 @@ export default function EmlAdvantagePage() {
             {pill(lab.status, C.green)}
             {pill("A8.1 holdout", C.purple)}
             {pill("A8.2 candidates", C.blue)}
+            {pill("A8.3 trials", C.green)}
+            {pill("A8.4 controls", C.red)}
             {pill("bounded comparison", C.blue)}
             {pill("general superiority: false", C.green)}
             {pill("compiler correctness: false", C.green)}
@@ -166,6 +215,8 @@ export default function EmlAdvantagePage() {
           <Metric label="Holdout retained" value={holdout.summary.retainedCount} color={C.green} />
           <Metric label="Controls passed" value={holdout.summary.negativeControlPassCount} color={C.blue} />
           <Metric label="Discovery candidates" value={candidates.summary.candidateCount} color={C.purple} />
+          <Metric label="Candidate trials" value={trials.summary.trialCount} color={C.green} />
+          <Metric label="Negative controls" value={negativeControls.summary.controlCount} color={C.red} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -179,6 +230,86 @@ export default function EmlAdvantagePage() {
             {Object.entries(lab.summary.byAdvantageClass).map(([name, count]) => (
               pill(`${name}: ${count}`, classColor(name as AdvantageClass))
             ))}
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A8.3 candidate trials
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            The first queue items have moved from ranked candidates into bounded trials. One proof-shape lane is supported, one identity lane stays mixed, and one runtime anti-example confirms standard math should win.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Proof-shape supported" value={trials.summary.proofShapeSupportedCount} color={C.green} />
+            <Metric label="Mixed identity" value={trials.summary.mixedIdentitySupportedCount} color={C.orange} />
+            <Metric label="Standard runtime win" value={trials.summary.standardRuntimeWinConfirmedCount} color={C.blue} />
+            <Metric label="Blocked" value={trials.summary.blockedCount} color={trials.summary.blockedCount === 0 ? C.green : C.red} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 880, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Candidate</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Trial</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Class</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Axis</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Profiles</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Interpretation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trials.trialPackets.map((packet) => (
+                  <tr key={packet.trialId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.candidateId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.trialId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.trialClass, packet.trialClass.includes("standard") ? C.blue : packet.trialClass.includes("mixed") ? C.orange : C.green)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.axisTested}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.profiles.length}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.interpretation}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A8.4 negative-control discipline
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            The lab keeps explicit cases where EML should lose or remain blocked. These controls prevent the scoreboard from turning into a one-way promotion surface.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10, marginBottom: 14 }}>
+            <Metric label="Controls" value={negativeControls.summary.controlCount} color={C.red} />
+            <Metric label="Confirmed" value={negativeControls.summary.confirmedControlCount} color={C.blue} />
+            <Metric label="Next holdout" value={negativeControls.summary.registeredForNextHoldoutCount} color={C.orange} />
+            <Metric label="Exhaustive" value={String(negativeControls.summary.negativeControlsExhaustive)} color={C.green} />
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 820, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Control</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Class</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Expected</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Evidence</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {negativeControls.controlPackets.map((packet) => (
+                  <tr key={packet.controlId}>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.controlId}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.controlClass, C.purple)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.expectedWinner, packet.expectedWinner === "standard" ? C.blue : C.orange)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.evidenceStatus, packet.evidenceStatus === "confirmed" ? C.green : C.orange)}</td>
+                    <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.reason}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
@@ -339,6 +470,12 @@ export default function EmlAdvantagePage() {
             ))}
             {candidates.nonClaims.map((item) => (
               <li key={`candidate-${item}`}>{item}</li>
+            ))}
+            {trials.nonClaims.map((item) => (
+              <li key={`trial-${item}`}>{item}</li>
+            ))}
+            {negativeControls.nonClaims.map((item) => (
+              <li key={`negative-control-${item}`}>{item}</li>
             ))}
           </ul>
         </section>
