@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { C, pill } from "../../evidence/data";
 import labJson from "./data/eml_advantage_lab_2026_05_27.json";
 import holdoutJson from "./data/eml_a8_1_holdout_advantage_benchmark_2026_05_27.json";
+import candidateJson from "./data/eml_a8_2_discovery_candidate_queue_2026_05_27.json";
 
 type AdvantageClass = "eml_win" | "standard_win" | "mixed" | "research_only" | "blocked";
 
@@ -29,6 +30,15 @@ type HoldoutPacket = {
   holdoutClass: string;
   holdoutConfidence: string;
   profiles: Array<Record<string, unknown>>;
+};
+
+type CandidatePacket = {
+  candidateId: string;
+  family: string;
+  expectedAdvantageAxis: string;
+  queueClass: string;
+  priorityScore: number;
+  whyEmlMightHelp: string;
 };
 
 const lab = labJson as unknown as {
@@ -61,6 +71,20 @@ const holdout = holdoutJson as unknown as {
     generalEmlSuperiorityClaim: boolean;
   };
   holdoutPackets: HoldoutPacket[];
+  nonClaims: string[];
+};
+
+const candidates = candidateJson as unknown as {
+  status: string;
+  summary: {
+    candidateCount: number;
+    byQueueClass: Record<string, number>;
+    topCandidateId: string;
+    topQueueClass: string;
+    candidateTestPerformed: boolean;
+    candidateProved: boolean;
+  };
+  candidatePackets: CandidatePacket[];
   nonClaims: string[];
 };
 
@@ -120,6 +144,7 @@ export default function EmlAdvantagePage() {
             {pill("EML Advantage Lab", C.orange)}
             {pill(lab.status, C.green)}
             {pill("A8.1 holdout", C.purple)}
+            {pill("A8.2 candidates", C.blue)}
             {pill("bounded comparison", C.blue)}
             {pill("general superiority: false", C.green)}
             {pill("compiler correctness: false", C.green)}
@@ -140,6 +165,7 @@ export default function EmlAdvantagePage() {
           <Metric label="Research-only" value={lab.summary.researchOnlyCount} color={C.purple} />
           <Metric label="Holdout retained" value={holdout.summary.retainedCount} color={C.green} />
           <Metric label="Controls passed" value={holdout.summary.negativeControlPassCount} color={C.blue} />
+          <Metric label="Discovery candidates" value={candidates.summary.candidateCount} color={C.purple} />
         </section>
 
         <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
@@ -153,6 +179,49 @@ export default function EmlAdvantagePage() {
             {Object.entries(lab.summary.byAdvantageClass).map(([name, count]) => (
               pill(`${name}: ${count}`, classColor(name as AdvantageClass))
             ))}
+          </div>
+        </section>
+
+        <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ color: C.green, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>
+            A8.2 discovery queue
+          </div>
+          <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>
+            The queue turns the holdout result into new EML-native candidates to test next. These are private candidates, not public claims.
+          </p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+            {Object.entries(candidates.summary.byQueueClass).map(([name, count]) => (
+              pill(`${name}: ${count}`, name === "ready_for_advantage_lab" ? C.green : name === "needs_machlib_witness" ? C.purple : C.orange)
+            ))}
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 920, fontSize: 12 }}>
+              <thead>
+                <tr style={{ color: C.muted, textAlign: "left" }}>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Candidate</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Family</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Axis</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Queue</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Score</th>
+                  <th style={{ borderBottom: `1px solid ${C.border}`, padding: "8px 10px" }}>Why</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...candidates.candidatePackets]
+                  .sort((a, b) => b.priorityScore - a.priorityScore || a.candidateId.localeCompare(b.candidateId))
+                  .slice(0, 8)
+                  .map((packet) => (
+                    <tr key={packet.candidateId}>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace", overflowWrap: "anywhere" }}>{packet.candidateId}</td>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.family, C.blue)}</td>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.expectedAdvantageAxis}</td>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px" }}>{pill(packet.queueClass, packet.queueClass === "ready_for_advantage_lab" ? C.green : packet.queueClass === "needs_machlib_witness" ? C.purple : C.orange)}</td>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", fontFamily: "monospace" }}>{packet.priorityScore}</td>
+                      <td style={{ borderBottom: `1px solid ${C.border}`, padding: "9px 10px", color: C.muted, lineHeight: 1.5 }}>{packet.whyEmlMightHelp}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
@@ -267,6 +336,9 @@ export default function EmlAdvantagePage() {
             ))}
             {holdout.nonClaims.map((item) => (
               <li key={`holdout-${item}`}>{item}</li>
+            ))}
+            {candidates.nonClaims.map((item) => (
+              <li key={`candidate-${item}`}>{item}</li>
             ))}
           </ul>
         </section>
