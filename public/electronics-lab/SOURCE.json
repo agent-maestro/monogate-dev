@@ -1,14 +1,14 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-05-28T01:45:43.771245+00:00",
+  "generated_at": "2026-05-29T05:21:36.258422+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "7c0bab75f26814bdc6ceb01909297127c34fc2b1",
+  "source_commit": "1a0a5d4190be11d3beafc3ff121766de47058de3",
   "source_dirty": false,
   "source_status": [],
-  "build_command": "npm ci && npm run build:monogate-dev",
+  "build_command": "python scripts/sync_electronics_lab_public.py",
   "artifact_repo": "https://github.com/agent-maestro/monogate-dev",
   "artifact_path": "public/electronics-lab",
   "boundary_flags": {
@@ -25,24 +25,24 @@
   },
   "artifacts": [
     {
-      "path": "assets/CoursePanel-WCg8ynW9.js",
+      "path": "assets/CoursePanel-BxEySvOB.js",
       "bytes": 8095,
-      "sha256": "856309aecf01dfd13a8d39551a57bd903b0d769a8869f41f66f81f3fadd66e81"
+      "sha256": "b7507b9649e7e4cc9d4f5367a269639b4cd4c5d4a73cb2e39cc5ae9177843528"
     },
     {
-      "path": "assets/icons-CScAvHjm.js",
-      "bytes": 14575,
-      "sha256": "755785b94462c3baf9e24954b7407aa437dbb1292ffc01eb6742eb1cb5a31457"
+      "path": "assets/icons-Br77vqab.js",
+      "bytes": 15609,
+      "sha256": "aeb0f02ce445b1abe4a2832c8a5759ecc1a6bfe07d1ff2fcf8c18026fde7b91b"
     },
     {
-      "path": "assets/index-CAdTF8N3.css",
-      "bytes": 84283,
-      "sha256": "16126ba77eb52640a53936b9c1ff82f4c28eea8c932cb16eef939d6e2e335d92"
+      "path": "assets/index-a1AdV7wq.js",
+      "bytes": 38945,
+      "sha256": "3a1e187076769f750f7d662cce66fc4f02959bf7490a6d93d2abc3ea58e3af25"
     },
     {
-      "path": "assets/index-CDqsq2Gy.js",
-      "bytes": 38954,
-      "sha256": "08e3a6fb9ba16b6aee06a5fa55271b3b32878de4070057c37bcc5db4b96e38c6"
+      "path": "assets/index-ffKIdtiw.css",
+      "bytes": 89724,
+      "sha256": "b5fc44ba54f21b8410f9e629fb2fc949bf81bc1592c778f21a5161bede26ea5d"
     },
     {
       "path": "assets/optimizationBoundary-B7GZTj9-.js",
@@ -50,14 +50,14 @@
       "sha256": "702292d17edc77204aadf130b0cc6560995027a653f47f188372efa4ee92aee9"
     },
     {
-      "path": "assets/OptimizationBoundaryLab-Co1xFsBk.js",
+      "path": "assets/OptimizationBoundaryLab-BdAqYY1v.js",
       "bytes": 13246,
-      "sha256": "ff8a2a4d677bbed0a5ecf7504c354e03c37413107da2843256e2ebe5220cf67e"
+      "sha256": "6e38a0538e2131b4f32968b46d0f8fbfd86fe280489b944a85eb48560c495e67"
     },
     {
-      "path": "assets/PhysicalBuildPanel-BKXWTVTV.js",
+      "path": "assets/PhysicalBuildPanel-_7Dyd_hA.js",
       "bytes": 3960,
-      "sha256": "9ca0d577444611f1b79e1056ffb1c5fabc7a16ded641ddeb7e07a360cd41fa4d"
+      "sha256": "df7b318c434dc7b9b667372338eb2aa4dbee7976b39ad0d223b7a70dbb434c6e"
     },
     {
       "path": "assets/react-BGrcABR8.js",
@@ -70,9 +70,9 @@
       "sha256": "243a7e64c4686ee9959e7d36a36c9fa1f5868b69c843ac378799913dcb9a0164"
     },
     {
-      "path": "assets/SimulatorBench-DxyFVM6Z.js",
-      "bytes": 111999,
-      "sha256": "6b1a24c39af8afb7be037de79de766b73f5120936196f333d7ab33042d9b3230"
+      "path": "assets/SimulatorBench-BUrSYlyd.js",
+      "bytes": 121972,
+      "sha256": "4b364b9bccbf003407db9f65069b033a36796832089286f08e7b6424b5f96260"
     },
     {
       "path": "assets/three-CgggyWJi.js",
@@ -85,29 +85,9 @@
       "sha256": "6bf5611e60556c4786eb39345b2e0872a5cd5ce64fca8c13bb924a82bdc1b3b7"
     },
     {
-      "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/electrocookie-build-guide.md",
-      "bytes": 6736,
-      "sha256": "ff29e61128f2403d6451ddb8d0d1a7e23d6e1357c18a7a078235a04c657a1d95"
-    },
-    {
-      "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/lab-packet.md",
-      "bytes": 11727,
-      "sha256": "e4c3c9a5cdefe0d4cb5b1c0aedb3f9d2e4b44bf096642aebe1e782357c52433f"
-    },
-    {
-      "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/quick-start.html",
-      "bytes": 5173,
-      "sha256": "0581064e0a5fc7aa9c471d7b8d11f7118bb5c0be91b440a244e1fdd39f90ed72"
-    },
-    {
-      "path": "courses/001-guarded-reflex-loops/resources/trainer-board-v0/quick-start.pdf",
-      "bytes": 112421,
-      "sha256": "35360c718675923c89e921f912eeca6114d03abc6302c7eea9d90feed849dee8"
-    },
-    {
       "path": "index.html",
       "bytes": 913,
-      "sha256": "91426cb0b0ce10fa2e69d864a589666412402130679a9ba4848632a6c22b65c1"
+      "sha256": "4a8bef5f0a070c3970784646c43d218b70da05ed6da383e6ecc8c99abc32b117"
     }
   ]
 }
