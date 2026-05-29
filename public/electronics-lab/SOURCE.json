@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-05-29T05:21:36.258422+00:00",
+  "generated_at": "2026-05-29T22:23:58.754868+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "1a0a5d4190be11d3beafc3ff121766de47058de3",
+  "source_commit": "9a3eaf6b47b6998cac0cd10c15ef5c1818296ce2",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -35,14 +35,14 @@
       "sha256": "aeb0f02ce445b1abe4a2832c8a5759ecc1a6bfe07d1ff2fcf8c18026fde7b91b"
     },
     {
-      "path": "assets/index-a1AdV7wq.js",
-      "bytes": 38945,
-      "sha256": "3a1e187076769f750f7d662cce66fc4f02959bf7490a6d93d2abc3ea58e3af25"
+      "path": "assets/index-C4z_Pp6D.css",
+      "bytes": 91811,
+      "sha256": "371bce94a07fc70906bb820812b4c0df8fb2d7e183397d37a934515a115157ab"
     },
     {
-      "path": "assets/index-ffKIdtiw.css",
-      "bytes": 89724,
-      "sha256": "b5fc44ba54f21b8410f9e629fb2fc949bf81bc1592c778f21a5161bede26ea5d"
+      "path": "assets/index-CNJywARj.js",
+      "bytes": 38945,
+      "sha256": "f0bbab54a48432b9900c9e2c22f5d811587168063e215396ababaec4f9f76d34"
     },
     {
       "path": "assets/optimizationBoundary-B7GZTj9-.js",
@@ -70,9 +70,9 @@
       "sha256": "243a7e64c4686ee9959e7d36a36c9fa1f5868b69c843ac378799913dcb9a0164"
     },
     {
-      "path": "assets/SimulatorBench-BUrSYlyd.js",
-      "bytes": 121972,
-      "sha256": "4b364b9bccbf003407db9f65069b033a36796832089286f08e7b6424b5f96260"
+      "path": "assets/SimulatorBench-BhjeQkip.js",
+      "bytes": 126457,
+      "sha256": "e97c7d92a0ee1f8aae2490169d8b80ed8ad2f07b3eeb24a9fa164f97c1c652ef"
     },
     {
       "path": "assets/three-CgggyWJi.js",
@@ -87,7 +87,7 @@
     {
       "path": "index.html",
       "bytes": 913,
-      "sha256": "4a8bef5f0a070c3970784646c43d218b70da05ed6da383e6ecc8c99abc32b117"
+      "sha256": "6c21a5fd7eedc454be4acb9e5f62e918d0c7134f98189c17b0a946c279c5a9fd"
     }
   ]
 }
