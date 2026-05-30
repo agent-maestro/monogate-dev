@@ -5,9 +5,9 @@ export const metadata: Metadata = {
   title: "EML in 30 Minutes (Level 1) — monogate.dev/learn/eml/intro",
   description:
     "Level 1 of the EML curriculum. Six lessons, five minutes each. By "
-    + "the end you'll have written your own equation, compiled it to 22 "
-    + "targets including FPGA hardware, added formal verification, and "
-    + "read the chain-order profile.",
+    + "the end you'll have written your own equation, emitted selected "
+    + "target artifacts, inspected hardware profiles and Lean theorem "
+    + "scaffolds, and read the chain-order profile.",
 };
 
 const ACCENT_GOLD = "#E8A020";
@@ -273,9 +273,9 @@ export default function ForgeTutorialPage() {
           }}
         >
           Six lessons, five minutes each. By the end you&apos;ll have written
-          your own equation, compiled it to 36 targets including FPGA
-          hardware, added formal verification, and read the chain-order
-          profile that predicts numerical behaviour.
+          your own equation, emitted selected target artifacts, inspected
+          hardware profiles and Lean theorem scaffolds, and read the
+          chain-order profile that predicts numerical behaviour.
         </p>
         <div
           style={{
@@ -325,7 +325,7 @@ export default function ForgeTutorialPage() {
           </li>
           <li>
             <a href="#l1" style={{ color: ACCENT_GOLD }}>
-              Compile it to 36 targets (C, Rust, Verilog, Lean, …)
+              Emit selected targets and inspect the artifacts
             </a>
           </li>
           <li>
@@ -340,17 +340,17 @@ export default function ForgeTutorialPage() {
           </li>
           <li>
             <a href="#l4" style={{ color: ACCENT_GOLD }}>
-              Add formal verification
+              Add a proof-shaped verification contract
             </a>
           </li>
           <li>
             <a href="#l5" style={{ color: ACCENT_GOLD }}>
-              Target an FPGA
+              Inspect an FPGA-target profile
             </a>
           </li>
           <li>
             <a href="#l6" style={{ color: ACCENT_GOLD }}>
-              Compile your own equation to silicon
+              Build a bounded project artifact
             </a>
           </li>
         </ol>
@@ -397,11 +397,11 @@ add             → the name (you pick this)
   hello.py          ← your equation in Python
   hello.ll          ← your equation in LLVM IR
   hello.wasm.ll     ← your equation in WebAssembly
-  hello.lean        ← your equation as a Lean theorem
-  hello.v           ← your equation in Verilog (hardware!)
-  hello.sv          ← your equation in SystemVerilog
-  hello.vhd         ← your equation in VHDL
-  Hello.scala       ← your equation in Chisel
+  hello.lean        ← a Lean theorem scaffold
+  hello.v           ← Verilog output when the hardware path is enabled
+  hello.sv          ← SystemVerilog output when enabled
+  hello.vhd         ← VHDL output when enabled
+  Hello.scala       ← Chisel output when enabled
   hello.ads         ← your equation in Ada/SPARK (spec)
   hello.adb         ← your equation in Ada/SPARK (body)
   hello.m           ← your equation in MATLAB
@@ -440,10 +440,10 @@ module add (
     assign result = a + b;
 endmodule`}</Code>
 
-        <P>Your equation. In hardware. Ready for an FPGA.</P>
+        <P>Your equation as a hardware module candidate, ready for simulation and hardware review.</P>
 
         <StrongLine>
-          You just compiled math to silicon. In one command.
+          You just turned one equation into inspectable software, proof-shaped, and hardware-shaped artifacts.
         </StrongLine>
 
         <Exercise>
@@ -580,13 +580,14 @@ fn pid(error: Real, integral: Real, derivative: Real) -> Real {
   drift_risk:  NONE           ← safe at ANY precision
   fpga_estimate:
     exp_units: 0              ← no transcendental hardware
-    luts:      ~50            ← tiny FPGA footprint
-    latency:   3 cycles       ← 30 ns at 100 MHz`}</Code>
+    luts:      estimate only   ← hardware-review input
+    latency:   estimate only   ← requires simulation/synthesis evidence`}</Code>
 
         <P>
           Chain order 0 means this PID is just arithmetic. No{" "}
-          <Inline>exp</Inline>. No <Inline>sin</Inline>. Pure math. Runs on
-          the smallest FPGA chip you can buy. 30 nanoseconds per cycle.
+          <Inline>exp</Inline>. No <Inline>sin</Inline>. Pure math. That makes
+          it a good candidate for the hardware path once simulation and board
+          evidence are attached.
         </P>
 
         <Heading>Now make it nonlinear</Heading>
@@ -605,7 +606,7 @@ fn adaptive_pid(error: Real, t: Real) -> Real {
   fpga_estimate:
     exp_units:  1             ← needs exp hardware
     trig_units: 1             ← needs cos hardware
-    luts:       ~300          ← 6× more FPGA resources`}</Code>
+    luts:       higher estimate ← more hardware-review pressure`}</Code>
 
         <StrongLine>
           The compiler told you the complexity jumped. Before you ran
@@ -631,7 +632,7 @@ fn adaptive_pid(error: Real, t: Real) -> Real {
         anchor="l4"
         accent={ACCENT_PURPLE}
       >
-        <Heading>Making the compiler PROVE your math is correct</Heading>
+        <Heading>Making the compiler state what must be proved</Heading>
         <P>
           Add <Inline>@verify</Inline> to any function:
         </P>
@@ -650,7 +651,7 @@ fn safe_pid(error: Real, integral: Real) -> Real
 
         <P>What the new keywords mean:</P>
         <Code>{`@verify(lean, theorem = "pid_is_bounded")
-  → "Generate a Lean proof for this function"
+  → "Generate a Lean theorem scaffold for this function"
   → The theorem will be named "pid_is_bounded"
 
 requires (abs(error) < 50.0)
@@ -659,7 +660,7 @@ requires (abs(error) < 50.0)
 
 ensures (abs(result) < max_output)
   → "I PROMISE the output is always between -100 and 100"
-  → The compiler generates a PROOF of this promise`}</Code>
+  → The compiler generates a proof obligation for this promise`}</Code>
 
         <Heading>Compile with verification</Heading>
         <Code lang="bash">{`python tools/cli/main.py safe_pid.eml --target lean -o ./verified.lean`}</Code>
@@ -697,18 +698,18 @@ theorem pid_is_bounded
   "Ship it and hope."
 
 WITH @verify:
-  "The Lean theorem prover proved my PID output stays
-   under 100 for all valid inputs."
-  "Here's the proof certificate."
-  "The math is guaranteed, not hoped."`}</Code>
+  "The generated theorem states exactly what must be proved."
+  "A checked proof can close the obligation later."
+  "The claim boundary is visible instead of hidden."`}</Code>
 
         <Heading>One annotation, many provers</Heading>
         <P>
           The same <Inline>@verify(lean, ...)</Inline> block also drives
           Coq, Isabelle/HOL, Ada SPARK Pre/Post aspects, SystemVerilog SVA
           assertions, MATLAB asserts, Java/Kotlin/Go runtime guards, and
-          Doxygen contract comments. One source. Twelve target ecosystems
-          hit by one annotation.
+          Doxygen contract comments where those targets are enabled. One
+          source can carry the same obligation shape across multiple
+          ecosystems, but proof and runtime validation remain target-specific.
         </P>
         <Code lang="bash">{`python tools/cli/main.py safe_pid.eml --target coq      -o ./safe.v
 python tools/cli/main.py safe_pid.eml --target isabelle -o ./Safe.thy
@@ -729,12 +730,12 @@ python tools/cli/main.py safe_pid.eml --target ada      -o ./safe.adb`}</Code>
       {/* ── Lesson 5 ───────────────────────────────────── */}
       <Lesson
         num={5}
-        title="Hardware target"
+        title="Hardware profile"
         minutes={5}
         anchor="l5"
         accent={ACCENT_GOLD}
       >
-        <Heading>Putting your math on a chip</Heading>
+        <Heading>Preparing your math for hardware review</Heading>
         <P>
           Add <Inline>@target(fpga)</Inline> to any function:
         </P>
@@ -746,19 +747,19 @@ fn hardware_pid(error: Real, integral: Real) -> Real {
     Kp * error + Ki * integral
 }`}</Code>
 
-        <Heading>Compile to Verilog (or SystemVerilog)</Heading>
+        <Heading>Emit Verilog (or SystemVerilog)</Heading>
         <Code lang="bash">{`python tools/cli/main.py fpga_pid.eml --target verilog -o ./hw/pid.v
 python tools/cli/main.py fpga_pid.eml --target systemverilog -o ./hw/pid.sv`}</Code>
         <P>The compiler tells you:</P>
         <Code>{`hardware_pid:
   FPGA allocation:
     target:    Xilinx Artix-7
-    LUTs:      48
+    LUTs:      48 (estimate)
     DSP blocks: 2
     exp units: 0 (not needed — chain 0)
     clock:     100 MHz
-    latency:   2 cycles (20 ns)
-    utilization: 0.07% of Artix-7 budget`}</Code>
+    latency:   2 cycles (estimate)
+    utilization: planning estimate only`}</Code>
 
         <P>
           Open <Inline>hw/pid.v</Inline>:
@@ -794,31 +795,31 @@ module hardware_pid_pipeline #(
 endmodule`}</Code>
 
         <P>
-          That&apos;s your equation. As a hardware module. Ready to load
-          onto a $50 FPGA board.
+          That&apos;s your equation as a hardware module candidate. The next
+          steps are simulation, synthesis, board integration, and an evidence
+          packet before any hardware-deployment claim.
         </P>
 
         <Heading>What the numbers mean</Heading>
-        <Code>{`LUTs:      Logic blocks on the FPGA. 48 out of 63,400 available.
-           Your PID uses 0.07% of the chip. Basically free.
+        <Code>{`LUTs:      Estimated logic blocks for the selected FPGA profile.
+           Treat this as a planning signal until synthesis confirms it.
 
 DSPs:      Dedicated multiplier blocks. 2 out of 240 available.
            One for each multiplication (Kp*error, Ki*integral).
 
-Latency:   How many clock cycles to compute one result.
-           2 cycles at 100 MHz = 20 nanoseconds.
-           That's 50,000,000 PID computations per second.
+Latency:   Estimated clock cycles from input valid to output valid.
+           Simulation and synthesis must confirm timing.
 
 For comparison:
-  PLC:     1 PID computation per millisecond (1,000/sec)
-  FPGA:    50,000,000 PID computations per second
+  Software path: run and test first.
+  FPGA path:     emit, simulate, synthesize, then measure.
 
-  50,000× faster. On a chip that costs $50 instead of $5,000.`}</Code>
+  Do not claim speed until measured evidence exists.`}</Code>
 
         <Exercise>
           Take the <Inline>damped_wave</Inline> from Lesson 2. Add{" "}
           <Inline>@target(fpga)</Inline>. Compile. Compare the FPGA
-          allocation to the simple PID.
+          allocation estimate to the simple PID.
           <span style={{ color: MUTED }}>
             {" "}
             (The damped wave needs exp + cos hardware units. More
@@ -899,23 +900,19 @@ fn realtime_spring(x: Real, v: Real) -> Real {
   2. Used transcendental functions (exp, sin, cos)
   3. Read chain-order profiles
   4. Built a PID controller
-  5. Added formal verification (@verify)
-  6. Targeted FPGA hardware (@target)
-  7. Compiled YOUR OWN equation to 36 targets
+  5. Added proof-shaped obligations (@verify)
+  6. Inspected a hardware-target profile (@target)
+  7. Built YOUR OWN bounded artifact
 
 You can now:
   - Write any equation in EML-lang
-  - Compile it to C, C++, Rust, Verilog, SystemVerilog,
-    Lean, Coq, Isabelle, Ada/SPARK, MATLAB, ROS2,
-    Java, Kotlin, Go, AUTOSAR, AADL, Solidity,
-    zkproof, spice, kicad, jlcpcb, and more
+  - Emit selected software, proof-shaped, and hardware-shaped artifacts
   - Read the structural profile (chain order, drift risk)
-  - Add formal proofs to safety-critical functions
-  - Deploy to FPGA hardware`}</Code>
+  - State proof obligations for safety-critical functions
+  - Prepare hardware candidates for simulation and evidence review`}</Code>
 
         <StrongLine>
-          One equation. Thirty-six targets. Verified. Write math. Get
-          silicon — and smart contracts.
+          One equation. Inspectable artifacts. Explicit evidence boundaries.
         </StrongLine>
       </Lesson>
 

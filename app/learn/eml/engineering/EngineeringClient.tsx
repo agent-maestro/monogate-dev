@@ -107,7 +107,7 @@ eml-compile climate_control.eml greenhouse.eml --target all -o ./build
 # build/climate_control.c   + build/greenhouse.c
 # build/climate_control.rs  + build/greenhouse.rs
 # build/climate_control.lean + build/greenhouse.lean
-# ... all 36 targets`,
+# ... selected configured targets`,
         explanation: [],
       },
     ],
@@ -413,7 +413,7 @@ fn autopilot_inner(roll_err: Real, pitch_err: Real) -> (Real, Real) {
         explanation: [
           "Same math targets different hardware automatically.",
           "The FPGA allocator adjusts pipeline depth for the target clock speed.",
-          "ASIC mode estimates gate count for custom silicon (Phase 3 of the master roadmap).",
+          "ASIC mode is roadmap/planning language until synthesis and measurement evidence exists.",
           "You design the math ONCE. Forge handles the hardware mapping.",
         ],
       },
@@ -432,8 +432,8 @@ fn autopilot_inner(roll_err: Real, pitch_err: Real) -> (Real, Real) {
     time: "10 min",
     intro:
       "The real power of EML isn't any single target — it's that one source "
-      + "file produces ALL targets simultaneously, and they're all guaranteed "
-      + "to compute the same math.",
+      + "file can produce a reviewed bundle of selected artifacts, with each "
+      + "target carrying its own validation evidence and claim boundary.",
     sections: [
       {
         heading: "The development workflow",
@@ -441,31 +441,31 @@ fn autopilot_inner(roll_err: Real, pitch_err: Real) -> (Real, Real) {
 eml-compile controller.eml --target python -o controller.py
 python -c "import controller; print(controller.pid(1.0, 0.0, 2.5, 0.1))"
 
-# Step 2: Verify with Lean (prove correctness)
+# Step 2: Emit Lean obligations (then prove separately)
 eml-compile controller.eml --target lean -o controller.lean
-cd lean-project && lake build  # Lean kernel says yes or no
+cd lean-project && lake build  # checks only completed proofs
 
 # Step 3: Build production in Rust (performance)
 eml-compile controller.eml --target rust -o controller.rs
 cargo build --release
 
-# Step 4: Generate certified Ada (safety-critical, Pro tier)
+# Step 4: Generate Ada/SPARK-shaped artifacts (safety review, Pro tier)
 eml-compile controller.eml --target ada -o controller.ads
 gnatprove -P controller.gpr  # SPARK formal analysis
 
-# Step 5: Synthesize FPGA (hardware, Pro tier)
+# Step 5: Emit and synthesize FPGA candidate (hardware review, Pro tier)
 eml-compile controller.eml --target verilog -o controller.v
 vivado -mode batch -source synth.tcl  # synthesis
 
-# All five outputs compute EXACTLY the same math.
-# Change the .eml file → all five update together.`,
+# Each output needs target-specific validation evidence.
+# Change the .eml file → regenerate the reviewed artifact bundle.`,
         explanation: [
           "Python for prototyping (seconds to test).",
-          "Lean for verification (minutes to prove).",
-          "Rust/C for production deployment (performance).",
-          "Ada/SPARK for safety-critical certification.",
-          "Verilog for hardware acceleration.",
-          "One source. Many targets. Zero translation errors.",
+          "Lean for proof obligations; only completed Lean proofs become proof evidence.",
+          "Rust/C for production-oriented code review.",
+          "Ada/SPARK for safety-critical analysis paths.",
+          "Verilog for hardware candidates after simulation and synthesis.",
+          "One source. Many artifacts. Validation is explicit per target.",
         ],
       },
       {
@@ -480,13 +480,15 @@ jobs:
       - uses: actions/checkout@v4
       - run: pip install monogate-forge
 
-      # Compile all targets
-      - run: eml-compile src/*.eml --target all -o build/
+      # Emit selected reviewed targets
+      - run: eml-compile src/*.eml --target python -o build/python/
+      - run: eml-compile src/*.eml --target c -o build/c/
+      - run: eml-compile src/*.eml --target lean -o build/lean/
 
       # Run Python tests
       - run: pytest build/test_*.py
 
-      # Verify Lean proofs
+      # Check completed Lean proofs; theorem stubs are not proof claims
       - run: cd build && lake build
 
       # Check chain-order budget (every fn <= chain 3)
@@ -497,18 +499,18 @@ jobs:
               && exit 1 || true
           done`,
         explanation: [
-          "Every push compiles, tests, and verifies automatically.",
+          "Every push emits the reviewed targets and runs available checks.",
           "The grep pass enforces a complexity budget in CI — fails on chain ≥ 4.",
           "If someone adds a chain-4 function, the build fails. Intentional.",
-          "The proof check catches contract violations before deployment.",
+          "The proof check only supports claims for obligations with completed proofs.",
         ],
       },
       {
         heading: "When to use which target",
         code: `# DECISION MATRIX
 #
-# Need speed?         → C, Rust, or FPGA (Verilog)
-# Need safety cert?   → Ada/SPARK (DO-178C), then Lean proof
+# Need speed?         → C or Rust first; FPGA after hardware evidence
+# Need safety cert?   → Ada/SPARK + completed proof evidence
 # Need prototyping?   → Python
 # Need browser?       → JavaScript (WebAssembly Pro)
 # Need browser GPU?   → WGSL (WebGPU)
@@ -516,13 +518,13 @@ jobs:
 # Need iOS / macOS?   → Swift
 # Need game engine?   → C# (Unity), GDScript (Godot), Luau (Roblox)
 # Need smart contract?→ Solidity
-# Need formal proof?  → Lean, Coq, or Isabelle/HOL
+# Need formal proof?  → Lean, Coq, or Isabelle/HOL with completed proofs
 # Need automotive?    → AUTOSAR (.arxml)
 # Need avionics?      → AADL + Ada/SPARK
 # Need robotics?      → ROS2 package
 # Need MATLAB compat? → MATLAB (.m)
 #
-# Need ALL of them?   → --target all`,
+# Need a public claim?→ evidence packet first`,
         explanation: [],
       },
     ],

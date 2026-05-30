@@ -282,9 +282,9 @@ export default function LearnHubClient({
             maxWidth: 640,
           }}
         >
-          Write math in EML and compile to 36 targets including FPGA hardware,
-          or prove your math is correct in Lean&nbsp;4 with the PETAL
-          curriculum. Progress saves locally — pick up where you left off.
+          Write math in EML, inspect its cost profile, and emit selected
+          targets, or practice Lean&nbsp;4 proof work with the PETAL curriculum.
+          Progress saves locally — pick up where you left off.
         </p>
       </header>
 
@@ -299,7 +299,7 @@ export default function LearnHubClient({
         <Card
           accent={ACCENT_GOLD}
           title="EML-lang in 30 Minutes"
-          subtitle="Write math. Compile to 36 targets. No prerequisites beyond algebra. Level 2+ available after."
+          subtitle="Write math. Inspect profiles. Emit selected targets. No prerequisites beyond algebra. Level 2+ available after."
           badge="6 lessons · 30 minutes · beginner"
           href="/learn/eml/intro"
           buttonLabel="Start Learning →"
