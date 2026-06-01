@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   description:
     "Level 1 of the EML curriculum. Six lessons, five minutes each. By "
     + "the end you'll have written your own equation, emitted selected "
-    + "target artifacts, inspected hardware profiles and Lean theorem "
-    + "scaffolds, and read the chain-order profile.",
+    + "software artifacts, read a chain-order profile, and seen how "
+    + "proof-shaped and hardware-shaped obligations stay evidence-bound.",
 };
 
 const ACCENT_GOLD = "#E8A020";
@@ -226,6 +226,96 @@ function StrongLine({ children }: { children: React.ReactNode }) {
   );
 }
 
+function BoundaryNote({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        margin: "18px 0",
+        padding: "14px 18px",
+        background: "rgba(106, 176, 245, 0.07)",
+        border: `1px solid rgba(106, 176, 245, 0.22)`,
+        borderRadius: 4,
+        color: TEXT,
+        fontSize: "0.92rem",
+        lineHeight: 1.65,
+      }}
+    >
+      <div
+        style={{
+          color: ACCENT_BLUE,
+          fontSize: 10.5,
+          fontWeight: 700,
+          letterSpacing: 1.5,
+          marginBottom: 8,
+        }}
+      >
+        CLAIM BOUNDARY
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function EvidenceFlow() {
+  const steps = [
+    { label: "EML source", detail: "one equation" },
+    { label: "Selected artifact", detail: "Python / C" },
+    { label: "Profile", detail: "chain order" },
+    { label: "Evidence packet", detail: "claim boundary" },
+    { label: "Review", detail: "human decision" },
+  ];
+  return (
+    <div
+      style={{
+        margin: "20px 0",
+        padding: "18px",
+        background: SURFACE_2,
+        border: `1px solid ${BORDER}`,
+        borderRadius: 4,
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(118px, 1fr))",
+          gap: 10,
+        }}
+      >
+        {steps.map((step, index) => (
+          <div
+            key={step.label}
+            style={{
+              minHeight: 86,
+              padding: "12px",
+              border: `1px solid ${index === steps.length - 1 ? "rgba(74, 222, 128, 0.32)" : BORDER}`,
+              borderRadius: 4,
+              background: index === 0 ? "rgba(232, 160, 32, 0.08)" : SURFACE,
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                color: index === steps.length - 1 ? ACCENT_GREEN : ACCENT_GOLD,
+                fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                fontSize: 10.5,
+                marginBottom: 8,
+              }}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </div>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: 13 }}>
+              {step.label}
+            </div>
+            <div style={{ color: MUTED, fontSize: 12, marginTop: 4 }}>
+              {step.detail}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Page ─────────────────────────────────────────────────────
 
 export default function ForgeTutorialPage() {
@@ -252,7 +342,7 @@ export default function ForgeTutorialPage() {
             ← /learn/eml
           </a>
         </div>
-        <Eyebrow>Monogate Forge · Level 1 · 30-minute crash course</Eyebrow>
+        <Eyebrow>EML-lang · Level 1 · 30-minute crash course</Eyebrow>
         <h1
           style={{
             fontSize: "clamp(1.9rem, 6vw, 2.6rem)",
@@ -273,9 +363,9 @@ export default function ForgeTutorialPage() {
           }}
         >
           Six lessons, five minutes each. By the end you&apos;ll have written
-          your own equation, emitted selected target artifacts, inspected
-          hardware profiles and Lean theorem scaffolds, and read the
-          chain-order profile that predicts numerical behaviour.
+          your own equation, emitted selected software artifacts, read the
+          chain-order profile, and seen how proof-shaped and hardware-shaped
+          obligations stay evidence-bound.
         </p>
         <div
           style={{
@@ -325,7 +415,7 @@ export default function ForgeTutorialPage() {
           </li>
           <li>
             <a href="#l1" style={{ color: ACCENT_GOLD }}>
-              Emit selected targets and inspect the artifacts
+              Emit selected software artifacts and inspect them
             </a>
           </li>
           <li>
@@ -340,12 +430,12 @@ export default function ForgeTutorialPage() {
           </li>
           <li>
             <a href="#l4" style={{ color: ACCENT_GOLD }}>
-              Add a proof-shaped verification contract
+              Add a proof-shaped obligation
             </a>
           </li>
           <li>
             <a href="#l5" style={{ color: ACCENT_GOLD }}>
-              Inspect an FPGA-target profile
+              Preview a hardware-target profile
             </a>
           </li>
           <li>
@@ -359,6 +449,13 @@ export default function ForgeTutorialPage() {
           braces.
         </P>
       </section>
+
+      <BoundaryNote>
+        Level 1 uses selected local artifacts. Some Forge targets are
+        structural-only, roadmap-only, or require extra toolchain validation.
+        Hardware, proof, and broad source-roundtrip claims require separate
+        evidence packets before they are treated as supported.
+      </BoundaryNote>
 
       {/* ── Lesson 1 ───────────────────────────────────── */}
       <Lesson
@@ -387,35 +484,18 @@ add             → the name (you pick this)
 }               → end`}</Code>
 
         <Heading>Compile it</Heading>
-        <Code lang="bash">{`python tools/cli/main.py hello.eml --target all -o ./my_first`}</Code>
+        <Code lang="bash">{`python tools/cli/main.py hello.eml --target python,c -o ./my_first`}</Code>
 
         <Heading>What you get</Heading>
         <Code>{`my_first/
-  hello.c           ← your equation in C
-  hello.cpp         ← your equation in C++
-  hello.rs          ← your equation in Rust
-  hello.py          ← your equation in Python
-  hello.ll          ← your equation in LLVM IR
-  hello.wasm.ll     ← your equation in WebAssembly
-  hello.lean        ← a Lean theorem scaffold
-  hello.v           ← Verilog output when the hardware path is enabled
-  hello.sv          ← SystemVerilog output when enabled
-  hello.vhd         ← VHDL output when enabled
-  Hello.scala       ← Chisel output when enabled
-  hello.ads         ← your equation in Ada/SPARK (spec)
-  hello.adb         ← your equation in Ada/SPARK (body)
-  hello.m           ← your equation in MATLAB
-  hello.go          ← your equation in Go
-  hello.kt          ← your equation in Kotlin
-  Hello.java        ← your equation in Java
-  hello.aadl        ← your equation as an AADL component
-  hello.arxml       ← your equation as an AUTOSAR SWC
-  hello_pkg/        ← your equation as a ROS2 package`}</Code>
+  hello.py          ← selected Python artifact
+  hello.c           ← selected C artifact
+  profile.json      ← structural profile and claim boundary`}</Code>
 
         <P>
           Open <Inline>hello.c</Inline> and look:
         </P>
-        <Code lang="hello.c">{`// Generated by Monogate Forge
+        <Code lang="hello.c">{`// Generated by selected EML backend
 // Source: hello.eml
 // Chain order: 0 | Cost class: p0-d2-w0-c0
 
@@ -423,32 +503,26 @@ double add(double a, double b) {
     return a + b;
 }`}</Code>
 
-        <P>Your equation. In C. Ready to compile and run.</P>
-
         <P>
-          Open <Inline>hello.v</Inline> and look:
+          Your equation, lowered into a small C artifact for inspection and
+          local validation.
         </P>
-        <Code lang="hello.v">{`// Generated by Monogate Forge
-// Source: hello.eml
-// Chain order: 0 | FPGA: 1 MAC unit
 
-module add (
-    input  wire signed [63:0] a,
-    input  wire signed [63:0] b,
-    output wire signed [63:0] result
-);
-    assign result = a + b;
-endmodule`}</Code>
-
-        <P>Your equation as a hardware module candidate, ready for simulation and hardware review.</P>
+        <Heading>The evidence shape</Heading>
+        <EvidenceFlow />
+        <P>
+          The point is not to pretend every target is already production-ready.
+          The point is to keep the artifact, profile, evidence packet, and
+          reviewer boundary close together.
+        </P>
 
         <StrongLine>
-          You just turned one equation into inspectable software, proof-shaped, and hardware-shaped artifacts.
+          You just turned one equation into selected inspectable artifacts with an explicit evidence boundary.
         </StrongLine>
 
         <Exercise>
           Change <Inline>a + b</Inline> to <Inline>a * b</Inline>. Recompile.
-          Open the C and Verilog files. See how they changed.
+          Open the Python and C files. See how they changed.
         </Exercise>
       </Lesson>
 
@@ -517,7 +591,7 @@ eml(x, y)      exp(x) - ln(y)               adds 1`}</Code>
         <Code>{`exponential_decay:
   chain_order: 1            ← one transcendental layer (exp)
   cost_class:  p1-d3-w1-c0
-  drift_risk:  LOW          ← safe at float32
+  drift_risk:  LOW          ← check the sample range
 
 damped_wave:
   chain_order: 3            ← three layers (exp + cos)
@@ -526,20 +600,20 @@ damped_wave:
 
         <Heading>What chain order means (plain English)</Heading>
         <Code>{`Chain 0:   Just arithmetic. x + y, x * y, x^2.
-           Simple. Fast. Always precise.
-           Safe at any precision (even float16).
+           Usually simplest. Low drift risk on normal ranges.
+           Still validate your numeric range.
 
 Chain 1:   One exp or ln involved.
            Like exponential decay, compound interest.
-           Still safe. Slight precision consideration.
+           Often manageable. Check domains and exponent size.
 
 Chain 2:   Trig involved. sin, cos, tanh.
            Like oscillations, waves, rotations.
-           Needs float32 minimum.
+           Usually wants float32+ and sample-grid checks.
 
 Chain 3+:  Multiple layers nested.
            Like exp(sin(x)) or damped oscillators.
-           Needs float64. FPGA needs more hardware units.
+           Often wants float64. FPGA profiles need review.
            The compiler warns you automatically.`}</Code>
 
         <Exercise>
@@ -570,24 +644,23 @@ fn pid(error: Real, integral: Real, derivative: Real) -> Real {
         <P>That&apos;s a complete PID controller.</P>
 
         <Heading>Compile it</Heading>
-        <Code lang="bash">{`python tools/cli/main.py pid_controller.eml --target all -o ./pid_out`}</Code>
+        <Code lang="bash">{`python tools/cli/main.py pid_controller.eml --target python,c --explain -o ./pid_out`}</Code>
 
         <Heading>What the compiler tells you</Heading>
         <Code>{`pid:
   chain_order: 0              ← purely polynomial (no exp/sin)
   nodes:       6              ← 6 arithmetic operations
   cost_class:  p0-d6-w0-c0
-  drift_risk:  NONE           ← safe at ANY precision
-  fpga_estimate:
-    exp_units: 0              ← no transcendental hardware
-    luts:      estimate only   ← hardware-review input
-    latency:   estimate only   ← requires simulation/synthesis evidence`}</Code>
+  drift_risk:  LOW            ← still validate the input range
+  evidence:
+    selected_targets: python, c
+    hardware_profile: not requested in this lesson`}</Code>
 
         <P>
           Chain order 0 means this PID is just arithmetic. No{" "}
           <Inline>exp</Inline>. No <Inline>sin</Inline>. Pure math. That makes
-          it a good candidate for the hardware path once simulation and board
-          evidence are attached.
+          it easier to inspect, but deployment still needs tests for the
+          numeric range you care about.
         </P>
 
         <Heading>Now make it nonlinear</Heading>
@@ -603,15 +676,12 @@ fn adaptive_pid(error: Real, t: Real) -> Real {
         <Code>{`adaptive_pid:
   chain_order: 3              ← jumped from 0 to 3!
   drift_risk:  MEDIUM         ← float64 recommended
-  fpga_estimate:
-    exp_units:  1             ← needs exp hardware
-    trig_units: 1             ← needs cos hardware
-    luts:       higher estimate ← more hardware-review pressure`}</Code>
+  review_note:  nested exp/cos path needs stronger numeric evidence`}</Code>
 
         <StrongLine>
           The compiler told you the complexity jumped. Before you ran
-          anything. Before you built any hardware. Before you spent any
-          money. The chain order predicts the cost.
+          anything expensive. Chain order is a review signal, not a proof of
+          speed, stability, or deployability.
         </StrongLine>
 
         <Exercise>
@@ -627,12 +697,12 @@ fn adaptive_pid(error: Real, t: Real) -> Real {
       {/* ── Lesson 4 ───────────────────────────────────── */}
       <Lesson
         num={4}
-        title="Formal verification"
+        title="Proof-shaped obligations"
         minutes={5}
         anchor="l4"
         accent={ACCENT_PURPLE}
       >
-        <Heading>Making the compiler state what must be proved</Heading>
+        <Heading>Making the artifact state what must be proved</Heading>
         <P>
           Add <Inline>@verify</Inline> to any function:
         </P>
@@ -651,7 +721,7 @@ fn safe_pid(error: Real, integral: Real) -> Real
 
         <P>What the new keywords mean:</P>
         <Code>{`@verify(lean, theorem = "pid_is_bounded")
-  → "Generate a Lean theorem scaffold for this function"
+  → "Generate a Lean theorem-shaped scaffold for this function"
   → The theorem will be named "pid_is_bounded"
 
 requires (abs(error) < 50.0)
@@ -659,8 +729,8 @@ requires (abs(error) < 50.0)
   → If someone passes error = 999, that's THEIR bug, not yours
 
 ensures (abs(result) < max_output)
-  → "I PROMISE the output is always between -100 and 100"
-  → The compiler generates a proof obligation for this promise`}</Code>
+  → "This is the safety property I want evidence for"
+  → The artifact records a proof obligation for that property`}</Code>
 
         <Heading>Compile with verification</Heading>
         <Code lang="bash">{`python tools/cli/main.py safe_pid.eml --target lean -o ./verified.lean`}</Code>
@@ -687,8 +757,7 @@ theorem pid_is_bounded
         <P>
           The compiler generated the <strong>theorem statement</strong>. The{" "}
           <Inline>sorry</Inline> means the proof isn&apos;t filled in yet.
-          That&apos;s where MachLib&apos;s proof corpus (or an agent) closes
-          it.
+          That is an explicit open obligation, not a proof claim.
         </P>
 
         <Heading>Why this matters</Heading>
@@ -702,14 +771,12 @@ WITH @verify:
   "A checked proof can close the obligation later."
   "The claim boundary is visible instead of hidden."`}</Code>
 
-        <Heading>One annotation, many provers</Heading>
+        <Heading>Advanced preview: other proof targets</Heading>
         <P>
-          The same <Inline>@verify(lean, ...)</Inline> block also drives
-          Coq, Isabelle/HOL, Ada SPARK Pre/Post aspects, SystemVerilog SVA
-          assertions, MATLAB asserts, Java/Kotlin/Go runtime guards, and
-          Doxygen contract comments where those targets are enabled. One
-          source can carry the same obligation shape across multiple
-          ecosystems, but proof and runtime validation remain target-specific.
+          The same obligation shape can be routed to other proof-shaped or
+          contract-shaped targets where those local backends are enabled. Each
+          target still needs its own validation; emitting a scaffold is not the
+          same thing as discharging a proof.
         </P>
         <Code lang="bash">{`python tools/cli/main.py safe_pid.eml --target coq      -o ./safe.v
 python tools/cli/main.py safe_pid.eml --target isabelle -o ./Safe.thy
@@ -730,7 +797,7 @@ python tools/cli/main.py safe_pid.eml --target ada      -o ./safe.adb`}</Code>
       {/* ── Lesson 5 ───────────────────────────────────── */}
       <Lesson
         num={5}
-        title="Hardware profile"
+        title="Hardware-shaped preview"
         minutes={5}
         anchor="l5"
         accent={ACCENT_GOLD}
@@ -747,7 +814,7 @@ fn hardware_pid(error: Real, integral: Real) -> Real {
     Kp * error + Ki * integral
 }`}</Code>
 
-        <Heading>Emit Verilog (or SystemVerilog)</Heading>
+        <Heading>Emit a hardware-shaped artifact</Heading>
         <Code lang="bash">{`python tools/cli/main.py fpga_pid.eml --target verilog -o ./hw/pid.v
 python tools/cli/main.py fpga_pid.eml --target systemverilog -o ./hw/pid.sv`}</Code>
         <P>The compiler tells you:</P>
@@ -758,14 +825,14 @@ python tools/cli/main.py fpga_pid.eml --target systemverilog -o ./hw/pid.sv`}</C
     DSP blocks: 2
     exp units: 0 (not needed — chain 0)
     clock:     100 MHz
-    latency:   2 cycles (estimate)
+    latency:   estimate only
     utilization: planning estimate only`}</Code>
 
         <P>
-          Open <Inline>hw/pid.v</Inline>:
+          A selected hardware-shaped artifact may look like:
         </P>
         <Code lang="verilog">{`// Generated by EML-lang Verilog backend
-// Chain order: 0 | 48 LUTs | 2 DSPs | 20 ns latency
+// Chain order: 0 | planning profile only
 
 module hardware_pid_pipeline #(
     parameter WIDTH = 32
@@ -799,6 +866,11 @@ endmodule`}</Code>
           steps are simulation, synthesis, board integration, and an evidence
           packet before any hardware-deployment claim.
         </P>
+        <BoundaryNote>
+          Level 1 does not claim hardware validation. Verilog-like output,
+          FPGA estimates, and hardware annotations are review inputs until
+          simulation, synthesis, and board evidence are attached.
+        </BoundaryNote>
 
         <Heading>What the numbers mean</Heading>
         <Code>{`LUTs:      Estimated logic blocks for the selected FPGA profile.
@@ -818,8 +890,8 @@ For comparison:
 
         <Exercise>
           Take the <Inline>damped_wave</Inline> from Lesson 2. Add{" "}
-          <Inline>@target(fpga)</Inline>. Compile. Compare the FPGA
-          allocation estimate to the simple PID.
+          <Inline>@target(fpga)</Inline>. Compare the hardware-review notes
+          to the simple PID.
           <span style={{ color: MUTED }}>
             {" "}
             (The damped wave needs exp + cos hardware units. More
@@ -890,8 +962,8 @@ fn realtime_spring(x: Real, v: Real) -> Real {
     spring_force(x, v)
 }`}</Code>
 
-        <Heading>Compile everything</Heading>
-        <Code lang="bash">{`python tools/cli/main.py my_project.eml --target all -o ./my_build`}</Code>
+        <Heading>Compile the selected lesson artifacts</Heading>
+        <Code lang="bash">{`python tools/cli/main.py my_project.eml --target python,c --explain -o ./my_build`}</Code>
 
         <Heading>What you just did</Heading>
         <Code>{`In 30 minutes you:
@@ -900,15 +972,15 @@ fn realtime_spring(x: Real, v: Real) -> Real {
   2. Used transcendental functions (exp, sin, cos)
   3. Read chain-order profiles
   4. Built a PID controller
-  5. Added proof-shaped obligations (@verify)
-  6. Inspected a hardware-target profile (@target)
+  5. Added proof-shaped obligations (@verify) without claiming proof
+  6. Previewed a hardware-shaped profile (@target) without claiming hardware validation
   7. Built YOUR OWN bounded artifact
 
 You can now:
   - Write any equation in EML-lang
-  - Emit selected software, proof-shaped, and hardware-shaped artifacts
+  - Emit selected software artifacts for inspection
   - Read the structural profile (chain order, drift risk)
-  - State proof obligations for safety-critical functions
+  - State proof obligations for later proof work
   - Prepare hardware candidates for simulation and evidence review`}</Code>
 
         <StrongLine>
@@ -955,22 +1027,22 @@ MATH
   eml(x, y) = exp(x) - ln(y)  fundamental EML operator
 
 ANNOTATIONS
-  @verify(lean, theorem = "name")  generate a formal proof
-  @target(fpga, clock_mhz = N)     compile to FPGA
+  @verify(lean, theorem = "name")  record a proof-shaped obligation
+  @target(fpga, clock_mhz = N)     record a hardware-shaped profile
   requires CONDITION               input precondition
   ensures  CONDITION               output postcondition
 
 COMPILE
-  python tools/cli/main.py file.eml --target all -o ./out
+  python tools/cli/main.py file.eml --target python,c -o ./out
   python tools/cli/main.py file.eml --target c -o out.c
-  python tools/cli/main.py file.eml --target verilog -o out.v
-  python tools/cli/main.py file.eml --target lean -o out.lean
+  python tools/cli/main.py file.eml --target lean -o out.lean       preview scaffold
+  python tools/cli/main.py file.eml --target verilog -o out.v       preview artifact
 
 PROFILE READING
-  chain_order: 0   polynomial (simple, always safe)
-  chain_order: 1   exponential (one layer, safe)
-  chain_order: 2   trigonometric (needs float32+)
-  chain_order: 3+  nested (needs float64, more FPGA)
+  chain_order: 0   polynomial (usually low drift risk)
+  chain_order: 1   exponential (check domains and exponent size)
+  chain_order: 2   trigonometric (sample-grid checks recommended)
+  chain_order: 3+  nested (stronger numeric review recommended)
   drift_risk: LOW / MEDIUM / HIGH  precision warning`}</Code>
       </section>
 
@@ -1002,62 +1074,30 @@ PROFILE READING
           }}
         >
           <li>
-            <strong style={{ color: "#fff" }}>Explore the examples.</strong>{" "}
-            <Inline>examples/</Inline> ships 12 short, public teaching{" "}
-            <Inline>.eml</Inline> files. Upgrade to{" "}
-            <a
-              href="https://monogateforge.com/get-started"
-              style={{ color: "#fff", textDecoration: "underline" }}
-            >
-              Forge Pro
-            </a>{" "}
-            for access to 280+ verified industry kernels across
-            23 verticals.
-          </li>
-          <li>
-            <strong style={{ color: "#fff" }}>Read the language guide.</strong>{" "}
-            <Inline>monogate-forge/docs/language_guide.md</Inline>.
-          </li>
-          <li>
-            <strong style={{ color: "#fff" }}>Try the interactive demos.</strong>{" "}
-            <a href="https://1op.io/playground" style={{ color: ACCENT_GOLD }}>
-              1op.io/playground
-            </a>
-            .
-          </li>
-          <li>
-            <strong style={{ color: "#fff" }}>Join the ecosystem.</strong>
-            <ul style={{ marginTop: 6, marginBottom: 0, paddingLeft: 18 }}>
-              <li>
-                <a
-                  href="https://monogateforge.com"
-                  style={{ color: ACCENT_GOLD }}
-                >
-                  monogateforge.com
-                </a>{" "}
-                → the compiler
-              </li>
-              <li>
-                <a href="https://machlib.org" style={{ color: ACCENT_GOLD }}>
-                  machlib.org
-                </a>{" "}
-                → machine-native math library
-              </li>
-              <li>
-                <a href="https://capcard.ai" style={{ color: ACCENT_GOLD }}>
-                  capcard.ai
-                </a>{" "}
-                → agent certification
-              </li>
-              <li>
-                <a href="https://monogate.org" style={{ color: ACCENT_GOLD }}>
-                  monogate.org
-                </a>{" "}
-                → the research behind it all
-              </li>
-            </ul>
+            <strong style={{ color: "#fff" }}>Build one bounded packet.</strong>{" "}
+            Take one equation from this lesson, emit selected Python/C
+            artifacts, save the chain-order profile, and write down which
+            claims are still blocked.
           </li>
         </ol>
+        <p style={{ marginTop: 18 }}>
+          <a
+            href="/explorer/eml-packets/builder"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              color: "#0b0d12",
+              background: ACCENT_GOLD,
+              borderRadius: 4,
+              padding: "10px 14px",
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            Open the packet builder
+          </a>
+        </p>
       </section>
     </main>
   );
