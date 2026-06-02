@@ -7,6 +7,7 @@ const nextConfig = {
       // served from the synced Vite artifact in public/electronics-lab.
       // Do not add an app/electronics route here; it will shadow these rewrites.
       { source: "/electronics", destination: "/electronics-lab/index.html" },
+      { source: "/electronics/:path*", destination: "/electronics-lab/index.html" },
       { source: "/electronics/trainer-board-v0", destination: "/electronics-lab/index.html" },
       { source: "/electronics/trainer-board-v0/:path*", destination: "/electronics-lab/index.html" },
       { source: "/electronics/arty-a7", destination: "/electronics-lab/index.html" },
