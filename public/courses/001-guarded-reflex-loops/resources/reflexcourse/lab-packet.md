@@ -1,6 +1,6 @@
-# Reflex Lab 01: Pot to Guarded LED
+# Reflex Lab 01: Build Your First Guarded Reflex Circuit
 
-## Monogate Trainer Board v0 First Live Lab Demo Packet
+## Monogate Reflex Course First Live Lab Demo Packet
 
 ### Threshold Reflex - Your First Verifiable EML Hardware Demo
 
@@ -11,13 +11,13 @@ trace that can be validated and replayed
 
 ## Welcome!
 
-Hi! Welcome to **Reflex Lab 01**, your very first Monogate Trainer Board v0 lab.
+Hi! Welcome to **Reflex Lab 01**, your very first Monogate Reflex Course lab.
 
 Today you're going to build a tiny but powerful circuit that shows the real
 magic of Monogate:
 
 ```text
-One clean kernel -> makes a guarded decision -> lights an LED -> leaves a trace anyone can check
+One clean EML kernel -> makes a guarded decision -> drives LED/button/buzzer I/O -> leaves a trace anyone can check
 ```
 
 By the end you'll have:
@@ -25,8 +25,19 @@ By the end you'll have:
 - A working breadboard circuit
 - Live kernel-controlled behavior you can see and tweak
 - A verifiable trace you can replay and share
+- A claim-bounded evidence packet starter
 
 Let's get started!
+
+## What You'll See
+
+This lab has three visible "wow" moments:
+
+1. Turning the potentiometer changes the live dashboard value.
+2. The LED follows the guarded output instead of blindly following the raw request.
+3. When the request tries to go past the safe limit, the guard clamps it and the trace proves when it happened.
+
+In Lab 01B, you add a button and buzzer. The button mutes the buzzer while the LED and guard behavior keep running, which makes the input/output boundary easy to feel.
 
 ## Naming Map
 
@@ -34,16 +45,16 @@ Let's get started!
 | --- | --- |
 | Platform | Monogate Electronics |
 | Track | Reflex Lab Series |
-| Board | Trainer Board v0 |
-| Course | Reflex Lab 01: Pot to Guarded LED |
+| Board | Reflex Course |
+| Course | Reflex Lab 01: Pot to Guarded Output |
 | Kernel | `threshold_reflex_v0` |
 
 ## Learning Objectives
 
 By the end of this lab you will be able to:
 
-- Wire a safe ESP32 + potentiometer + LED circuit on a breadboard
-- Understand how `threshold_reflex_v0` controls a visible trainer-board output
+- Wire a safe ESP32 + potentiometer + LED/button/buzzer circuit on a breadboard
+- Understand how `threshold_reflex_v0` controls visible breadboard outputs
 - Capture and replay a live trace that shows whether the guard clamp fired
 - Explain the Monogate way: input -> EML kernel -> guard decision -> visible output -> verifiable evidence
 
@@ -53,9 +64,11 @@ Please read this before wiring:
 
 - Use only 3.3V, never 5V, for this demo
 - Always use the 220 ohm or 330 ohm resistor with the LED
+- Disconnect USB before adding the Lab 01B button and buzzer stage
+- Use the 1 kOhm resistor with the passive piezo buzzer stage
 - Never connect the potentiometer to 5V or VIN
 - If anything gets warm, unplug immediately
-- Do not add motors, relays, buzzers, or high-current parts yet
+- Do not add motors, relays, solenoids, coils, or high-current parts yet
 
 ## What You Need
 
@@ -67,61 +80,36 @@ Required for this first demo:
 - Jumper wires, male-to-male
 - 10 kOhm potentiometer
 - One LED, any color
-- 220 ohm or 330 ohm resistor
+- 220 ohm or 330 ohm LED resistor
+- Tactile button
+- Passive piezo buzzer
+- 1 kOhm buzzer resistor
 - Laptop with power
 
 Nice-to-have for later demos, not needed today:
 
-- Piezo buzzer
-- Momentary button
 - SSD1306 OLED
 - BME280 sensor
 
-## Software Prerequisites
+## Software Setup: Do This First
 
-Set these up before the bench build. Software issues are the easiest way for a
-good wiring session to stall.
+Before touching wires, get the computer ready. This usually takes 10-20 minutes the first time.
 
-Required:
+### 1. Install Arduino IDE 2.x
 
-- This `monogate-electronics` folder
-- Python 3.10 or newer
-- A terminal:
-  - Windows: PowerShell
-  - macOS/Linux: Terminal
-- Arduino IDE 2.x or Arduino CLI
-- ESP32 board support installed in Arduino tooling
-- A USB data cable, not a charge-only cable
-
-Recommended:
-
-- Git, if you plan to pull updates from the repo
-- A text editor such as VS Code
-- `just`, optional, for shortcut commands
-
-Check Python:
-
-```powershell
-python --version
-```
-
-Expected:
+Download Arduino IDE from:
 
 ```text
-Python 3.10 or newer
+https://www.arduino.cc/en/software
 ```
 
-If `python` is not found on Windows, try:
+Install it normally.
 
-```powershell
-py --version
-```
-
-For Arduino IDE, install ESP32 support:
+### 2. Add ESP32 Board Support
 
 1. Open Arduino IDE.
 2. Go to `File` -> `Preferences`.
-3. Add this to `Additional boards manager URLs`:
+3. In `Additional boards manager URLs`, paste:
 
 ```text
 https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
@@ -131,19 +119,39 @@ https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32
 5. Search for `esp32`.
 6. Install `esp32 by Espressif Systems`.
 
-Before uploading firmware, confirm Arduino IDE can see your ESP32 port under:
+### 3. Get The Firmware
+
+The firmware is in the Monogate Electronics repository:
+
+```text
+kernels/threshold_reflex_v0/esp32/threshold_reflex_v0/threshold_reflex_v0.ino
+```
+
+If you are using Git, clone or pull the repo. If you are not using Git, download the repository ZIP from GitHub and open that `.ino` file in Arduino IDE.
+
+### 4. Check Your USB Cable
+
+Use a USB data cable. A charge-only cable may power the ESP32 but will not show a serial port.
+
+Before uploading firmware, confirm Arduino IDE can see your ESP32 port:
 
 ```text
 Tools -> Port
 ```
 
-If no port appears, try another USB cable first. Many USB cables provide power
-but do not carry data.
+If no port appears, try another USB cable first.
 
-## Step 1: Computer Setup And Dry Run
+### Optional: Python Trace Tools
 
-Do this before you touch any wires. It proves everything works on your computer
-first.
+Python is only needed for local trace validation and replay commands. If you want to run those checks on your laptop, install Python 3.10 or newer and confirm:
+
+```powershell
+python --version
+```
+
+## Step 1: Optional Computer Dry Run
+
+Do this before you touch wires if you want the full Monogate validation path on your laptop. It proves the kernel and golden trace are healthy before hardware enters the loop.
 
 Open your terminal or PowerShell in the `monogate-electronics` folder.
 
@@ -193,6 +201,11 @@ Pot middle/wiper -> ESP32 GPIO34
 Pot outer leg 2 -> blue/- rail
 ESP32 GPIO25 -> 220/330 ohm resistor -> LED long leg
 LED short leg -> blue/- rail
+-- stop here for Reflex Lab 01A bring-up --
+ESP32 GPIO27 -> tactile button
+Button other side -> blue/- rail
+ESP32 GPIO26 -> 1 kOhm resistor -> piezo +
+Piezo - -> blue/- rail
 ```
 
 ### Beginner Step-By-Step
@@ -251,6 +264,52 @@ Final safety check before power:
 - No extra parts are connected yet
 
 Take a photo of your finished breadboard.
+
+#### 2D. Stop, Program, Then Continue To Reflex Lab 01B
+
+Do not add the buzzer yet. First power the 01A LED build, upload firmware, and
+confirm the dashboard reacts to the potentiometer.
+
+After 01A works, disconnect USB. Lab 01B adds a digital button input and the
+audible buzzer output.
+
+#### 2E. Add The Button
+
+Wire:
+
+```text
+ESP32 GPIO27 -> tactile button GPIO side
+Button other side -> blue/- rail
+```
+
+Check:
+
+```text
+The button shares ESP32 ground.
+No button leg is connected to 3V3, VIN, or 5V.
+```
+
+#### 2F. Add The Buzzer And Resistor
+
+Wire:
+
+```text
+ESP32 GPIO26 -> one end of 1 kOhm resistor
+Other end of resistor -> piezo + leg
+Piezo - leg -> blue/- rail
+```
+
+Check:
+
+```text
+The buzzer shares ground with the ESP32.
+The buzzer signal comes through the resistor.
+No buzzer lead is connected to VIN or 5V.
+```
+
+If your buzzer is very quiet, that is acceptable for this lab. The evidence
+claim is that the firmware reports and gates the audible output, not that the
+sound is loud.
 
 ## Step 3: Upload The Firmware
 
@@ -318,8 +377,10 @@ Slowly turn the potentiometer knob.
 What you should see:
 
 - When the knob is low, the LED is off or very dim
+- The buzzer stays off when the guarded output is below the audible threshold
 - As you turn through the threshold region, the LED gradually brightens
-- When the math would ask for too much power, the guard clamp kicks in
+- When the guarded output is high enough, the buzzer turns on
+- When the math would ask for too much output, the guard clamp kicks in
 
 This clamp is the star of the show. It is the kernel limiting the requested
 output before the trainer-board adapter drives the LED.
@@ -327,7 +388,7 @@ output before the trainer-board adapter drives the LED.
 The first demo path is:
 
 ```text
-potentiometer -> threshold_reflex_v0 -> guard clamp -> LED -> serial trace -> replay
+potentiometer -> threshold_reflex_v0 -> guard clamp -> LED/buzzer -> serial trace -> replay
 ```
 
 ## Step 5: Capture, Validate, And Replay Your Trace
@@ -336,19 +397,19 @@ When you're happy with the demo, copy the live JSON output from Serial Monitor
 into a new file:
 
 ```text
-evidence/trainer_board_v0/first_reflex_demo_YYYY_MM_DD/live_trace.jsonl
+evidence/reflexcourse/first_reflex_demo_YYYY_MM_DD/live_trace.jsonl
 ```
 
 Validate it:
 
 ```powershell
-python tools\validate_trace.py evidence\trainer_board_v0\first_reflex_demo_YYYY_MM_DD\live_trace.jsonl
+python tools\validate_trace.py evidence\reflexcourse\first_reflex_demo_YYYY_MM_DD\live_trace.jsonl
 ```
 
 Replay it:
 
 ```powershell
-python tools\replay_trace.py evidence\trainer_board_v0\first_reflex_demo_YYYY_MM_DD\live_trace.jsonl
+python tools\replay_trace.py evidence\reflexcourse\first_reflex_demo_YYYY_MM_DD\live_trace.jsonl
 ```
 
 Watch the LED behavior again on your screen.
@@ -363,16 +424,22 @@ Create a quick `FINDINGS.md` file in your evidence folder and answer:
 
 Save:
 
-- One photo of your breadboard
+- Photos of the parts, power rails, pot, LED/resistor path, buzzer/button path,
+  final powered breadboard, and dashboard capture
 - Your live trace file
+- Replay HTML exported from the dashboard
+- Dashboard PNG or screenshot
 - Validation output
 - Replay output
 - Any wiring notes
 
+Use the [Evidence Packet Guide](evidence-packet-guide.md) for the full photo
+and tutorial checklist.
+
 Run the packet manifest tool at the end:
 
 ```powershell
-python tools\make_packet.py evidence\trainer_board_v0\first_reflex_demo_YYYY_MM_DD
+python tools\make_packet.py evidence\reflexcourse\first_reflex_demo_YYYY_MM_DD
 ```
 
 ## Troubleshooting
@@ -409,7 +476,7 @@ Next steps, when you're ready:
 
 - Add the buzzer or button
 - Try other EML kernels
-- Move to a soldered Trainer Board in a future lesson
+- Rebuild the same loop as a permanent trainer board in a future lesson
 
 Drop your findings, photos, or questions in the Monogate group. I would love to
 see your demo.
