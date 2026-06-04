@@ -1,324 +1,1121 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
-import CopyButton from "./CopyButton";
+import LessonComplete from "./LessonComplete";
 
 export const metadata: Metadata = {
-  title: "EML Intro: Your First Guard Kernel",
+  title: "EML in 30 Minutes (Level 1) — monogate.dev/learn/eml/intro",
   description:
-    "Write a Reflex Guard function in EML, compile it toward ESP32 C, inspect the proof obligation, and watch the guard fire in the Monogate Electronics visualizer.",
+    "Level 1 of the EML curriculum. Six lessons, five minutes each. By "
+    + "the end you'll have written your own equation, emitted selected "
+    + "software artifacts, read a chain-order profile, and seen how "
+    + "proof-shaped and hardware-shaped obligations stay evidence-bound.",
 };
 
-const GREEN = "#4ADE80";
-const CYAN = "#6AB0F5";
-const GOLD = "#E8A020";
-const BG = "#08090e";
+const ACCENT_GOLD = "#E8A020";
+const ACCENT_GREEN = "#4ADE80";
+const ACCENT_BLUE = "#6AB0F5";
+const ACCENT_PURPLE = "#A78BFA";
 const SURFACE = "#0d0f18";
 const SURFACE_2 = "#12151f";
 const BORDER = "#1c1f2e";
 const TEXT = "#d4d4d4";
-const MUTED = "#7f8499";
+const MUTED = "#6a6e85";
 
-const emlSource = `module threshold_reflex;
+// ── Reusable bits ──────────────────────────────────────────
 
-fn guard(request: Real, limit: Real) -> Real
-    requires (limit > 0.0)
-    ensures (return <= limit)
-{
-    let clamped = request - (request - limit);
-    if request > limit { limit } else { request }
-}`;
-
-const compileC = `eml-compile threshold_reflex_v0.eml --target c --profile esp32`;
-const compileLean = `eml-compile threshold_reflex_v0.eml --target lean`;
-const compileVerilog = `eml-compile threshold_reflex_v0.eml --target verilog`;
-
-const generatedC = `#include <assert.h>
-
-double threshold_reflex_guard(double request, double limit) {
-    assert(limit > 0.0);
-    if (request > limit) {
-        return limit;
-    }
-    return request;
-}`;
-
-const inoAdapter = `#include "threshold_reflex_v0.h"
-
-void loop() {
-    int raw = analogRead(34);
-    double pot_raw = raw / 4095.0;
-    double requested_output = pot_raw;
-    double safe_output = threshold_reflex_guard(requested_output, 0.85);
-    const char* guard_action =
-        requested_output > safe_output ? "clamp_to_safe_output" : "pass_through";
-
-    Serial.printf(
-        "{\\"pot_raw\\":%.3f,\\"requested_output\\":%.3f,\\"safe_output\\":%.3f,\\"guard_action\\":\\"%s\\"}\\n",
-        pot_raw,
-        requested_output,
-        safe_output,
-        guard_action
-    );
-}`;
-
-const leanOutput = `def guard (request limit : Real) : Real :=
-  if request > limit then limit else request
-
-theorem guard_output_bounded
-    (request limit : Real)
-    (h_limit : limit > 0.0) :
-    guard request limit <= limit := by
-  unfold guard
-  by_cases h : request > limit
-  . simp [h]
-  . simp [h]
-    exact le_of_not_gt h`;
-
-const jsonFrame = `{
-  "pot_raw": 0.97,
-  "requested_output": 1.00,
-  "safe_output": 0.85,
-  "guard_action": "clamp_to_safe_output"
-}`;
-
-function Shell({ children }: { children: ReactNode }) {
+function Code({
+  lang,
+  children,
+}: {
+  lang?: string;
+  children: string;
+}) {
   return (
-    <main
+    <pre
       style={{
-        minHeight: "100vh",
-        background: BG,
+        background: SURFACE,
+        border: `1px solid ${BORDER}`,
+        borderRadius: 4,
+        padding: "16px 18px",
+        margin: "12px 0",
+        fontSize: 12.5,
+        lineHeight: 1.55,
+        fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
         color: TEXT,
-        fontFamily: "Space Mono, ui-monospace, SFMono-Regular, Menlo, monospace",
-        padding: "42px 18px 96px",
+        overflowX: "auto",
+        whiteSpace: "pre",
       }}
     >
-      <div style={{ maxWidth: 1040, margin: "0 auto" }}>{children}</div>
-    </main>
+      {lang ? (
+        <span style={{ color: MUTED, fontSize: 10, display: "block", marginBottom: 6 }}>
+          {lang}
+        </span>
+      ) : null}
+      <code style={{ color: "inherit", background: "transparent" }}>{children}</code>
+    </pre>
   );
 }
 
-function Section({ id, kicker, title, children }: { id: string; kicker: string; title: string; children: ReactNode }) {
+function Inline({ children }: { children: React.ReactNode }) {
   return (
-    <section
-      id={id}
+    <code
       style={{
-        padding: "34px 0",
-        borderTop: `1px solid ${BORDER}`,
-        display: "grid",
-        gap: 18,
+        fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+        fontSize: "0.92em",
+        color: ACCENT_GOLD,
+        background: "rgba(232, 160, 32, 0.08)",
+        padding: "1px 6px",
+        borderRadius: 3,
       }}
     >
-      <div>
-        <p style={{ margin: "0 0 8px", color: GOLD, fontSize: 12, fontWeight: 700, letterSpacing: 0, textTransform: "uppercase" }}>
-          {kicker}
-        </p>
-        <h2 style={{ margin: 0, color: "#fff", fontSize: "clamp(25px, 4vw, 38px)", lineHeight: 1.12 }}>{title}</h2>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function P({ children }: { children: ReactNode }) {
-  return <p style={{ margin: 0, color: TEXT, fontSize: 15, lineHeight: 1.72 }}>{children}</p>;
-}
-
-function Inline({ children }: { children: ReactNode }) {
-  return (
-    <code style={{ color: "#fff2a6", background: "rgba(232,160,32,0.10)", borderRadius: 3, padding: "1px 5px" }}>
       {children}
     </code>
   );
 }
 
-function CodeBlock({ code, lang, filename, command }: { code: string; lang?: string; filename?: string; command?: boolean }) {
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "grid", gap: 0 }}>
-      {filename ? (
-        <div
+    <div
+      style={{
+        fontSize: 11,
+        fontWeight: 600,
+        color: ACCENT_GOLD,
+        textTransform: "uppercase",
+        letterSpacing: 1.5,
+        marginBottom: 12,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Lesson({
+  num,
+  title,
+  minutes,
+  anchor,
+  accent,
+  children,
+}: {
+  num: number;
+  title: string;
+  minutes: number;
+  anchor: string;
+  accent: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      id={anchor}
+      style={{
+        marginTop: 56,
+        paddingTop: 32,
+        borderTop: `1px solid ${BORDER}`,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          alignItems: "baseline",
+          marginBottom: 6,
+        }}
+      >
+        <span
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 10,
-            alignItems: "center",
-            padding: "8px 10px",
-            border: `1px solid ${BORDER}`,
-            borderBottom: 0,
-            borderRadius: "6px 6px 0 0",
-            background: SURFACE_2,
-            color: CYAN,
-            fontSize: 12,
-            fontWeight: 700,
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            fontSize: 11,
+            color: accent,
+            letterSpacing: 1.5,
           }}
         >
-          <span>{filename}</span>
-          <CopyButton text={code} />
-        </div>
-      ) : null}
-      <div style={{ position: "relative" }}>
-        {!filename && (command || lang) ? (
-          <div style={{ position: "absolute", right: 8, top: 8, zIndex: 1 }}>
-            <CopyButton text={code} />
+          LESSON {num.toString().padStart(2, "0")}
+        </span>
+        <span style={{ fontSize: 11, color: MUTED }}>· {minutes} min</span>
+      </div>
+      <h2
+        style={{
+          fontSize: "clamp(1.4rem, 4vw, 1.8rem)",
+          fontWeight: 700,
+          color: "#fff",
+          marginBottom: 18,
+          lineHeight: 1.2,
+        }}
+      >
+        {title}
+      </h2>
+      {children}
+      <LessonComplete num={num} />
+    </section>
+  );
+}
+
+function Heading({ children }: { children: React.ReactNode }) {
+  return (
+    <h3
+      style={{
+        fontSize: "1.05rem",
+        fontWeight: 600,
+        color: "#eaeaea",
+        marginTop: 28,
+        marginBottom: 10,
+      }}
+    >
+      {children}
+    </h3>
+  );
+}
+
+function P({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        color: TEXT,
+        fontSize: "0.96rem",
+        lineHeight: 1.7,
+        margin: "10px 0",
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function Exercise({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        marginTop: 16,
+        padding: "14px 18px",
+        background: "rgba(74, 222, 128, 0.06)",
+        border: `1px solid rgba(74, 222, 128, 0.20)`,
+        borderRadius: 4,
+        fontSize: "0.92rem",
+        color: TEXT,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 10.5,
+          fontWeight: 700,
+          letterSpacing: 1.5,
+          color: ACCENT_GREEN,
+          marginBottom: 8,
+        }}
+      >
+        EXERCISE
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function StrongLine({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        margin: "20px 0",
+        fontSize: "1.02rem",
+        fontWeight: 600,
+        color: ACCENT_GOLD,
+        lineHeight: 1.5,
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
+function BoundaryNote({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        margin: "18px 0",
+        padding: "14px 18px",
+        background: "rgba(106, 176, 245, 0.07)",
+        border: `1px solid rgba(106, 176, 245, 0.22)`,
+        borderRadius: 4,
+        color: TEXT,
+        fontSize: "0.92rem",
+        lineHeight: 1.65,
+      }}
+    >
+      <div
+        style={{
+          color: ACCENT_BLUE,
+          fontSize: 10.5,
+          fontWeight: 700,
+          letterSpacing: 1.5,
+          marginBottom: 8,
+        }}
+      >
+        CLAIM BOUNDARY
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function EvidenceFlow() {
+  const steps = [
+    { label: "EML source", detail: "one equation" },
+    { label: "Selected artifact", detail: "Python / C" },
+    { label: "Profile", detail: "chain order" },
+    { label: "Evidence packet", detail: "claim boundary" },
+    { label: "Review", detail: "human decision" },
+  ];
+  return (
+    <div
+      style={{
+        margin: "20px 0",
+        padding: "18px",
+        background: SURFACE_2,
+        border: `1px solid ${BORDER}`,
+        borderRadius: 4,
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(118px, 1fr))",
+          gap: 10,
+        }}
+      >
+        {steps.map((step, index) => (
+          <div
+            key={step.label}
+            style={{
+              minHeight: 86,
+              padding: "12px",
+              border: `1px solid ${index === steps.length - 1 ? "rgba(74, 222, 128, 0.32)" : BORDER}`,
+              borderRadius: 4,
+              background: index === 0 ? "rgba(232, 160, 32, 0.08)" : SURFACE,
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                color: index === steps.length - 1 ? ACCENT_GREEN : ACCENT_GOLD,
+                fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                fontSize: 10.5,
+                marginBottom: 8,
+              }}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </div>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: 13 }}>
+              {step.label}
+            </div>
+            <div style={{ color: MUTED, fontSize: 12, marginTop: 4 }}>
+              {step.detail}
+            </div>
           </div>
-        ) : null}
-        <pre
-          style={{
-            margin: 0,
-            padding: command || lang ? "42px 14px 14px" : "14px",
-            overflowX: "auto",
-            border: `1px solid ${BORDER}`,
-            borderRadius: filename ? "0 0 6px 6px" : 6,
-            background: SURFACE,
-            color: "#eef3f4",
-            fontSize: 12.5,
-            lineHeight: 1.55,
-          }}
-        >
-          {lang ? <span style={{ color: MUTED, display: "block", marginBottom: 8 }}>{lang}</span> : null}
-          <code>{code}</code>
-        </pre>
+        ))}
       </div>
     </div>
   );
 }
 
-function LinkButton({ href, children }: { href: string; children: ReactNode }) {
+// ── Page ─────────────────────────────────────────────────────
+
+export default function ForgeTutorialPage() {
   return (
-    <a
-      href={href}
+    <main
       style={{
-        minHeight: 40,
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "0 13px",
-        border: `1px solid rgba(74, 222, 128, 0.34)`,
-        borderRadius: 5,
-        background: "rgba(31, 88, 58, 0.76)",
-        color: "#dffff0",
-        fontSize: 13,
-        fontWeight: 700,
-        textDecoration: "none",
+        maxWidth: 880,
+        margin: "0 auto",
+        padding: "clamp(32px, 6vw, 60px) clamp(16px, 4vw, 24px) 120px",
+        color: TEXT,
       }}
     >
-      {children}
-    </a>
-  );
-}
-
-function SignalDiagram() {
-  return (
-    <svg viewBox="0 0 720 190" role="img" aria-label="Potentiometer input flows through guard kernel to LED and buzzer output" style={{ width: "100%", maxWidth: 760, border: `1px solid ${BORDER}`, borderRadius: 6, background: SURFACE }}>
-      <rect x="40" y="58" width="130" height="58" rx="6" fill="#14241d" stroke="#4ADE80" />
-      <rect x="285" y="58" width="150" height="58" rx="6" fill="#111b29" stroke="#6AB0F5" />
-      <rect x="550" y="58" width="130" height="58" rx="6" fill="#241f12" stroke="#E8A020" />
-      <text x="105" y="92" textAnchor="middle" fill="#dfffea" fontSize="16">Pot</text>
-      <text x="360" y="92" textAnchor="middle" fill="#e5f3ff" fontSize="16">Guard Kernel</text>
-      <text x="615" y="92" textAnchor="middle" fill="#fff2a6" fontSize="16">LED/Buzzer</text>
-      <path d="M170 87 H285" stroke="#8fa6a2" strokeWidth="3" markerEnd="url(#arrow)" />
-      <path d="M435 87 H550" stroke="#8fa6a2" strokeWidth="3" markerEnd="url(#arrow)" />
-      <path d="M286 135 H435" stroke="#E8A020" strokeWidth="2" strokeDasharray="7 7" />
-      <text x="360" y="158" textAnchor="middle" fill="#E8A020" fontSize="13">clamp boundary: safe_output &lt;= limit</text>
-      <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#8fa6a2" /></marker></defs>
-    </svg>
-  );
-}
-
-export default function EmlIntroPage() {
-  return (
-    <Shell>
-      <header style={{ minHeight: "min(640px, calc(100vh - 70px))", display: "grid", alignContent: "center", gap: 24 }}>
-        <a href="/learn/eml" style={{ color: MUTED, fontSize: 12, textDecoration: "none" }}>
-          Back to /learn/eml
-        </a>
-        <div style={{ display: "grid", gap: 14, maxWidth: 820 }}>
-          <p style={{ margin: 0, color: GREEN, fontSize: 13, fontWeight: 700, letterSpacing: 0, textTransform: "uppercase" }}>
-            Monogate Electronics Lab
-          </p>
-          <h1 style={{ margin: 0, color: "#fff", fontSize: "clamp(42px, 8vw, 82px)", lineHeight: 0.98 }}>
-            EML Intro: Your First Guard Kernel
-          </h1>
-          <p style={{ margin: 0, color: "#cfd8d6", fontSize: "clamp(17px, 2vw, 22px)", lineHeight: 1.45, maxWidth: 760 }}>
-            You built the Reflex Lab 01 circuit. Now write the guard in EML, compile it toward C for the ESP32, and watch your own clamp event appear in the visualizer.
-          </p>
+      {/* ── Header ─────────────────────────────────────── */}
+      <header style={{ marginBottom: 40 }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            color: "#666",
+            marginBottom: 14,
+          }}
+        >
+          <a href="/learn/eml" style={{ color: "#888", textDecoration: "none" }}>
+            ← /learn/eml
+          </a>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-          <LinkButton href="/electronics/esp32/reflex-guard/lab">Guard Trace Console</LinkButton>
-          <LinkButton href="/explorer/eml-packets/builder">Evidence Packet Builder</LinkButton>
-          <LinkButton href="https://github.com/agent-maestro/monogate-electronics/blob/main/kernels/threshold_reflex_v0/kernel.eml">
-            threshold_reflex_v0.eml
-          </LinkButton>
+        <Eyebrow>EML-lang · Level 1 · 30-minute crash course</Eyebrow>
+        <h1
+          style={{
+            fontSize: "clamp(1.9rem, 6vw, 2.6rem)",
+            fontWeight: 700,
+            color: "#fff",
+            marginBottom: 16,
+            lineHeight: 1.12,
+          }}
+        >
+          EML-lang in 30 Minutes
+        </h1>
+        <p
+          style={{
+            fontSize: "clamp(0.98rem, 2.4vw, 1.08rem)",
+            color: "#bbb",
+            lineHeight: 1.65,
+            maxWidth: 640,
+          }}
+        >
+          Six lessons, five minutes each. By the end you&apos;ll have written
+          your own equation, emitted selected software artifacts, read the
+          chain-order profile, and seen how proof-shaped and hardware-shaped
+          obligations stay evidence-bound.
+        </p>
+        <div
+          style={{
+            display: "flex",
+            gap: 18,
+            flexWrap: "wrap",
+            marginTop: 22,
+            fontSize: 13,
+            color: MUTED,
+          }}
+        >
+          <span>
+            <strong style={{ color: TEXT }}>Audience.</strong> Anyone who
+            can write an equation.
+          </span>
+          <span>
+            <strong style={{ color: TEXT }}>Prerequisite.</strong>
+            Algebra. That&apos;s it.
+          </span>
         </div>
       </header>
 
-      <Section id="circuit" kicker="Section 1" title="What just happened in your circuit">
+      {/* ── What you'll build (TOC) ────────────────────── */}
+      <section
+        style={{
+          marginBottom: 40,
+          padding: "20px 22px",
+          background: SURFACE_2,
+          border: `1px solid ${BORDER}`,
+          borderRadius: 4,
+        }}
+      >
+        <Eyebrow>What you&apos;ll build</Eyebrow>
+        <ol
+          style={{
+            margin: 0,
+            paddingLeft: 20,
+            color: TEXT,
+            fontSize: "0.95rem",
+            lineHeight: 1.85,
+          }}
+        >
+          <li>
+            <a href="#l1" style={{ color: ACCENT_GOLD }}>
+              Write your first equation in EML-lang
+            </a>
+          </li>
+          <li>
+            <a href="#l1" style={{ color: ACCENT_GOLD }}>
+              Emit selected software artifacts and inspect them
+            </a>
+          </li>
+          <li>
+            <a href="#l2" style={{ color: ACCENT_GOLD }}>
+              Read a chain-order profile
+            </a>
+          </li>
+          <li>
+            <a href="#l3" style={{ color: ACCENT_GOLD }}>
+              Build a PID controller
+            </a>
+          </li>
+          <li>
+            <a href="#l4" style={{ color: ACCENT_GOLD }}>
+              Add a proof-shaped obligation
+            </a>
+          </li>
+          <li>
+            <a href="#l5" style={{ color: ACCENT_GOLD }}>
+              Preview a hardware-target profile
+            </a>
+          </li>
+          <li>
+            <a href="#l6" style={{ color: ACCENT_GOLD }}>
+              Build a bounded project artifact
+            </a>
+          </li>
+        </ol>
         <P>
-          The potentiometer sends <Inline>pot_raw</Inline>. Firmware maps it into <Inline>requested_output</Inline>. The guard kernel clamps it to <Inline>safe_output</Inline>. The LED and buzzer reflect the safe output, not the raw request.
+          No programming experience required. EML-lang is math with curly
+          braces.
         </P>
-        <SignalDiagram />
+      </section>
+
+      <BoundaryNote>
+        Level 1 uses selected local artifacts. Some Forge targets are
+        structural-only, roadmap-only, or require extra toolchain validation.
+        Hardware, proof, and broad source-roundtrip claims require separate
+        evidence packets before they are treated as supported.
+      </BoundaryNote>
+
+      {/* ── Lesson 1 ───────────────────────────────────── */}
+      <Lesson
+        num={1}
+        title="Your first equation"
+        minutes={5}
+        anchor="l1"
+        accent={ACCENT_BLUE}
+      >
+        <Heading>The simplest possible program</Heading>
         <P>
-          In the visualizer, the important fields are <Inline>pot_raw</Inline>, <Inline>requested_output</Inline>, <Inline>safe_output</Inline>, and <Inline>guard_action</Inline>.
+          Create a file called <Inline>hello.eml</Inline>:
         </P>
-      </Section>
+        <Code lang="hello.eml">{`fn add(a: Real, b: Real) -> Real {
+    a + b
+}`}</Code>
+        <P>That&apos;s it. You just wrote EML-lang.</P>
+        <P>Let&apos;s break it down:</P>
+        <Code>{`fn              → "I'm defining a function"
+add             → the name (you pick this)
+(a: Real,       → first input, it's a real number
+ b: Real)       → second input, also a real number
+-> Real         → this function returns a real number
+{               → start of the math
+    a + b       → the equation (just addition)
+}               → end`}</Code>
 
-      <Section id="math" kicker="Section 2" title="The guard kernel in plain math">
-        <CodeBlock code={"safe(request, limit) = if request > limit then limit else request"} lang="math" />
+        <Heading>Compile it</Heading>
+        <Code lang="bash">{`python tools/cli/main.py hello.eml --target python,c -o ./my_first`}</Code>
+
+        <Heading>What you get</Heading>
+        <Code>{`my_first/
+  hello.py          ← selected Python artifact
+  hello.c           ← selected C artifact
+  profile.json      ← structural profile and claim boundary`}</Code>
+
         <P>
-          The domain is <Inline>limit &gt; 0</Inline>. The guarantee is <Inline>safe output &lt;= limit</Inline>. The proof obligation is the exact thing a reviewer would ask: show that the clamped path never returns a value above the limit.
+          Open <Inline>hello.c</Inline> and look:
         </P>
-      </Section>
+        <Code lang="hello.c">{`// Generated by selected EML backend
+// Source: hello.eml
+// Chain order: 0 | Cost class: p0-d2-w0-c0
 
-      <Section id="eml" kicker="Section 3" title="Writing the guard in EML">
-        <P>Save this file beside the Reflex Guard lesson files.</P>
-        <CodeBlock code={emlSource} lang="eml" filename="threshold_reflex_v0.eml" />
+double add(double a, double b) {
+    return a + b;
+}`}</Code>
+
         <P>
-          <Inline>requires</Inline> and <Inline>ensures</Inline> are not comments. They become obligations that MachLib/Lean can close later.
+          Your equation, lowered into a small C artifact for inspection and
+          local validation.
         </P>
-      </Section>
 
-      <Section id="compile-c" kicker="Section 4" title="Compiling to C for the ESP32">
-        <CodeBlock code={compileC} lang="bash" command />
-        <CodeBlock code={generatedC} lang="c" filename="threshold_reflex_v0.c" />
-        <CodeBlock code={inoAdapter} lang="cpp" filename="threshold_reflex_adapter.ino" />
+        <Heading>The evidence shape</Heading>
+        <EvidenceFlow />
         <P>
-          The current hand-written firmware reference remains in <Inline>kernels/threshold_reflex_v0/esp32/threshold_reflex_v0</Inline>. Generated C should match the same guard boundary and serial fields.
+          The point is not to pretend every target is already production-ready.
+          The point is to keep the artifact, profile, evidence packet, and
+          reviewer boundary close together.
         </P>
-      </Section>
 
-      <Section id="proof" kicker="Section 5" title="The proof obligation">
-        <CodeBlock code={compileLean} lang="bash" command />
-        <CodeBlock code={leanOutput} lang="lean" filename="threshold_reflex_v0.lean" />
+        <StrongLine>
+          You just turned one equation into selected inspectable artifacts with an explicit evidence boundary.
+        </StrongLine>
+
+        <Exercise>
+          Change <Inline>a + b</Inline> to <Inline>a * b</Inline>. Recompile.
+          Open the Python and C files. See how they changed.
+        </Exercise>
+      </Lesson>
+
+      {/* ── Lesson 2 ───────────────────────────────────── */}
+      <Lesson
+        num={2}
+        title="Constants and real math"
+        minutes={5}
+        anchor="l2"
+        accent={ACCENT_BLUE}
+      >
+        <Heading>Adding constants</Heading>
+        <Code lang="gravity.eml">{`const g: Real = 9.81
+const half: Real = 0.5
+
+fn fall_distance(t: Real) -> Real {
+    half * g * t * t
+}
+
+fn fall_velocity(t: Real) -> Real {
+    g * t
+}`}</Code>
         <P>
-          If your generated Lean contains <Inline>sorry</Inline>, that means the proof is still open. The important win is that the compiler named the exact property to prove.
+          <Inline>const</Inline> gives a name to a number. Same as any
+          language.
         </P>
-      </Section>
 
-      <Section id="visualizer" kicker="Section 6" title="Watching it in the visualizer">
-        <CodeBlock code={jsonFrame} lang="json" />
+        <Heading>Using transcendental functions</Heading>
+        <P>These are the functions that make EML-lang special:</P>
+        <Code lang="transcendental.eml">{`fn exponential_decay(t: Real, k: Real) -> Real {
+    exp(-k * t)
+}
+
+fn oscillation(t: Real, freq: Real) -> Real {
+    sin(freq * t)
+}
+
+fn damped_wave(t: Real, decay: Real, freq: Real) -> Real {
+    exp(-decay * t) * cos(freq * t)
+}`}</Code>
+
+        <P>The available math functions:</P>
+        <Code>{`FUNCTION       WHAT IT DOES                 CHAIN ORDER
+─────────────────────────────────────────────────────────
++ - * /        arithmetic                   0
+exp(x)         e to the x                   adds 1
+ln(x)          natural log of x             adds 1
+sin(x)         sine                         adds 2
+cos(x)         cosine                       adds 2
+tan(x)         tangent                      adds 2
+sqrt(x)        square root                  0
+tanh(x)        hyperbolic tangent           adds 2
+arcsin(x)      inverse sine                 adds 2
+arccos(x)      inverse cosine               adds 2
+atan2(y, x)    angle from coordinates       adds 2
+abs(x)         absolute value               0
+clamp(x, l, h) clip to range                0
+min(a, b)      smaller of two               0
+max(a, b)      larger of two                0
+pow(x, y)      x to the y                   0 to 1
+eml(x, y)      exp(x) - ln(y)               adds 1`}</Code>
+
+        <Heading>Compile and read the profile</Heading>
+        <Code lang="bash">{`python tools/cli/main.py transcendental.eml --explain`}</Code>
+        <P>The compiler tells you about each function:</P>
+        <Code>{`exponential_decay:
+  chain_order: 1            ← one transcendental layer (exp)
+  cost_class:  p1-d3-w1-c0
+  drift_risk:  LOW          ← check the sample range
+
+damped_wave:
+  chain_order: 3            ← three layers (exp + cos)
+  cost_class:  p3-d5-w2-c1
+  drift_risk:  MEDIUM       ← use float64 for precision`}</Code>
+
+        <Heading>What chain order means (plain English)</Heading>
+        <Code>{`Chain 0:   Just arithmetic. x + y, x * y, x^2.
+           Usually simplest. Low drift risk on normal ranges.
+           Still validate your numeric range.
+
+Chain 1:   One exp or ln involved.
+           Like exponential decay, compound interest.
+           Often manageable. Check domains and exponent size.
+
+Chain 2:   Trig involved. sin, cos, tanh.
+           Like oscillations, waves, rotations.
+           Usually wants float32+ and sample-grid checks.
+
+Chain 3+:  Multiple layers nested.
+           Like exp(sin(x)) or damped oscillators.
+           Often wants float64. FPGA profiles need review.
+           The compiler warns you automatically.`}</Code>
+
+        <Exercise>
+          Write a function for compound interest:{" "}
+          <Inline>A = P * exp(r * t)</Inline>. Compile it. What chain order
+          does the compiler report?
+          <span style={{ color: MUTED }}> (Answer: chain 1 — one exp layer.)</span>
+        </Exercise>
+      </Lesson>
+
+      {/* ── Lesson 3 ───────────────────────────────────── */}
+      <Lesson
+        num={3}
+        title="PID controller"
+        minutes={5}
+        anchor="l3"
+        accent={ACCENT_GOLD}
+      >
+        <Heading>The most common equation in all of engineering</Heading>
+        <P>Every robot, drone, car, thermostat, and factory uses PID:</P>
+        <Code lang="pid_controller.eml">{`const Kp: Real = 2.5      // proportional gain
+const Ki: Real = 0.1      // integral gain
+const Kd: Real = 0.05     // derivative gain
+
+fn pid(error: Real, integral: Real, derivative: Real) -> Real {
+    Kp * error + Ki * integral + Kd * derivative
+}`}</Code>
+        <P>That&apos;s a complete PID controller.</P>
+
+        <Heading>Compile it</Heading>
+        <Code lang="bash">{`python tools/cli/main.py pid_controller.eml --target python,c --explain -o ./pid_out`}</Code>
+
+        <Heading>What the compiler tells you</Heading>
+        <Code>{`pid:
+  chain_order: 0              ← purely polynomial (no exp/sin)
+  nodes:       6              ← 6 arithmetic operations
+  cost_class:  p0-d6-w0-c0
+  drift_risk:  LOW            ← still validate the input range
+  evidence:
+    selected_targets: python, c
+    hardware_profile: not requested in this lesson`}</Code>
+
         <P>
-          When <Inline>guard_action</Inline> becomes <Inline>clamp_to_safe_output</Inline>, the dashboard logs the event, flashes the panel, and plays the sound. The loop is now visible: EML source, generated firmware shape, ESP32 serial frame, visualizer event.
+          Chain order 0 means this PID is just arithmetic. No{" "}
+          <Inline>exp</Inline>. No <Inline>sin</Inline>. Pure math. That makes
+          it easier to inspect, but deployment still needs tests for the
+          numeric range you care about.
         </P>
-      </Section>
 
-      <Section id="next" kicker="Section 7" title="What is next">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
-          {[
-            "Add a minimum threshold and inspect the new proof obligations.",
-            `Run ${compileVerilog} and compare the hardware-shaped logic.`,
-            "Paste the guard expression into the Evidence Packet Builder."
-          ].map((item) => (
-            <div key={item} style={{ border: `1px solid ${BORDER}`, borderRadius: 6, padding: 14, background: SURFACE_2, color: TEXT, fontSize: 14, lineHeight: 1.55 }}>
-              {item}
-            </div>
-          ))}
-        </div>
-      </Section>
+        <Heading>Now make it nonlinear</Heading>
+        <Code lang="nonlinear_pid.eml">{`const Kp: Real = 2.5
+const decay: Real = 0.1
+const freq: Real = 10.0
 
-      <footer style={{ marginTop: 24, border: "1px solid rgba(232,160,32,0.28)", borderRadius: 6, background: "rgba(232,160,32,0.07)", padding: 16 }}>
-        <p style={{ margin: 0, color: "#fff2a6", fontSize: 13, lineHeight: 1.6 }}>
-          This course shows the EML -&gt; C -&gt; ESP32 path and the proof obligation shape. The generated Lean proof uses sorry placeholders. Discharging those placeholders requires MachLib and is covered in the advanced course. No claim is made that the guard is formally verified until the proof is closed.
+fn adaptive_pid(error: Real, t: Real) -> Real {
+    let gain = exp(-decay * t) * cos(freq * t);
+    gain * Kp * error
+}`}</Code>
+        <P>Compile it again. Now the compiler says:</P>
+        <Code>{`adaptive_pid:
+  chain_order: 3              ← jumped from 0 to 3!
+  drift_risk:  MEDIUM         ← float64 recommended
+  review_note:  nested exp/cos path needs stronger numeric evidence`}</Code>
+
+        <StrongLine>
+          The compiler told you the complexity jumped. Before you ran
+          anything expensive. Chain order is a review signal, not a proof of
+          speed, stability, or deployability.
+        </StrongLine>
+
+        <Exercise>
+          Add a <Inline>tanh</Inline> to the PID output (to clamp it
+          smoothly). What does the chain order become?
+          <span style={{ color: MUTED }}>
+            {" "}
+            (Answer: chain 2 — tanh adds 2 to chain 0.)
+          </span>
+        </Exercise>
+      </Lesson>
+
+      {/* ── Lesson 4 ───────────────────────────────────── */}
+      <Lesson
+        num={4}
+        title="Proof-shaped obligations"
+        minutes={5}
+        anchor="l4"
+        accent={ACCENT_PURPLE}
+      >
+        <Heading>Making the artifact state what must be proved</Heading>
+        <P>
+          Add <Inline>@verify</Inline> to any function:
+        </P>
+        <Code lang="safe_pid.eml">{`const Kp: Real = 2.5
+const Ki: Real = 0.1
+const max_output: Real = 100.0
+
+@verify(lean, theorem = "pid_is_bounded")
+fn safe_pid(error: Real, integral: Real) -> Real
+    requires (abs(error) < 50.0)
+    requires (abs(integral) < 500.0)
+    ensures  (abs(result) < max_output)
+{
+    Kp * error + Ki * integral
+}`}</Code>
+
+        <P>What the new keywords mean:</P>
+        <Code>{`@verify(lean, theorem = "pid_is_bounded")
+  → "Generate a Lean theorem-shaped scaffold for this function"
+  → The theorem will be named "pid_is_bounded"
+
+requires (abs(error) < 50.0)
+  → "This function only works when error is between -50 and 50"
+  → If someone passes error = 999, that's THEIR bug, not yours
+
+ensures (abs(result) < max_output)
+  → "This is the safety property I want evidence for"
+  → The artifact records a proof obligation for that property`}</Code>
+
+        <Heading>Compile with verification</Heading>
+        <Code lang="bash">{`python tools/cli/main.py safe_pid.eml --target lean -o ./verified.lean`}</Code>
+        <P>
+          Open <Inline>verified.lean</Inline>:
+        </P>
+        <Code lang="lean">{`import MachLib.EML
+import MachLib.Trig
+
+open MachLib
+open MachLib.Real
+
+def safe_pid (error integral : Real) : Real :=
+  2.5 * error + 0.1 * integral
+
+theorem pid_is_bounded
+    (error integral : Real)
+    (h1 : abs error < 50.0)
+    (h2 : abs integral < 500.0) :
+    abs (safe_pid error integral) < 100.0 := by
+  unfold safe_pid
+  sorry  -- TODO: prove against MachLib foundations`}</Code>
+
+        <P>
+          The compiler generated the <strong>theorem statement</strong>. The{" "}
+          <Inline>sorry</Inline> means the proof isn&apos;t filled in yet.
+          That is an explicit open obligation, not a proof claim.
+        </P>
+
+        <Heading>Why this matters</Heading>
+        <Code>{`WITHOUT @verify:
+  "I think my PID output stays under 100."
+  "It worked in testing."
+  "Ship it and hope."
+
+WITH @verify:
+  "The generated theorem states exactly what must be proved."
+  "A checked proof can close the obligation later."
+  "The claim boundary is visible instead of hidden."`}</Code>
+
+        <Heading>Advanced preview: other proof targets</Heading>
+        <P>
+          The same obligation shape can be routed to other proof-shaped or
+          contract-shaped targets where those local backends are enabled. Each
+          target still needs its own validation; emitting a scaffold is not the
+          same thing as discharging a proof.
+        </P>
+        <Code lang="bash">{`python tools/cli/main.py safe_pid.eml --target coq      -o ./safe.v
+python tools/cli/main.py safe_pid.eml --target isabelle -o ./Safe.thy
+python tools/cli/main.py safe_pid.eml --target ada      -o ./safe.adb`}</Code>
+
+        <Exercise>
+          Write a function for temperature conversion:{" "}
+          <Inline>fn celsius_to_fahrenheit(c: Real) -&gt; Real</Inline>{" "}
+          returning <Inline>1.8 * c + 32.0</Inline>. Add{" "}
+          <Inline>@verify</Inline> with{" "}
+          <Inline>requires (c &gt; -273.15)</Inline> (can&apos;t go below
+          absolute zero) and{" "}
+          <Inline>ensures (result &gt; -459.67)</Inline> (same constraint
+          in Fahrenheit). Compile to Lean. Look at the generated theorem.
+        </Exercise>
+      </Lesson>
+
+      {/* ── Lesson 5 ───────────────────────────────────── */}
+      <Lesson
+        num={5}
+        title="Hardware-shaped preview"
+        minutes={5}
+        anchor="l5"
+        accent={ACCENT_GOLD}
+      >
+        <Heading>Preparing your math for hardware review</Heading>
+        <P>
+          Add <Inline>@target(fpga)</Inline> to any function:
+        </P>
+        <Code lang="fpga_pid.eml">{`const Kp: Real = 2.5
+const Ki: Real = 0.1
+
+@target(fpga, clock_mhz = 100)
+fn hardware_pid(error: Real, integral: Real) -> Real {
+    Kp * error + Ki * integral
+}`}</Code>
+
+        <Heading>Emit a hardware-shaped artifact</Heading>
+        <Code lang="bash">{`python tools/cli/main.py fpga_pid.eml --target verilog -o ./hw/pid.v
+python tools/cli/main.py fpga_pid.eml --target systemverilog -o ./hw/pid.sv`}</Code>
+        <P>The compiler tells you:</P>
+        <Code>{`hardware_pid:
+  FPGA allocation:
+    target:    Xilinx Artix-7
+    LUTs:      48 (estimate)
+    DSP blocks: 2
+    exp units: 0 (not needed — chain 0)
+    clock:     100 MHz
+    latency:   estimate only
+    utilization: planning estimate only`}</Code>
+
+        <P>
+          A selected hardware-shaped artifact may look like:
+        </P>
+        <Code lang="verilog">{`// Generated by EML-lang Verilog backend
+// Chain order: 0 | planning profile only
+
+module hardware_pid_pipeline #(
+    parameter WIDTH = 32
+) (
+    input  wire             clk,
+    input  wire             rst,
+    input  wire             valid_in,
+    input  wire signed [WIDTH-1:0] error,
+    input  wire signed [WIDTH-1:0] integral,
+    output reg              valid_out,
+    output reg signed [WIDTH-1:0] result
+);
+    wire signed [WIDTH-1:0] _w1, _w2, _w3;
+    assign _w1 = Kp * error;
+    assign _w2 = Ki * integral;
+    assign _w3 = _w1 + _w2;
+
+    always @(posedge clk) begin
+        if (rst) begin
+            valid_out <= 1'b0;
+            result    <= '0;
+        end else begin
+            valid_out <= valid_in;
+            result    <= _w3;
+        end
+    end
+endmodule`}</Code>
+
+        <P>
+          That&apos;s your equation as a hardware module candidate. The next
+          steps are simulation, synthesis, board integration, and an evidence
+          packet before any hardware-deployment claim.
+        </P>
+        <BoundaryNote>
+          Level 1 does not claim hardware validation. Verilog-like output,
+          FPGA estimates, and hardware annotations are review inputs until
+          simulation, synthesis, and board evidence are attached.
+        </BoundaryNote>
+
+        <Heading>What the numbers mean</Heading>
+        <Code>{`LUTs:      Estimated logic blocks for the selected FPGA profile.
+           Treat this as a planning signal until synthesis confirms it.
+
+DSPs:      Dedicated multiplier blocks. 2 out of 240 available.
+           One for each multiplication (Kp*error, Ki*integral).
+
+Latency:   Estimated clock cycles from input valid to output valid.
+           Simulation and synthesis must confirm timing.
+
+For comparison:
+  Software path: run and test first.
+  FPGA path:     emit, simulate, synthesize, then measure.
+
+  Do not claim speed until measured evidence exists.`}</Code>
+
+        <Exercise>
+          Take the <Inline>damped_wave</Inline> from Lesson 2. Add{" "}
+          <Inline>@target(fpga)</Inline>. Compare the hardware-review notes
+          to the simple PID.
+          <span style={{ color: MUTED }}>
+            {" "}
+            (The damped wave needs exp + cos hardware units. More
+            resources.)
+          </span>
+        </Exercise>
+      </Lesson>
+
+      {/* ── Lesson 6 ───────────────────────────────────── */}
+      <Lesson
+        num={6}
+        title="Your own project"
+        minutes={5}
+        anchor="l6"
+        accent={ACCENT_GREEN}
+      >
+        <Heading>Pick any equation you know</Heading>
+        <P>Here are ideas based on what you do:</P>
+        <Code>{`IF YOU'RE A MECHANICAL ENGINEER:
+  Spring-mass-damper: F = -k*x - c*v
+  Heat transfer:      Q = h*A*(T_surface - T_fluid)
+  Stress:             sigma = F / A
+
+IF YOU'RE AN ELECTRICAL ENGINEER:
+  RC decay:       V = V0 * exp(-t / (R*C))
+  RLC oscillator: V = V0 * exp(-R*t/(2*L)) * cos(omega*t)
+  Ohm's law:      V = I * R
+
+IF YOU'RE A CHEMICAL ENGINEER:
+  Arrhenius:       k = A * exp(-Ea / (R*T))
+  First-order:     C = C0 * exp(-k*t)
+  pH:              pH = -ln(H_concentration) / ln(10)
+
+IF YOU'RE A GAME DEVELOPER:
+  Projectile:      y = v0*t - 0.5*g*t*t
+  Bounce decay:    y = A * exp(-d*t) * abs(sin(omega*t))
+  Camera smoothing: pos = lerp(curr, target, 1 - exp(-speed*dt))
+
+IF YOU DON'T KNOW WHAT EQUATION TO USE:
+  Just do this:
+
+  fn my_function(x: Real) -> Real {
+      exp(x) * sin(x)
+  }
+
+  Compile it. See what happens.`}</Code>
+
+        <Heading>Write it</Heading>
+        <Code lang="my_project.eml">{`const k: Real = 100.0     // spring constant
+const c: Real = 5.0       // damping coefficient
+const m: Real = 1.0       // mass
+
+fn spring_force(x: Real, v: Real) -> Real {
+    (-k * x - c * v) / m
+}
+
+@verify(lean, theorem = "force_proportional")
+fn verified_spring(x: Real, v: Real) -> Real
+    requires (abs(x) < 10.0)
+    requires (abs(v) < 100.0)
+    ensures  (abs(result) < 1500.0)
+{
+    spring_force(x, v)
+}
+
+@target(fpga, clock_mhz = 200)
+fn realtime_spring(x: Real, v: Real) -> Real {
+    spring_force(x, v)
+}`}</Code>
+
+        <Heading>Compile the selected lesson artifacts</Heading>
+        <Code lang="bash">{`python tools/cli/main.py my_project.eml --target python,c --explain -o ./my_build`}</Code>
+
+        <Heading>What you just did</Heading>
+        <Code>{`In 30 minutes you:
+
+  1. Learned EML-lang syntax (fn, const, Real)
+  2. Used transcendental functions (exp, sin, cos)
+  3. Read chain-order profiles
+  4. Built a PID controller
+  5. Added proof-shaped obligations (@verify) without claiming proof
+  6. Previewed a hardware-shaped profile (@target) without claiming hardware validation
+  7. Built YOUR OWN bounded artifact
+
+You can now:
+  - Write any equation in EML-lang
+  - Emit selected software artifacts for inspection
+  - Read the structural profile (chain order, drift risk)
+  - State proof obligations for later proof work
+  - Prepare hardware candidates for simulation and evidence review`}</Code>
+
+        <StrongLine>
+          One equation. Inspectable artifacts. Explicit evidence boundaries.
+        </StrongLine>
+      </Lesson>
+
+      {/* ── Quick Reference ────────────────────────────── */}
+      <section
+        id="reference"
+        style={{
+          marginTop: 64,
+          paddingTop: 32,
+          borderTop: `1px solid ${BORDER}`,
+        }}
+      >
+        <Eyebrow>Quick reference card</Eyebrow>
+        <h2
+          style={{
+            fontSize: "clamp(1.4rem, 4vw, 1.8rem)",
+            fontWeight: 700,
+            color: "#fff",
+            marginBottom: 18,
+          }}
+        >
+          Print this and pin it to your wall.
+        </h2>
+        <Code>{`SYNTAX
+  const NAME: Real = VALUE
+  fn NAME(x: Real, y: Real) -> Real { equation }
+  let temp = sub_expression;
+  if condition { a } else { b }
+
+MATH
+  +  -  *  /                  arithmetic
+  exp(x)  ln(x)               exponential / log
+  sin(x)  cos(x)  tanh(x)     trigonometric
+  sqrt(x)  abs(x)             utilities
+  min(a, b)  max(a, b)        comparison
+  clamp(x, lo, hi)            saturating clip
+  arcsin(x)  arccos(x)        inverse trig
+  atan2(y, x)                 angle from (x, y)
+  pow(x, y)                   x to the y
+  eml(x, y) = exp(x) - ln(y)  fundamental EML operator
+
+ANNOTATIONS
+  @verify(lean, theorem = "name")  record a proof-shaped obligation
+  @target(fpga, clock_mhz = N)     record a hardware-shaped profile
+  requires CONDITION               input precondition
+  ensures  CONDITION               output postcondition
+
+COMPILE
+  python tools/cli/main.py file.eml --target python,c -o ./out
+  python tools/cli/main.py file.eml --target c -o out.c
+  python tools/cli/main.py file.eml --target lean -o out.lean       preview scaffold
+  python tools/cli/main.py file.eml --target verilog -o out.v       preview artifact
+
+PROFILE READING
+  chain_order: 0   polynomial (usually low drift risk)
+  chain_order: 1   exponential (check domains and exponent size)
+  chain_order: 2   trigonometric (sample-grid checks recommended)
+  chain_order: 3+  nested (stronger numeric review recommended)
+  drift_risk: LOW / MEDIUM / HIGH  precision warning`}</Code>
+      </section>
+
+      {/* ── Next Steps ─────────────────────────────────── */}
+      <section
+        style={{
+          marginTop: 56,
+          paddingTop: 32,
+          borderTop: `1px solid ${BORDER}`,
+        }}
+      >
+        <Eyebrow>Next steps</Eyebrow>
+        <h2
+          style={{
+            fontSize: "clamp(1.4rem, 4vw, 1.8rem)",
+            fontWeight: 700,
+            color: "#fff",
+            marginBottom: 18,
+          }}
+        >
+          You finished. Now what?
+        </h2>
+        <ol
+          style={{
+            color: TEXT,
+            fontSize: "0.96rem",
+            lineHeight: 1.85,
+            paddingLeft: 22,
+          }}
+        >
+          <li>
+            <strong style={{ color: "#fff" }}>Build one bounded packet.</strong>{" "}
+            Take one equation from this lesson, emit selected Python/C
+            artifacts, save the chain-order profile, and write down which
+            claims are still blocked.
+          </li>
+        </ol>
+        <p style={{ marginTop: 18 }}>
+          <a
+            href="/explorer/eml-packets/builder"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              color: "#0b0d12",
+              background: ACCENT_GOLD,
+              borderRadius: 4,
+              padding: "10px 14px",
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            Open the packet builder
+          </a>
+          <a
+            href="/learn/eml/intro/guard"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              color: ACCENT_GOLD,
+              border: `1px solid ${ACCENT_GOLD}`,
+              borderRadius: 4,
+              padding: "10px 14px",
+              fontWeight: 700,
+              textDecoration: "none",
+              marginLeft: 10,
+            }}
+          >
+            Continue to the first guard kernel
+          </a>
         </p>
-      </footer>
-    </Shell>
+      </section>
+    </main>
   );
 }
