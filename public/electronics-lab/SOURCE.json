@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-06-04T19:00:09.071844+00:00",
+  "generated_at": "2026-06-04T19:23:50.456123+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "84865152a6e0d839b9947c88ccea94796b2e803f",
+  "source_commit": "c92996757d4e8939c1e8c609f61d53ca495a8ee1",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -25,9 +25,9 @@
   },
   "artifacts": [
     {
-      "path": "assets/GlossaryHint-ChE08-bH.js",
+      "path": "assets/GlossaryHint-qTEvHPC-.js",
       "bytes": 671,
-      "sha256": "42da5f15daa5ec188ec318fdef0d4be39f47ea541e5bafd5485358c96da64b30"
+      "sha256": "805de9e443b24363d1687a21c68075578b11f5b1bb65ebdf71f7d73f4e4214b5"
     },
     {
       "path": "assets/icons-DsT05lyB.js",
@@ -40,9 +40,9 @@
       "sha256": "9070e44c459699564f0d8bc0096eee515872d2631c3fc045db6ea2f1a08ef63e"
     },
     {
-      "path": "assets/index-DXpTmY1F.js",
+      "path": "assets/index-DfoazdVb.js",
       "bytes": 116234,
-      "sha256": "0d402daa2cecfab78ef7796c74e80b0fce48c439d0d73669179fea4e3e0d6203"
+      "sha256": "cf889ffab3424a127e9b823ee1b52b1edd611115bb2bc97be7a8c68a96338d6d"
     },
     {
       "path": "assets/optimizationBoundary-B7GZTj9-.js",
@@ -55,9 +55,9 @@
       "sha256": "24a3704b032ad950b4220ef16e9704cde20033f1b3c1843ecb0d5ca0774b8ddb"
     },
     {
-      "path": "assets/PhysicalBuildPanel-BndRHPbg.js",
-      "bytes": 8798,
-      "sha256": "86d34a129948b027e0d08bd2c59469d7ca965875cdadfea93c8eab04d9ab822c"
+      "path": "assets/PhysicalBuildPanel-DsYvHlXA.js",
+      "bytes": 9166,
+      "sha256": "150652b827ea63b21835d151d884c4eece16ce2b9bbb3193d6b861f61dd27fda"
     },
     {
       "path": "assets/react-BGrcABR8.js",
@@ -70,9 +70,9 @@
       "sha256": "243a7e64c4686ee9959e7d36a36c9fa1f5868b69c843ac378799913dcb9a0164"
     },
     {
-      "path": "assets/SimulatorBench-CtN51kOs.js",
+      "path": "assets/SimulatorBench-BWN0M0J9.js",
       "bytes": 202880,
-      "sha256": "d24879426ac65ab7d5219b7f13ead8a7ccfb4170751a1db05336d2ce576e5c31"
+      "sha256": "8f10ca8a3a5b07d46b9a8e87c03baf2331c6c97bcf7a39a028c227e7855ecc12"
     },
     {
       "path": "assets/three-CgggyWJi.js",
@@ -92,7 +92,7 @@
     {
       "path": "index.html",
       "bytes": 913,
-      "sha256": "b6843b1ad17628e525fbbb6c7ad1f750d49386cd35b93482df1a8e1333c3d5e8"
+      "sha256": "2339c402effc0b58a48a853e72f8293d331d65dd75629eb3b047af760d9a0bba"
     }
   ]
 }
