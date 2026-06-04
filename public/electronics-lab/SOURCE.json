@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-06-04T17:02:52.205996+00:00",
+  "generated_at": "2026-06-04T17:20:17.527361+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "4a498b44c9c2fc5e510294c0db8604195ffff659",
+  "source_commit": "9960bb93a1dfc5a96171f52cb77dedda8318e239",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -25,9 +25,9 @@
   },
   "artifacts": [
     {
-      "path": "assets/GlossaryHint-BonKlbFW.js",
+      "path": "assets/GlossaryHint-Y-PhlqUG.js",
       "bytes": 671,
-      "sha256": "76d477610c7a2fd27b930f037070050a9f3ccf58cd08be8429ef43e01dd31697"
+      "sha256": "30a82f09ef454420a9adbc4d9214195ad812993d7d7b8e9345c48f7d8b0ed1ea"
     },
     {
       "path": "assets/icons-DsT05lyB.js",
@@ -35,14 +35,14 @@
       "sha256": "05a6199b429e46da3a530848eb663575206bdc842108eb04319a3d5669c2a11a"
     },
     {
-      "path": "assets/index-7Zei1_xT.js",
+      "path": "assets/index-BO1jPe_s.js",
       "bytes": 116234,
-      "sha256": "baaf9531a2ac9a1d7e109d6a15875e734b4f0f65ee050b0055fc289aa22533d2"
+      "sha256": "b80fc930382789f08ff786844125ca1eec33505c86ffcabd47db0e55a6ab5636"
     },
     {
-      "path": "assets/index-DFbfDEj-.css",
-      "bytes": 129611,
-      "sha256": "6d3a4b460dd22248869e4f93e4c33c00144b40076909d387b4c2c53d1bdb96d5"
+      "path": "assets/index-DUQhAyw4.css",
+      "bytes": 130921,
+      "sha256": "fb26856dcc3ad51ba83e7d65ce6ce871b1d5aeec0dd7584294f6bac63c2c5afe"
     },
     {
       "path": "assets/optimizationBoundary-B7GZTj9-.js",
@@ -55,9 +55,9 @@
       "sha256": "24a3704b032ad950b4220ef16e9704cde20033f1b3c1843ecb0d5ca0774b8ddb"
     },
     {
-      "path": "assets/PhysicalBuildPanel-BGIvb0qM.js",
+      "path": "assets/PhysicalBuildPanel-Cv1UFiC2.js",
       "bytes": 8798,
-      "sha256": "3b3f0cd8bc82997ea0956955c8b40ecc89edc9531990675fa613d5e081ffc1d7"
+      "sha256": "f8fd706ecf5b12dff1f045c3960f00dbe3527aa3394e83312c482e89d257998f"
     },
     {
       "path": "assets/react-BGrcABR8.js",
@@ -70,9 +70,9 @@
       "sha256": "243a7e64c4686ee9959e7d36a36c9fa1f5868b69c843ac378799913dcb9a0164"
     },
     {
-      "path": "assets/SimulatorBench-DOTcBX2Z.js",
-      "bytes": 201163,
-      "sha256": "19ed3be463e408f44fe2c77288f5c3d5346215a727f834158e317b0c95736b5f"
+      "path": "assets/SimulatorBench-DaGanCGd.js",
+      "bytes": 202125,
+      "sha256": "04539f5ec4b66cb9d02568aa754c99d9d37d46fa9eaa3ff4ba263ebece070b5a"
     },
     {
       "path": "assets/three-CgggyWJi.js",
@@ -92,7 +92,7 @@
     {
       "path": "index.html",
       "bytes": 913,
-      "sha256": "d863ee005dc29290828f9bba8b54589746235caa792591d236c0447cc9b759ae"
+      "sha256": "30d24234d7ee49e7c1873e569a5b598fc30504fbcdd4abac716cfcae90946b75"
     }
   ]
 }
