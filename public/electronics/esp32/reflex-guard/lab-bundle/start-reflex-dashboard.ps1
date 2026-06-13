@@ -1,9 +1,9 @@
 $ErrorActionPreference = "Stop"
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$dashboardUrl = "http://127.0.0.1:5191/visualizer"
+$dashboardUrl = "http://127.0.0.1:5191/live-board"
 $stateUrl = "http://127.0.0.1:5191/state"
-$serialPort = if ($env:MG_SERIAL_PORT) { $env:MG_SERIAL_PORT } else { "COM6" }
+$serialPort = if ($env:MG_SERIAL_PORT) { $env:MG_SERIAL_PORT } else { "auto" }
 $serialBaud = if ($env:MG_SERIAL_BAUD) { $env:MG_SERIAL_BAUD } else { "115200" }
 
 function Find-RepoRoot {
@@ -40,14 +40,26 @@ function Test-DashboardRunning {
 }
 
 if (-not (Test-DashboardRunning)) {
-  $python = Get-Command python -ErrorAction Stop
-  $args = @(
-    "dashboards\esp32-arduino\dashboard.py",
-    "--port", $serialPort,
-    "--baud", $serialBaud
-  )
-  Start-Process -WindowStyle Hidden -FilePath $python.Source -ArgumentList $args -WorkingDirectory $repoRoot
-  Start-Sleep -Seconds 2
+  $exe = Join-Path $scriptDir "MonogateDashboard.exe"
+  if (Test-Path $exe) {
+    $args = @("--no-browser")
+    if ($env:MG_SERIAL_PORT) {
+      $args += @("--port", $serialPort)
+    }
+    if ($env:MG_SERIAL_BAUD) {
+      $args += @("--baud", $serialBaud)
+    }
+    Start-Process -WindowStyle Hidden -FilePath $exe -ArgumentList $args -WorkingDirectory $scriptDir
+  } else {
+    $python = Get-Command python -ErrorAction Stop
+    $args = @(
+      "dashboards\esp32-arduino\dashboard.py",
+      "--port", $serialPort,
+      "--baud", $serialBaud
+    )
+    Start-Process -WindowStyle Hidden -FilePath $python.Source -ArgumentList $args -WorkingDirectory $repoRoot
+  }
+  Start-Sleep -Seconds 4
 }
 
 Start-Process $dashboardUrl
@@ -56,5 +68,5 @@ Write-Host ""
 Write-Host "Reflex Lab 01 dashboard opened:" -ForegroundColor Green
 Write-Host "  $dashboardUrl"
 Write-Host ""
-Write-Host "Serial port: $serialPort @ $serialBaud"
-Write-Host "If the board is offline, check the USB cable and COM port."
+Write-Host "Serial: auto-detect @ $serialBaud"
+Write-Host "If the board is not found, plug it in, wait 5 seconds, then click Scan Again."

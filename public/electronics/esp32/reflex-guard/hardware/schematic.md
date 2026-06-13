@@ -60,6 +60,6 @@ Button(GPIO27) -----------------------------> Buzzer mute state
 
 ## Future PCB Note
 
-KiCad files are not required for the Course 01 breadboard release. If this
+KiCad files are not required for the ESP32-001 breadboard release. If this
 course later grows a soldered or PCB variant, add KiCad source and PDF exports
 under this folder without changing the breadboard evidence claim.

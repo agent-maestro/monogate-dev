@@ -12,15 +12,16 @@ Use Chrome or Edge for the dashboard path.
 ### Windows
 
 1. Plug in the ESP32 with a data-capable USB cable.
-2. Double-click `start-reflex-dashboard.bat`.
-3. Wait for the browser to open:
+2. Double-click `MonogateDashboard.exe` if it is present.
+3. If you do not see the exe, double-click `start-reflex-dashboard.bat`.
+4. Wait for the browser to open:
 
 ```text
-http://127.0.0.1:5191/visualizer
+http://127.0.0.1:5191/live-board
 ```
 
-4. If the dashboard says the port is offline, confirm the ESP32 port. The
-   default is `COM6`.
+The dashboard scans for the ESP32 automatically. If Windows is still assigning
+the USB port, wait about 5 seconds and click `Scan Again`.
 
 ### Mac
 
@@ -29,17 +30,17 @@ dashboard directly from Terminal:
 
 ```bash
 python3 -m pip install pyserial
-python3 electronics/dashboards/esp32-arduino/dashboard.py --port /dev/cu.usbserial-0001 --baud 115200
+python3 electronics/dashboards/esp32-arduino/dashboard.py
 ```
 
-Replace `/dev/cu.usbserial-0001` with the port shown in Arduino IDE. Common
-Mac ESP32 ports are `/dev/cu.usbserial-*`, `/dev/cu.SLAB_USBtoUART`, and
-`/dev/cu.wchusbserial*`.
+The dashboard will try to auto-detect common ESP32 serial adapters. If needed,
+advanced users can still pass a specific port such as
+`--port /dev/cu.usbserial-0001 --baud 115200`.
 
 Then open Chrome or Edge:
 
 ```text
-http://127.0.0.1:5191/visualizer
+http://127.0.0.1:5191/live-board
 ```
 
 Mac instructions follow the standard ESP32/macOS workflow and are pending a
@@ -65,10 +66,16 @@ $env:MG_SERIAL_BAUD = "115200"
 The launcher starts:
 
 ```powershell
-python dashboards\esp32-arduino\dashboard.py --port COM6 --baud 115200
+MonogateDashboard.exe
 ```
 
-Then it opens the Guard Trace Console visualizer.
+If the exe is not present, the launcher falls back to:
+
+```powershell
+python dashboards\esp32-arduino\dashboard.py --port auto --baud 115200
+```
+
+Then it opens the live serial dashboard.
 
 On Mac, the manual `python3 ... dashboard.py` command starts the same dashboard.
 
