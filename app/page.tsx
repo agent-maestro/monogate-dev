@@ -320,8 +320,9 @@ export default function LandingPage() {
         </div>
         <div style={{ marginTop: 24, padding: "16px 20px", background: "rgba(232,160,32,0.08)", border: `1px solid rgba(232,160,32,0.18)`, borderRadius: 6, fontFamily: "monospace", fontSize: 12, color: C.text, lineHeight: 1.6 }}>
           Surface split: <strong style={{ color: C.orange }}>monogate.dev</strong> is the workbench,{" "}
-          <strong style={{ color: C.orange }}>monogate.org</strong> is the research record, and{" "}
-          <strong style={{ color: C.orange }}>1.op/io</strong> is for games and visualization.
+          <a href="https://monogate.org" style={{ color: C.orange, fontWeight: 700 }}>monogate.org</a> is the research record,{" "}
+          <a href="https://monogate.net" style={{ color: C.orange, fontWeight: 700 }}>monogate.net</a> is the CI-emitted verification dashboard, and{" "}
+          <a href="https://1op.io" style={{ color: C.orange, fontWeight: 700 }}>1op.io</a> is games and visualization.
         </div>
       </section>
 
@@ -348,6 +349,8 @@ export default function LandingPage() {
             { href: "https://github.com/agent-maestro/monogate", label: "GitHub" },
             { href: "https://www.npmjs.com/package/monogate", label: "npm" },
             { href: "https://monogate.org", label: "monogate.org" },
+            { href: "https://monogate.net", label: "monogate.net" },
+            { href: "https://1op.io", label: "1op.io" },
           ].map(({ href, label }) => (
             <a key={label} href={href} target="_blank" rel="noopener noreferrer" style={{ color: C.muted }}>{label}</a>
           ))}
