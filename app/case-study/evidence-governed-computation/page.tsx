@@ -5,7 +5,7 @@ import { C, pill } from "@/app/evidence/data";
 export const metadata: Metadata = {
   title: "Evidence-Governed Computation | Monogate",
   description:
-    "A Monogate case study on EML research, evidence packets, reviewer decisions, claim boundaries, and electronics evidence.",
+    "A Monogate case study on EML research, evidence bundles, reviewer decisions, claim boundaries, and electronics evidence.",
 };
 
 const steps = [
@@ -43,9 +43,9 @@ const proofPoints = [
     text: "Approved and candidate artifacts with validation, replay, semantic strength, and non-claims.",
   },
   {
-    label: "Forge Rescue Packet",
+    label: "Forge Rescue Bundle",
     href: "/evidence/forge-rescue",
-    text: "A bounded evidence packet for the current proof-carrying rescue lane.",
+    text: "A bounded evidence bundle for the current proof-carrying rescue lane.",
   },
   {
     label: "Rescue Explorer",
@@ -55,27 +55,27 @@ const proofPoints = [
   {
     label: "Proof Digestion Lab",
     href: "/proof-digestion",
-    text: "Understanding Packets for Forge Rescue and the Monogate OS EML Bridge: core ideas, reuse paths, failure modes, and open questions.",
+    text: "Understanding bundles for Forge Rescue and the Monogate OS EML Bridge: core ideas, reuse paths, failure modes, and open questions.",
   },
   {
     label: "Electronics Evidence",
     href: "/electronics",
-    text: "Simulated EE math packets for RC transient, voltage divider, and logic guard kernels with hardware flags false.",
+    text: "Simulated EE math bundles for RC transient, voltage divider, and logic guard kernels with hardware flags false.",
   },
   {
-    label: "Packet Builder",
+    label: "Bundle Builder",
     href: "/explorer/eml-packets/builder",
-    text: "Client-side packet intake for AI answers, proof notes, traces, hardware packets, compiler artifacts, and EML expressions.",
+    text: "Client-side bundle intake for AI answers, proof notes, traces, hardware artifacts, compiler outputs, and EML expressions.",
   },
 ];
 
 const built = [
-  "Designed an evidence packet flow with validation status, replay status, semantic strength, claim flags, evidence paths, and non-claims.",
+  "Designed an evidence-bundle flow with validation status, replay status, semantic strength, claim flags, evidence paths, and non-claims.",
   "Implemented a reviewer-gate pattern that separates private approval decisions from bounded public inspection surfaces.",
   "Generated public fixtures from internal research artifacts so pages can drift-check against source evidence.",
   "Built Proof Digestion infrastructure that turns evidence-backed artifacts into teachable explanations, reuse paths, failure modes, and credit lineage.",
   "Ran A6 symbolic regression, R10 cost/stability, and R11 lowering-planner checks that blocked broad EML-superiority claims.",
-  "Connected the electronics lane through simulated evidence packets without claiming hardware observation.",
+  "Connected the electronics lane through simulated evidence bundles without claiming hardware observation.",
   "Deployed public case-study, evidence, explorer, electronics, and digestion surfaces while keeping the private command cockpit out of the public product.",
 ];
 

@@ -325,17 +325,17 @@ export default function PacketBuilderClient() {
 
         <header style={{ marginBottom: 28 }}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
-            {pill("Evidence Packet Builder v1", C.orange)}
+            {pill("Evidence Bundle Builder v1", C.orange)}
             {pill("client-side only", C.blue)}
-            {pill("draft packets", C.orange)}
+            {pill("draft bundles", C.orange)}
             {pill("claim flags locked false", C.green)}
           </div>
           <h1 style={{ color: C.orange, fontSize: 34, lineHeight: 1.1, margin: "0 0 12px", fontFamily: "monospace" }}>
-            Evidence Packet Builder
+            Evidence Bundle Builder
           </h1>
           <p style={{ color: C.text, fontSize: 16, lineHeight: 1.75, maxWidth: 820, margin: 0 }}>
-            Paste an artifact, choose its type, generate a candidate evidence packet, inspect blocked
-            claims, and export JSON. EML expressions also get an expression packet draft.
+            Paste an artifact, choose its type, generate a candidate evidence bundle, inspect blocked
+            claims, and export JSON. EML expressions also get an expression-bundle draft.
           </p>
         </header>
 
@@ -404,7 +404,7 @@ export default function PacketBuilderClient() {
             <section style={{ border: `1px solid ${C.border}`, background: C.surface, borderRadius: 8, padding: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
                 <div style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                  evidence packet json
+                  evidence bundle json
                 </div>
                 <a href={encodedEvidence} download={`${evidencePacket.artifactId}_evidence_packet.json`} style={{ color: C.green, fontSize: 12 }}>
                   export JSON

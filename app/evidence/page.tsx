@@ -29,8 +29,9 @@ export default function EvidencePage() {
             Inspect computational claims and their boundaries.
           </h1>
           <p style={{ color: C.muted, fontSize: 13, lineHeight: 1.75, maxWidth: 760, margin: 0 }}>
-            Monogate publishes reviewable evidence packets with traces, replay logs, proof obligations, semantic tiers,
-            and claim flags. This page displays what has been approved for a surface and what remains candidate evidence.
+            Every claim Monogate ships as an <strong style={{ color: C.text }}>evidence bundle</strong> — traces,
+            replay logs, proof obligations, semantic tiers, and explicit non-claims. This page shows what has been
+            approved for a surface and what remains candidate evidence.
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
             {pill("validation")}

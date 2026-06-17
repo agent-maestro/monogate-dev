@@ -133,8 +133,8 @@ const RESEARCH_STACK = [
   },
   {
     href: "/explorer/eml-packets/builder",
-    title: "Packet Builder",
-    sub: "Draft Evidence Packet v0 JSON from AI answers, proofs, traces, hardware packets.",
+    title: "Bundle Builder",
+    sub: "Draft Evidence Bundle JSON from AI answers, proofs, traces, and hardware artifacts.",
     color: C.orange,
   },
   {
@@ -157,8 +157,8 @@ const RESEARCH_STACK = [
   },
   {
     href: "/explorer/eml-packets",
-    title: "Packet Gallery",
-    sub: "Candidate EML expression packets from the private builder flow.",
+    title: "Bundle Gallery",
+    sub: "Candidate EML expression bundles from the private builder flow.",
     color: C.green,
   },
   {
@@ -219,7 +219,7 @@ export default function LandingPage() {
             { label: "ESP32", color: C.green },
             { label: "FPGA", color: C.green },
             { label: "Lean-verified", color: C.purple },
-            { label: "evidence-packeted", color: C.orange },
+            { label: "evidence-bundled", color: C.orange },
           ].map(({ label, color }) => (
             <span
               key={label}

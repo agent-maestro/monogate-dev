@@ -79,18 +79,19 @@ export default function LandingPage({ onEnter }) {
           <h1 style={{
             fontSize: "clamp(32px, 7vw, 56px)", fontWeight: 700,
             color: "#fff", margin: "0 0 14px",
-            letterSpacing: "-0.03em", lineHeight: 1,
+            letterSpacing: "-0.03em", lineHeight: 1.05,
           }}>
-            monogate
+            One operator.<br />
+            <span style={{ color: C.accent }}>Every elementary function.</span>
           </h1>
 
           <p style={{
             fontSize: "clamp(13px, 2vw, 16px)", color: C.muted,
             margin: "0 0 24px", lineHeight: 1.6, maxWidth: 540,
           }}>
-            A symbolic math optimizer built on a single binary operator.
             Calculate, verify, search, and benchmark EML expressions across
-            nine tools. For the 8-operator fractal zoo, see monogate.dev/lab.
+            nine tools. A symbolic math optimizer built on a single binary
+            operator. For the 8-operator fractal zoo, see monogate.dev/lab.
           </p>
 
           <code style={{
