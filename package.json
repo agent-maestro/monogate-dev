@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "check:evidence": "node scripts/check_evidence_cockpit_fixture.mjs",
+    "check:first-impression": "node scripts/lint_first_impression.mjs",
+    "check:first-impression:strict": "node scripts/lint_first_impression.mjs --strict",
     "start": "next start",
     "lint": "next lint"
   },
