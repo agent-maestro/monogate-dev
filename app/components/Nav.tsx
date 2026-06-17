@@ -2,15 +2,19 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
+// Nav order is deliberately the first impression. Visitor first sees three
+// items they can understand cold (Learn, Explorer, Electronics), then the
+// interactive surfaces (Lab, Challenge), then the research-stack items
+// (Evidence, Builder, Digestion) which require Monogate vocabulary to grok.
 const LINKS = [
-  { href: "/explorer",          label: "Tools" },
+  { href: "/learn",             label: "Learn" },
+  { href: "/explorer",          label: "Explorer" },
+  { href: "/electronics",       label: "Electronics" },
+  { href: "/lab",               label: "Lab" },
+  { href: "/challenge",         label: "Challenge" },
   { href: "/evidence",          label: "Evidence" },
   { href: "/explorer/eml-packets/builder", label: "Builder" },
   { href: "/proof-digestion",   label: "Digestion" },
-  { href: "/challenge",         label: "Challenge" },
-  { href: "/lab",               label: "Lab" },
-  { href: "/electronics",       label: "Electronics" },
-  { href: "/learn",             label: "Learn" },
   { href: "/docs",              label: "Docs" },
   { href: "https://monogate.org", label: "Research ↗", external: true },
 ];

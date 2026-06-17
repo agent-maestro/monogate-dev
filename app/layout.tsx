@@ -7,23 +7,27 @@ const siteUrl = "https://monogate.dev";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "monogate.dev — Developer Playground",
+    default: "monogate.dev — EML math language playground",
     template: "%s — monogate.dev",
   },
   description:
-    "Developer playground for Monogate artifacts: EML explorers, evidence " +
-    "packets, rescue traces, packet builders, simulators, and bounded demos.",
+    "EML — a single-operator math language verified in Lean and running from " +
+    "your browser to ESP32 to FPGA. Explore the language, try the hardware lab, " +
+    "and learn EML.",
   keywords: [
     "EML operator", "elementary functions", "exp minus log", "arXiv:2603.21852",
-    "developer playground", "evidence packets", "rescue traces", "monogate",
+    "math language", "Lean-verified", "ESP32", "FPGA", "monogate",
+    "hardware-validated math", "evidence packets",
   ],
   authors: [{ name: "monogate.dev" }],
   openGraph: {
     type: "website",
     siteName: "monogate.dev",
-    title: "monogate.dev — Developer Playground",
+    title: "monogate.dev — Math you can verify. Hardware that confirms it.",
     description:
-      "Try Monogate tools: inspect evidence packets, run EML explorers, open rescue traces, draft packet JSON, and use bounded simulators.",
+      "EML is a single-operator math language. Every kernel ships with a Lean " +
+      "proof and runs from your browser to ESP32 to FPGA. Try the Explorer, " +
+      "open the Electronics Lab, or learn EML.",
     url: siteUrl,
     images: [
       {
@@ -36,9 +40,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "monogate.dev — Developer Playground",
+    title: "monogate.dev — Math you can verify. Hardware that confirms it.",
     description:
-      "A developer playground for Monogate artifacts, evidence packets, EML explorers, and bounded simulators.",
+      "EML — a single-operator math language verified in Lean and running on " +
+      "browser, ESP32, and FPGA. Try the Explorer or Electronics Lab.",
     images: ["/og-image.jpg"],
   },
   icons: {

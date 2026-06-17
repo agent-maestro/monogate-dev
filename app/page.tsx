@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "monogate.dev — Developer Playground",
+  title: "monogate.dev — EML math language playground",
   description:
-    "A developer playground for Monogate artifacts: inspect evidence packets, " +
-    "run EML explorers, draft packet JSON, and try bounded simulators.",
+    "EML — a single-operator math language verified in Lean and running from " +
+    "your browser to ESP32 to FPGA. Explore the language, try the hardware lab, " +
+    "and learn EML.",
 };
 
 const C = {
@@ -24,7 +25,7 @@ const FLOW_STEPS: { n: string; text: string; sub: string }[] = [
   {
     n: "01",
     text: "Open a live tool",
-    sub: "Start with a packet builder, explorer, simulator, evidence browser, or replay fixture.",
+    sub: "Start with the EML Explorer, Electronics Lab, Learn pages, or a research-stack workbench.",
   },
   {
     n: "02",
@@ -48,160 +49,144 @@ const FLOW_STEPS: { n: string; text: string; sub: string }[] = [
   },
 ];
 
-const TOOLKIT: { cmd: string; tagline: string; color: string }[] = [
+// Primary spotlights — what a first-time visitor should try.
+// Order matters: Explorer first (what is EML), Electronics (the differentiator),
+// Learn (where to go next), Advantage (why it matters).
+const PRIMARY_SPOTLIGHTS = [
   {
-    cmd: "Inspect",
-    tagline: "Open generated EML, rescue, evidence, and proof-digestion artifacts.",
-    color: C.blue,
-  },
-  {
-    cmd: "Build",
-    tagline: "Draft candidate evidence packets and EML expression packets in the browser.",
-    color: C.orange,
-  },
-  {
-    cmd: "Export",
-    tagline: "Copy packet JSON and carry bounded claims into private review.",
-    color: C.green,
-  },
-];
-
-const SECTIONS = [
-  {
-    href: "/explorer/eml-packets/builder",
-    label: "Packet Builder",
-    desc: "Draft candidate Evidence Packet v0 JSON from AI answers, proof notes, traces, hardware packets, compiler artifacts, or EML expressions.",
-    color: C.orange,
-    tag: "build",
-  },
-  {
-    href: "/evidence",
-    label: "Evidence Browser",
-    desc: "Inspect artifacts by validation, replay, semantic strength, claim flags, and reviewer decision.",
-    color: C.green,
-    tag: "review",
-  },
-  {
-    href: "/explorer",
-    label: "Explorer",
-    desc: "Browse the current Explorer surfaces: EML language, packet gallery, rescue suite, advantage lab, Atlas annex, and symbolic-regression fixtures.",
-    color: C.blue,
-    tag: "index",
-  },
-  {
-    href: "/proof-digestion",
-    label: "Proof Digestion",
-    desc: "Turn evidence-backed artifacts into core ideas, minimum examples, reuse paths, failure modes, and open questions.",
-    color: C.orange,
-    tag: "lab",
-  },
-  {
-    href: "/case-study/evidence-governed-computation",
-    label: "Case Study",
-    desc: "A concise public framing for the artifact-to-evidence-to-review-to-understanding pipeline.",
-    color: C.blue,
-    tag: "overview",
-  },
-  {
-    href: "/electronics",
-    label: "Electronics Lab",
-    desc: "Laptop-agent-owned electronics surface for simulated trainer boards and physical-evidence-ready packets.",
-    color: C.green,
-    tag: "sim lab",
-  },
-  {
-    href: "/challenge",
-    label: "Challenge Board",
-    desc: "Open problems: construct sin, cos, π, i from eml(x,y) = exp(x) − ln(y). Submit a construction, get credited permanently.",
-    color: C.orange,
-    tag: "challenge",
-  },
-  {
-    href: "/lab",
-    label: "Math Lab",
-    desc: "Interactive experiments and experiences built on the EML grammar.",
-    color: C.purple,
-    tag: "lab",
-  },
-  {
-    href: "/docs",
-    label: "Docs",
-    desc: "Reference material and developer notes for the current Monogate surfaces.",
-    color: C.blue,
-    tag: "docs",
-  },
-];
-
-const SPOTLIGHTS = [
-  {
-    href: "/explorer/rescue-suite",
-    title: "Rescue Suite",
-    eyebrow: "inspect · replay",
-    text: "Open optimization-failure rescue packets, replay status, trace frames, and MachLib obligation routing.",
-    color: C.green,
-  },
-  {
-    href: "/explorer/eml-packets/builder",
-    title: "Packet Builder",
-    eyebrow: "build · export",
-    text: "Draft candidate Evidence Packet v0 JSON and EML Expression Packet v0 JSON from pasted artifacts.",
-    color: C.orange,
-  },
-  {
-    href: "/explorer/eml-advantage",
-    title: "EML Advantage Lab",
-    eyebrow: "compare · guard",
-    text: "See where EML helps, where protected standard math wins, and which claims stay blocked.",
+    href: "/explorer/eml-language",
+    title: "EML Language Explorer",
+    eyebrow: "start here · what is eml",
+    text:
+      "The single-operator language at the heart of Monogate. Browse syntax, " +
+      "expressions, and worked examples. Start here if you're new.",
     color: C.blue,
   },
   {
     href: "/electronics",
     title: "Electronics Lab",
-    eyebrow: "simulate · export",
-    text: "Open the laptop-agent electronics surface for simulated trainer board work and physical-evidence-ready packets.",
+    eyebrow: "differentiator · esp32 / fpga",
+    text:
+      "EML kernels running on real hardware: ESP32 trainer boards, FPGA bitstreams, " +
+      "and physical-evidence-ready packets. The thing other AI projects don't have.",
     color: C.green,
   },
   {
-    href: "/evidence",
-    title: "Evidence Browser",
-    eyebrow: "review · packets",
-    text: "Inspect candidate and approved evidence packets by validation, replay, semantic strength, and claim flags.",
+    href: "/learn",
+    title: "Learn EML",
+    eyebrow: "tutorials · quick start",
+    text:
+      "Step-by-step paths into EML, Forge, and the certificate system. " +
+      "Start with the language, then follow the lanes that interest you.",
+    color: C.purple,
+  },
+  {
+    href: "/explorer/eml-advantage",
+    title: "EML Advantage Lab",
+    eyebrow: "compare · why eml",
+    text:
+      "Side-by-side fixtures: where EML helps, where standard math wins, " +
+      "where claims stay blocked. The honest comparison view.",
     color: C.orange,
   },
+];
+
+// Secondary spotlights — interactive surfaces that aren't the "start here" but
+// reward curiosity.
+const EXPLORE_FURTHER = [
   {
-    href: "/proof-digestion",
-    title: "Proof Digestion Lab",
-    eyebrow: "explain · reuse",
-    text: "Turn evidence-backed artifacts into minimum examples, failure modes, reuse paths, and open questions.",
-    color: C.blue,
+    href: "/lab",
+    title: "Math Lab",
+    eyebrow: "interactive · playground",
+    text: "Hands-on experiments and experiences built on the EML grammar.",
+    color: C.purple,
   },
   {
-    href: "/explorer/eml-ir-bridge",
-    title: "EML IR Bridge",
-    eyebrow: "new · candidate fixture",
-    text: "Inspect one EML expression as a shared DAG, replay packet, and explicit non-claim boundary.",
+    href: "/challenge",
+    title: "Challenge Board",
+    eyebrow: "open problems · credited",
+    text:
+      "Construct sin, cos, π, i from eml(x,y) = exp(x) − ln(y). " +
+      "Submit a construction, get credited permanently.",
     color: C.orange,
-  },
-  {
-    href: "/explorer/eml-packets",
-    title: "EML Packet Gallery",
-    eyebrow: "inspect · packets",
-    text: "Browse candidate EML expression packets generated from the private packet-builder flow.",
-    color: C.green,
-  },
-  {
-    href: "/explorer/eml-atlas-annex",
-    title: "EML Atlas Annex",
-    eyebrow: "review · atlas",
-    text: "Review Atlas-style identities, claim boundaries, and candidate MachLib witness targets.",
-    color: C.blue,
   },
   {
     href: "/explorer/eml-symbolic-regression",
     title: "EML Template Search",
-    eyebrow: "new · research frontier",
-    text: "Compare fixed EML, standard, control, and baseline templates on the prime residual fixture.",
+    eyebrow: "research frontier · compare",
+    text:
+      "Compare fixed EML, standard, control, and baseline templates on the " +
+      "prime residual fixture.",
     color: C.orange,
+  },
+];
+
+// Under-the-hood surfaces — the research stack. Demoted from "start here" to
+// "available if you want to go deep" — these are the tools that make sense
+// AFTER you understand what Monogate is doing.
+const RESEARCH_STACK = [
+  {
+    href: "/evidence",
+    title: "Evidence Browser",
+    sub: "Inspect artifacts by validation, replay, semantic strength, and claim flags.",
+    color: C.green,
+  },
+  {
+    href: "/explorer/eml-packets/builder",
+    title: "Packet Builder",
+    sub: "Draft Evidence Packet v0 JSON from AI answers, proofs, traces, hardware packets.",
+    color: C.orange,
+  },
+  {
+    href: "/explorer/rescue-suite",
+    title: "Rescue Suite",
+    sub: "Optimization-failure rescue packets, replay status, MachLib obligation routing.",
+    color: C.green,
+  },
+  {
+    href: "/proof-digestion",
+    title: "Proof Digestion",
+    sub: "Turn artifacts into core ideas, examples, reuse paths, and open questions.",
+    color: C.orange,
+  },
+  {
+    href: "/explorer/eml-ir-bridge",
+    title: "EML IR Bridge",
+    sub: "One EML expression as shared DAG, replay packet, and non-claim boundary.",
+    color: C.orange,
+  },
+  {
+    href: "/explorer/eml-packets",
+    title: "Packet Gallery",
+    sub: "Candidate EML expression packets from the private builder flow.",
+    color: C.green,
+  },
+  {
+    href: "/explorer/eml-atlas-annex",
+    title: "Atlas Annex",
+    sub: "Atlas-style identities, claim boundaries, and MachLib witness targets.",
+    color: C.blue,
+  },
+];
+
+// Ecosystem-status strip — three live-feeling cells under the hero. These
+// signal "this is a real, active project" without requiring the visitor to
+// click anything.
+const ECOSYSTEM_STATUS = [
+  {
+    label: "EML kernels",
+    value: "108",
+    note: "Lean-verified in MachLib",
+  },
+  {
+    label: "Hardware ports",
+    value: "browser · ESP32 · FPGA",
+    note: "running today",
+  },
+  {
+    label: "Status feed",
+    value: "monogate.net",
+    note: "CI-emitted dashboard",
   },
 ];
 
@@ -209,80 +194,179 @@ export default function LandingPage() {
   return (
     <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 920, margin: "0 auto", padding: "0 18px 80px" }}>
 
-      {/* Hero */}
-      <section style={{ marginBottom: 56 }}>
+      {/* Hero — lead with what EML is, not what the tools are. */}
+      <section style={{ marginBottom: 36 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>
-          monogate.dev — developer playground
+          monogate.dev — eml math language workbench
         </div>
-        <h1 style={{ fontSize: 36, fontWeight: 700, color: C.orange, fontFamily: "monospace", marginBottom: 16, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
-          Open the tool.<br />Inspect the packet.
+        <h1 style={{ fontSize: 38, fontWeight: 700, color: C.orange, fontFamily: "monospace", marginBottom: 14, letterSpacing: "-0.02em", lineHeight: 1.12 }}>
+          Math you can verify.<br />
+          <span style={{ color: C.green }}>Hardware that confirms it.</span>
         </h1>
-        <p style={{ fontSize: 15, color: C.text, lineHeight: 1.8, maxWidth: 640, marginBottom: 24 }}>
-          This is the public workbench for Monogate artifacts: EML explorers,
-          evidence packets, rescue traces, packet builders, proof-digestion
-          views, and bounded simulators. The deeper research story lives on{" "}
-          <a href="https://monogate.org" style={{ color: C.blue }}>monogate.org</a>;
-          this site is for trying the tools.
+        <p style={{ fontSize: 16, color: C.text, lineHeight: 1.7, maxWidth: 660, marginBottom: 24 }}>
+          <strong style={{ color: C.text }}>EML</strong> is a single-operator math
+          language — every expression reduces to one primitive,{" "}
+          <code style={{ color: C.purple, fontSize: 14, fontFamily: "monospace" }}>
+            eml(x, y) = exp(x) − ln(y)
+          </code>
+          . Every kernel ships with a Lean proof. The same kernel runs in your
+          browser, on an ESP32, and as a synthesizable FPGA block.
         </p>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-          <code style={{ fontSize: 12, color: C.blue, background: "rgba(106,176,245,0.07)", border: `1px solid rgba(106,176,245,0.2)`, borderRadius: 4, padding: "6px 12px" }}>
-            inspect artifacts
-          </code>
-          <code style={{ fontSize: 12, color: C.green, background: "rgba(74,222,128,0.07)", border: `1px solid rgba(74,222,128,0.2)`, borderRadius: 4, padding: "6px 12px" }}>
-            export candidate JSON
-          </code>
+        {/* Capability badges — the "where it runs / how it's checked" strip. */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+          {[
+            { label: "browser", color: C.blue },
+            { label: "ESP32", color: C.green },
+            { label: "FPGA", color: C.green },
+            { label: "Lean-verified", color: C.purple },
+            { label: "evidence-packeted", color: C.orange },
+          ].map(({ label, color }) => (
+            <span
+              key={label}
+              style={{
+                fontSize: 10, color, background: `${color}10`,
+                border: `1px solid ${color}33`, borderRadius: 4,
+                padding: "5px 10px", fontFamily: "monospace",
+                letterSpacing: "0.08em", textTransform: "uppercase",
+              }}
+            >
+              {label}
+            </span>
+          ))}
         </div>
+        {/* Primary CTAs — three doorways: Explorer (what), Electronics (proof
+            of life), Learn (next step). */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <a href="/explorer/rescue-suite" style={{ fontSize: 12, color: C.bg, background: C.orange, border: `1px solid ${C.orange}`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
-            Start With Rescue Suite
+          <a
+            href="/explorer/eml-language"
+            style={{
+              fontSize: 13, color: C.bg, background: C.blue,
+              border: `1px solid ${C.blue}`, borderRadius: 5,
+              padding: "10px 16px", textDecoration: "none", fontWeight: 700,
+            }}
+          >
+            Try the Explorer →
           </a>
-          <a href="/explorer/eml-packets/builder" style={{ fontSize: 12, color: C.blue, background: "rgba(106,176,245,0.07)", border: `1px solid rgba(106,176,245,0.28)`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
-            Open Packet Builder
+          <a
+            href="/electronics"
+            style={{
+              fontSize: 13, color: C.green,
+              background: "rgba(74,222,128,0.07)",
+              border: `1px solid rgba(74,222,128,0.32)`, borderRadius: 5,
+              padding: "10px 16px", textDecoration: "none", fontWeight: 700,
+            }}
+          >
+            Open Electronics Lab
           </a>
-          <a href="/electronics" style={{ fontSize: 12, color: C.green, background: "rgba(74,222,128,0.07)", border: `1px solid rgba(74,222,128,0.28)`, borderRadius: 5, padding: "8px 12px", textDecoration: "none", fontWeight: 700 }}>
-            Try Electronics
+          <a
+            href="/learn"
+            style={{
+              fontSize: 13, color: C.purple,
+              background: "rgba(167,139,250,0.07)",
+              border: `1px solid rgba(167,139,250,0.32)`, borderRadius: 5,
+              padding: "10px 16px", textDecoration: "none", fontWeight: 700,
+            }}
+          >
+            Learn EML
           </a>
         </div>
       </section>
 
-      {/* Spotlight workbenches */}
+      {/* Ecosystem-status strip — three cells showing this is alive. */}
+      <section
+        aria-label="Ecosystem status"
+        style={{
+          marginBottom: 56,
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
+          gap: 10,
+        }}
+      >
+        {ECOSYSTEM_STATUS.map(({ label, value, note }) => (
+          <div
+            key={label}
+            style={{
+              background: C.surface,
+              border: `1px solid ${C.border}`,
+              borderRadius: 6,
+              padding: "12px 14px",
+            }}
+          >
+            <div style={{ fontSize: 9, color: C.muted, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6 }}>
+              {label}
+            </div>
+            <div style={{ fontSize: 14, color: C.text, fontFamily: "monospace", fontWeight: 700, marginBottom: 4 }}>
+              {value}
+            </div>
+            <div style={{ fontSize: 10, color: C.muted }}>
+              {note}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* Primary spotlights — the four cards a first-time visitor should try. */}
       <section style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
           Start here
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
-          {SPOTLIGHTS.map(({ href, title, eyebrow, text, color }) => (
-            <a key={href} href={href} style={{ display: "block", minHeight: 150, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "16px 18px", textDecoration: "none", color: "inherit" }}>
-              <div style={{ fontSize: 9, color, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "monospace", marginBottom: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+          {PRIMARY_SPOTLIGHTS.map(({ href, title, eyebrow, text, color }) => (
+            <a
+              key={href}
+              href={href}
+              style={{
+                display: "block", minHeight: 170,
+                background: C.surface,
+                border: `1px solid ${color}33`,
+                borderRadius: 8,
+                padding: "18px 20px",
+                textDecoration: "none",
+                color: "inherit",
+              }}
+            >
+              <div style={{ fontSize: 9, color, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "monospace", marginBottom: 12 }}>
                 {eyebrow}
               </div>
-              <div style={{ fontSize: 16, color, fontWeight: 700, marginBottom: 8 }}>{title}</div>
+              <div style={{ fontSize: 17, color, fontWeight: 700, marginBottom: 8 }}>{title}</div>
               <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.65 }}>{text}</div>
             </a>
           ))}
         </div>
       </section>
 
-      {/* Toolkit row */}
+      {/* Explore further — interactive surfaces, medium prominence. */}
       <section style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
-          Playground contract
+          Try something
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
-          {TOOLKIT.map(({ cmd, tagline, color }) => (
-            <div key={cmd} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "16px 20px" }}>
-              <div style={{ fontFamily: "monospace", fontSize: 13, color, marginBottom: 6, fontWeight: 700 }}>
-                {cmd}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
+          {EXPLORE_FURTHER.map(({ href, title, eyebrow, text, color }) => (
+            <a
+              key={href}
+              href={href}
+              style={{
+                display: "block", minHeight: 130,
+                background: C.surface,
+                border: `1px solid ${C.border}`,
+                borderRadius: 6,
+                padding: "14px 16px",
+                textDecoration: "none",
+                color: "inherit",
+              }}
+            >
+              <div style={{ fontSize: 9, color, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "monospace", marginBottom: 8 }}>
+                {eyebrow}
               </div>
-              <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>
-                {tagline}
-              </div>
-            </div>
+              <div style={{ fontSize: 14, color, fontWeight: 700, marginBottom: 6 }}>{title}</div>
+              <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.6 }}>{text}</div>
+            </a>
           ))}
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How it works — kept from the original; useful for visitors who want
+          to understand the workbench contract before clicking deeper. */}
       <section style={{ marginBottom: 56 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
           How it works
@@ -326,22 +410,48 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Section cards */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10, marginBottom: 48 }}>
-        {SECTIONS.map(({ href, label, desc, color, tag }) => (
-          <a key={href} href={href} style={{ display: "block", background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: "18px 18px", textDecoration: "none", color: "inherit" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color }}>{label}</div>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color, background: `${color}15`, border: `1px solid ${color}30`, borderRadius: 3, padding: "2px 6px" }}>
-                {tag}
-              </span>
-            </div>
-            <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7 }}>{desc}</div>
-          </a>
-        ))}
+      {/* Research stack — the previously-prominent internal nouns (Evidence
+          Packets, Rescue Traces, Proof Digestion, EML IR Bridge, Atlas Annex,
+          Packet Gallery). Demoted from "start here" to "the tools that make
+          sense after you understand Monogate". Visually smaller, set apart by
+          its own heading and a thin divider strip. */}
+      <section style={{ marginBottom: 56 }}>
+        <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 28 }}>
+          <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+            Research stack
+          </div>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.3 }}>
+            Under the hood — the evidence machinery.
+          </h2>
+          <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.7, marginBottom: 18, maxWidth: 600 }}>
+            Once you know what EML is, these are the workbenches that make
+            Monogate&apos;s claims auditable. Each surface is bounded — what is
+            simulated, candidate-only, or public-ready is marked inline.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 8 }}>
+            {RESEARCH_STACK.map(({ href, title, sub, color }) => (
+              <a
+                key={href}
+                href={href}
+                style={{
+                  display: "block",
+                  background: C.surface,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 6,
+                  padding: "12px 14px",
+                  textDecoration: "none",
+                  color: "inherit",
+                }}
+              >
+                <div style={{ fontSize: 13, color, fontWeight: 700, marginBottom: 5 }}>{title}</div>
+                <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.55 }}>{sub}</div>
+              </a>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* Links */}
+      {/* Footer links */}
       <footer style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10, fontSize: 10, color: C.muted }}>
         <div style={{ display: "flex", gap: 16 }}>
           {[
