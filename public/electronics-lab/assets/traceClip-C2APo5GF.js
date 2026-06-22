@@ -1,4 +1,4 @@
-import{b as S,H as E,n as M}from"./vendor-Bozx688T.js";const F=`<!doctype html>\r
+import{b as A,H as E,n as F}from"./vendor-Bozx688T.js";const C=`<!doctype html>\r
 <html lang="en">\r
 <head>\r
 <meta charset="utf-8" />\r
@@ -226,6 +226,16 @@ function isClamp(f) {\r
   if (req !== null && lim !== null) return req > lim + 0.004;\r
   return false;\r
 }\r
+// The shaded band marks "the watched condition is active": a guard clamp for the\r
+// guard model, a response error for the response-error model. Keeps the band and\r
+// its legend honest across courses.\r
+function isBandActive(f) {\r
+  if (CONFIG.model === "response_error") {\r
+    const ds = CONFIG.fields.decision;\r
+    return ds ? f[ds] === CONFIG.fields.errorState : false;\r
+  }\r
+  return isClamp(f);\r
+}\r
 function checkContract() {\r
   const safeK = CONFIG.fields.safe; const ceils = CONFIG.contractCeilings || [];\r
   let violations = 0, worst = 0; const failures = [];\r
@@ -250,6 +260,13 @@ function detectEvents() {\r
   for (let i = 0; i < FRAMES.length; i++) {\r
     const f = FRAMES[i], p = i ? FRAMES[i - 1] : null;\r
     if (i === 0) { push("BASELINE", "", 0, baselineMsg(f)); continue; }\r
+    if (CONFIG.model === "response_error") {\r
+      // response-error course: decision transitions, not guard clamps.\r
+      const ds = fields.decision, es = fields.errorState;\r
+      const d = ds ? f[ds] : null, pd = ds ? p[ds] : null;\r
+      if (d === es && pd !== es) push("RESPONSE ERROR", "clamp", i, errorWhy(f));\r
+      if (d !== es && pd === es) push("TRACKING", "release", i, "Output tracked the command again (within deadband).");\r
+    } else {\r
     // violation latch / clear\r
     if (fields.violation) {\r
       const v = boolf(f, fields.violation), pv = boolf(p, fields.violation);\r
@@ -267,6 +284,7 @@ function detectEvents() {\r
         const up = l > pl;\r
         push(up ? "LIMIT UP" : "LIMIT DOWN", "limit", i, "Safe limit " + fmt(pl) + " → " + fmt(l) + (up ? " (raised)" : " (lowered)") + (isClamp(f) ? "" : " — passing"));\r
       }\r
+    }\r
     }\r
     // momentary input (surge / mute button)\r
     if (fields.button) {\r
@@ -286,12 +304,19 @@ function detectEvents() {\r
 }\r
 function baselineMsg(f) {\r
   const safe = num(f, CONFIG.fields.safe);\r
+  if (CONFIG.model === "response_error") {\r
+    return "Baseline — output " + fmt(safe) + ", " + (isBandActive(f) ? "response error" : "tracking the command") + ".";\r
+  }\r
   return "Baseline — safe output " + fmt(safe) + ", guard " + (isClamp(f) ? "clamping" : "passing") + ".";\r
 }\r
 function clampWhy(f) {\r
   const req = num(f, CONFIG.fields.requested), lim = num(f, CONFIG.fields.limit);\r
   if (req !== null && lim !== null) return "requested " + fmt(req) + " > limit " + fmt(lim);\r
   return "requested over the safe limit";\r
+}\r
+function errorWhy(f) {\r
+  const cmd = num(f, CONFIG.fields.demandLabel), obs = num(f, CONFIG.fields.requested), err = num(f, CONFIG.fields.error);\r
+  return "commanded " + fmt(cmd) + " vs observed " + fmt(obs) + " (Δ " + fmt(err) + ") — output diverged from reality.";\r
 }\r
 \r
 // ---- rubric evaluation ----\r
@@ -323,11 +348,11 @@ function evalRubric(events) {\r
 function computeStats(events) {\r
   const safeK = CONFIG.fields.safe, reqK = CONFIG.fields.requested;\r
   const rng = (key) => { const xs = FRAMES.map((f) => num(f, key)).filter((v) => v !== null); return xs.length ? [Math.min(...xs), Math.max(...xs)] : [null, null]; };\r
-  const clampN = FRAMES.filter(isClamp).length;\r
+  const clampN = FRAMES.filter(isBandActive).length;\r
   const out = [];\r
   out.push(["frames", String(FRAMES.length)]);\r
   if (TK) out.push(["duration", clockLabel(FRAMES.length - 1)]);\r
-  out.push(["% clamping", pct(clampN / Math.max(1, FRAMES.length))]);\r
+  out.push([CONFIG.model === "response_error" ? "% resp error" : "% clamping", pct(clampN / Math.max(1, FRAMES.length))]);\r
   const r = rng(reqK), s = rng(safeK);\r
   if (r[0] !== null) out.push(["request max", fmt(r[1])]);\r
   if (s[0] !== null) out.push(["safe max", fmt(s[1])]);\r
@@ -371,14 +396,31 @@ function render() {\r
 \r
   // verdict\r
   const c = checkContract();\r
-  const v = $("verdict"); v.className = "verdict " + (c.violations === 0 ? "pass" : "fail");\r
-  $("verdictMark").textContent = c.violations === 0 ? "✅" : "⛔";\r
-  $("verdictHeadline").textContent = c.violations === 0\r
-    ? "GUARD HELD — 0 contract violations across " + FRAMES.length + " frames"\r
-    : "CONTRACT FAILED — " + c.violations + " violation" + (c.violations === 1 ? "" : "s");\r
-  $("verdictDetail").textContent = c.violations === 0\r
-    ? "Safe output never exceeded its ceiling (" + (CONFIG.contractCeilings || []).join(" / ") + ")."\r
-    : "First failure at " + clockLabel(c.failures[0].i) + ": safe " + fmt(c.failures[0].safe) + " > " + c.failures[0].ck + " " + fmt(c.failures[0].ceil) + ".";\r
+  const v = $("verdict");\r
+  if (CONFIG.model === "response_error") {\r
+    // detection course: count response-error onsets; the loop "verifies" by\r
+    // confirming the observed output against the command, not a ceiling.\r
+    const es = CONFIG.fields.errorState, ds = CONFIG.fields.decision;\r
+    let errEvents = 0;\r
+    for (let i = 1; i < FRAMES.length; i++) {\r
+      if (FRAMES[i][ds] === es && FRAMES[i - 1][ds] !== es) errEvents++;\r
+    }\r
+    v.className = "verdict pass";\r
+    $("verdictMark").textContent = "✅";\r
+    $("verdictHeadline").textContent = "CLOSED LOOP VERIFIED — " + errEvents + " response-error event" + (errEvents === 1 ? "" : "s") + " across " + FRAMES.length + " frames";\r
+    $("verdictDetail").textContent = errEvents === 0\r
+      ? "Observed tracked the command throughout — no divergence flagged."\r
+      : "The board flagged where commanded output and observed reality diverged, then recovered to tracking.";\r
+  } else {\r
+    v.className = "verdict " + (c.violations === 0 ? "pass" : "fail");\r
+    $("verdictMark").textContent = c.violations === 0 ? "✅" : "⛔";\r
+    $("verdictHeadline").textContent = c.violations === 0\r
+      ? "GUARD HELD — 0 contract violations across " + FRAMES.length + " frames"\r
+      : "CONTRACT FAILED — " + c.violations + " violation" + (c.violations === 1 ? "" : "s");\r
+    $("verdictDetail").textContent = c.violations === 0\r
+      ? "Safe output never exceeded its ceiling (" + (CONFIG.contractCeilings || []).join(" / ") + ")."\r
+      : "First failure at " + clockLabel(c.failures[0].i) + ": safe " + fmt(c.failures[0].safe) + " > " + c.failures[0].ck + " " + fmt(c.failures[0].ceil) + ".";\r
+  }\r
   if (isVirtual) $("verdictDetail").textContent += " Virtual replay — no Arty A7 was programmed or observed.";\r
 \r
   // events + rubric + stats + log\r
@@ -406,7 +448,8 @@ function render() {\r
   // legend + player init\r
   const legend = $("legend"); legend.innerHTML = "";\r
   (CONFIG.traces || []).forEach((t) => { const s = document.createElement("span"); s.innerHTML = '<i style="background:' + t.color + '"></i>' + t.label; legend.appendChild(s); });\r
-  const cs = document.createElement("span"); cs.innerHTML = '<i style="background:rgba(255,122,122,.45)"></i>guard clamping'; legend.appendChild(cs);\r
+  const bandLabel = CONFIG.model === "response_error" ? "response error" : "guard clamping";\r
+  const cs = document.createElement("span"); cs.innerHTML = '<i style="background:rgba(255,122,122,.45)"></i>' + bandLabel; legend.appendChild(cs);\r
   $("scrub").max = String(Math.max(0, FRAMES.length - 1));\r
   seek(0);\r
 \r
@@ -481,7 +524,7 @@ function drawGraph(upto) {\r
   x.clearRect(0, 0, w, h); x.fillStyle = "#00080c"; x.fillRect(0, 0, w, h);\r
   // red bands wherever the guard is actively clamping — the hardware "guard active" red, carried into the trace\r
   x.fillStyle = "rgba(255,122,122,.13)";\r
-  FRAMES.slice(0, upto + 1).forEach((f, j) => { if (isClamp(f)) { const xx = p + j / n * (w - p * 2); x.fillRect(xx - step / 2, p, step + 1, h - p * 2); } });\r
+  FRAMES.slice(0, upto + 1).forEach((f, j) => { if (isBandActive(f)) { const xx = p + j / n * (w - p * 2); x.fillRect(xx - step / 2, p, step + 1, h - p * 2); } });\r
   x.strokeStyle = "rgba(216,232,228,.09)";\r
   for (let k = 0; k <= 5; k++) { const y = p + k / 5 * (h - p * 2); x.beginPath(); x.moveTo(p, y); x.lineTo(w - p, y); x.stroke(); }\r
   (CONFIG.traces || []).forEach((t) => {\r
@@ -498,6 +541,21 @@ function drawGraph(upto) {\r
 }\r
 function renderFrame(i) {\r
   const f = FRAMES[i] || {};\r
+  if (CONFIG.model === "response_error") {\r
+    const err = f[CONFIG.fields.decision] === CONFIG.fields.errorState;\r
+    $("frameMeta").innerHTML = "frame " + (i + 1) + " / " + FRAMES.length + "  ·  " + wallClock(i) + (err ? '  ·  <span class="alert">RESPONSE ERROR</span>' : "  ·  tracking");\r
+    const ro = $("readouts"); ro.innerHTML = "";\r
+    const show = [\r
+      ["command", fmt(num(f, CONFIG.fields.demandLabel))],\r
+      ["observed", fmt(num(f, CONFIG.fields.requested))],\r
+      ["resp err", fmt(num(f, CONFIG.fields.error))],\r
+      ["decision", err ? "resp err" : "tracking", err ? "alert" : ""],\r
+    ];\r
+    show.forEach(([k, val, cls]) => { const d = document.createElement("div"); d.innerHTML = "<span>" + k + "</span><b" + (cls ? ' class="' + cls + '"' : "") + ">" + (val ?? "--") + "</b>"; ro.appendChild(d); });\r
+    $("rawFrame").textContent = JSON.stringify(f.raw ?? f, null, 2);\r
+    drawGraph(i);\r
+    return;\r
+  }\r
   const clamping = isClamp(f);\r
   $("frameMeta").innerHTML = "frame " + (i + 1) + " / " + FRAMES.length + "  ·  " + wallClock(i) + (clamping ? '  ·  <span class="alert">CLAMP</span>' : "  ·  pass");\r
   const ro = $("readouts"); ro.innerHTML = "";\r
@@ -526,6 +584,6 @@ else { document.body.innerHTML = '<main><section class="panel"><h1>No frames</h1
 <\/script>\r
 </body>\r
 </html>\r
-`,b={courseTitle:"ARTY-001 Switch Guard — Virtual Verification Replay",contractRule:"safe_output never exceeds the safe_limit or the requested_output",fields:{demandLabel:"switch_bits",requested:"requested_output",safe:"safe_output",limit:"safe_limit",margin:"safety_margin",violation:"violation_latched",guardAction:"guard_action",clampValue:"clamp_to_safe_output",button:"button_pressed"},contractCeilings:["safe_limit","requested_output"],trackLimitMoves:!0,traces:[{key:"requested_output",label:"request",color:"#f7b267",width:2},{key:"safe_output",label:"safe",color:"#8ee0b2",width:4},{key:"safe_limit",label:"limit",color:"#ffd166",width:1,dashed:!0}],provenance:[{key:"board_id",label:"Board"},{key:"kernel_id",label:"Kernel"},{key:"schema_version",label:"Schema"},{key:"source_mode",label:"Source"}],liveSourceValue:"live_board",buttonOnMessage:"Surge asserted (BTN0) — demand pushed over the limit.",buttonOffMessage:"Surge released (BTN0).",rubric:[{label:"Demand ramped toward full",test:{type:"maxAtLeast",field:"requested_output",value:.95}},{label:"Guard clamp engaged",test:{type:"eventAtLeast",event:"CLAMP",n:1}},{label:"Violation latched",test:{type:"eventAtLeast",event:"VIOLATION LATCHED",n:1}},{label:"Violation cleared (BTN3)",test:{type:"eventAtLeast",event:"VIOLATION CLEARED",n:1}},{label:"Surge applied (BTN0)",test:{type:"anyTrue",field:"button_pressed"}},{label:"Safe limit moved (BTN1/BTN2)",test:{type:"eventAtLeast",event:["LIMIT UP","LIMIT DOWN"],n:1}}],disclaimers:["Volatile FPGA programming."],about:{heading:"About this guard — and how to drive it",lede:"Promise: the safe output never exceeds the safe limit or the demand.",sections:[{h:"Real life",body:"Motor / power / heater / actuator ceilings held below a safe maximum."},{h:"Use it",body:"A last-line interlock between a controller and a power stage."}],operate:{intro:"Operating the contract",rows:[["SW0–SW3","set the demand"],["BTN0","surge the demand over the limit"],["BTN1 / BTN2","raise / lower the safe limit"],["BTN3","acknowledge a latched violation"]]}}};function y(e){return e.map(r=>({schema_version:r.schema_version,sample_index:r.sample_index,timestamp_ms:r.timestamp_ms,switch_bits:r.switch_bits,source_mode:r.source_mode,board_id:"— (virtual)",kernel_id:r.kernel_sha256,button_pressed:r.button_pressed,requested_output:r.guard.requested_output,safe_output:r.guard.safe_output,safe_limit:r.guard.limit,safety_margin:r.guard.safety_margin,violation_latched:r.guard.violation_latched,guard_action:r.guard.guard_action}))}function T(e){return{captured_at:e.toISOString(),device:"Browser FPGA simulator (Arty A7 model)",source:"virtual://arty001-switch-guard-sim",virtual:!0}}function C(e){return(e.skeleton??F).replace('"__FRAMES__"',()=>JSON.stringify(e.frames)).replace('"__CONFIG__"',()=>JSON.stringify(e.config)).replace('"__META__"',()=>JSON.stringify(e.meta))}function L(e){const r=a=>"{"+Object.keys(a).sort().map(o=>JSON.stringify(o)+":"+JSON.stringify(a[o])).join(",")+"}";return e.map(r).join(`
+`,b={courseTitle:"ARTY-001 Switch Guard — Virtual Verification Replay",contractRule:"safe_output never exceeds the safe_limit or the requested_output",fields:{demandLabel:"switch_bits",requested:"requested_output",safe:"safe_output",limit:"safe_limit",margin:"safety_margin",violation:"violation_latched",guardAction:"guard_action",clampValue:"clamp_to_safe_output",button:"button_pressed"},contractCeilings:["safe_limit","requested_output"],trackLimitMoves:!0,traces:[{key:"requested_output",label:"request",color:"#f7b267",width:2},{key:"safe_output",label:"safe",color:"#8ee0b2",width:4},{key:"safe_limit",label:"limit",color:"#ffd166",width:1,dashed:!0}],provenance:[{key:"board_id",label:"Board"},{key:"kernel_id",label:"Kernel"},{key:"schema_version",label:"Schema"},{key:"source_mode",label:"Source"}],liveSourceValue:"live_board",buttonOnMessage:"Surge asserted (BTN0) — demand pushed over the limit.",buttonOffMessage:"Surge released (BTN0).",rubric:[{label:"Demand ramped toward full",test:{type:"maxAtLeast",field:"requested_output",value:.95}},{label:"Guard clamp engaged",test:{type:"eventAtLeast",event:"CLAMP",n:1}},{label:"Violation latched",test:{type:"eventAtLeast",event:"VIOLATION LATCHED",n:1}},{label:"Violation cleared (BTN3)",test:{type:"eventAtLeast",event:"VIOLATION CLEARED",n:1}},{label:"Surge applied (BTN0)",test:{type:"anyTrue",field:"button_pressed"}},{label:"Safe limit moved (BTN1/BTN2)",test:{type:"eventAtLeast",event:["LIMIT UP","LIMIT DOWN"],n:1}}],disclaimers:["Volatile FPGA programming."],about:{heading:"About this guard — and how to drive it",lede:"Promise: the safe output never exceeds the safe limit or the demand.",sections:[{h:"Real life",body:"Motor / power / heater / actuator ceilings held below a safe maximum."},{h:"Use it",body:"A last-line interlock between a controller and a power stage."}],operate:{intro:"Operating the contract",rows:[["SW0–SW3","set the demand"],["BTN0","surge the demand over the limit"],["BTN1 / BTN2","raise / lower the safe limit"],["BTN3","acknowledge a latched violation"]]}}};function y(e){return e.map(r=>({schema_version:r.schema_version,sample_index:r.sample_index,timestamp_ms:r.timestamp_ms,switch_bits:r.switch_bits,source_mode:r.source_mode,board_id:"— (virtual)",kernel_id:r.kernel_sha256,button_pressed:r.button_pressed,requested_output:r.guard.requested_output,safe_output:r.guard.safe_output,safe_limit:r.guard.limit,safety_margin:r.guard.safety_margin,violation_latched:r.guard.violation_latched,guard_action:r.guard.guard_action}))}function M(e){return{captured_at:e.toISOString(),device:"Browser FPGA simulator (Arty A7 model)",source:"virtual://arty001-switch-guard-sim",virtual:!0}}function T(e){return(e.skeleton??C).replace('"__FRAMES__"',()=>JSON.stringify(e.frames)).replace('"__CONFIG__"',()=>JSON.stringify(e.config)).replace('"__META__"',()=>JSON.stringify(e.meta))}function L(e){const r=a=>"{"+Object.keys(a).sort().map(o=>JSON.stringify(o)+":"+JSON.stringify(a[o])).join(",")+"}";return e.map(r).join(`
 `)+`
-`}async function R(e){const r=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(e));return Array.from(new Uint8Array(r)).map(a=>a.toString(16).padStart(2,"0")).join("")}async function x(e,r,a){const o=await R(L(e)),t={...T(a),trace_sha256:o};return C({frames:e,config:r,meta:t})}async function D(e,r){const a={...b,disclaimers:[...b.disclaimers,"Browser simulation — candidate-only; no Arty A7 was programmed or observed."]};return x(y(e),a,r)}const h={courseTitle:"Reflex Lab 01 — ESP32 Guard Virtual Replay",contractRule:"safe_output never exceeds the requested_output (the guard only reduces)",fields:{demandLabel:"pot_raw",requested:"requested_output",safe:"safe_output",limit:null,margin:"safety_margin",violation:null,guardAction:"guard_action",clampValue:"clamp_to_safe_output",button:"button_pressed"},contractCeilings:["requested_output"],trackLimitMoves:!1,traces:[{key:"pot_raw",label:"pot",color:"#7bdcff",width:2},{key:"requested_output",label:"request",color:"#ffb86b",width:2},{key:"safe_output",label:"safe",color:"#83e6ac",width:4}],provenance:[{key:"board_id",label:"Board"},{key:"kernel_id",label:"Kernel"},{key:"schema_version",label:"Schema"},{key:"source_mode",label:"Source"}],liveSourceValue:"live_board",deviceSignals:[{key:"led",label:"LED",onAt:.03},{key:"buzzer",label:"Buzzer",onAt:.03}],rubric:[{label:"Input swept toward full",test:{type:"maxAtLeast",field:"pot_raw",value:.85}},{label:"Guard clamp engaged",test:{type:"eventAtLeast",event:"CLAMP",n:1}},{label:"LED driven",test:{type:"maxAtLeast",field:"led",value:.5}},{label:"Buzzer activated",test:{type:"maxAtLeast",field:"buzzer",value:.5}},{label:"Mute button used",test:{type:"anyTrue",field:"button_pressed"}}],disclaimers:["Low-voltage educational evidence only."],about:{heading:"About this guard — and how to drive it",lede:"Firmware promise: output never exceeds the request; the guard only reduces.",sections:[{h:"Real life",body:"A dimmer / motor / setpoint capped before the load."}],operate:{intro:"Operating the contract",rows:[["Potentiometer","set the demand"],["Button","mute the buzzer"]]}}};function k(e){return e.map(r=>({schema_version:r.schema_version,sample_index:r.sample_index,timestamp_ms:r.timestamp_ms,pot_raw:r.pot_raw,source_mode:"browser_sim",board_id:"— (virtual)",kernel_id:r.kernel_id,button_pressed:r.button_pressed??!1,requested_output:r.outputs.requested_output,safe_output:r.outputs.safe_output,led:r.outputs.led,buzzer:r.outputs.buzzer,safety_margin:r.guard.safety_margin,guard_action:r.guard.guard_action}))}async function j(e,r){const a={...h,disclaimers:[...h.disclaimers,"Browser simulation — candidate-only; low-voltage educational evidence, not a hardware capture."]};return x(k(e),a,r)}function K(e){return e.toISOString().replace("T","_").replace(/[:.]/g,"-").slice(0,19)}const c=600,u=180,g=26,m=u+g,l=14,I=80,v=90,N={lines:[{key:"safe_limit",color:"#ffd166",width:2,dashed:!0},{key:"safety_margin",color:"#c4b5fd",width:2,dashed:!1},{key:"requested_output",color:"#f7b267",width:2,dashed:!1},{key:"safe_output",color:"#8ee0b2",width:4,dashed:!1}],legend:[{label:"request",color:"#f7b267",dashed:!1,width:2},{label:"safe",color:"#8ee0b2",dashed:!1,width:3},{label:"limit",color:"#ffd166",dashed:!0,width:2},{label:"margin",color:"#c4b5fd",dashed:!1,width:2}]},O={lines:[{key:"pot_raw",color:"#7bdcff",width:2,dashed:!1},{key:"requested_output",color:"#ffb86b",width:2,dashed:!1},{key:"safe_output",color:"#83e6ac",width:4,dashed:!1},{key:"buzzer",color:"#a893ff",width:2,dashed:!1},{key:"button_pressed",color:"#ff9d9d",width:2,dashed:!0}],legend:[{label:"pot",color:"#7bdcff",dashed:!1,width:2},{label:"request",color:"#ffb86b",dashed:!1,width:2},{label:"safe",color:"#83e6ac",dashed:!1,width:3},{label:"buzzer",color:"#a893ff",dashed:!1,width:2},{label:"btn",color:"#ff9d9d",dashed:!0,width:2}]};function G(e){return Math.max(0,Math.min(1,e))}function z(e){return e.guard_action==="clamp_to_safe_output"}function H(e,r,a,o){const t=Math.max(1,r.length-1),s=(c-l*2)/t;e.fillStyle="#00080c",e.fillRect(0,0,c,u),e.fillStyle="rgba(255,122,122,0.16)";for(let n=0;n<=a;n++)if(z(r[n])){const i=l+n/t*(c-l*2);e.fillRect(i-s/2,l,s+1,u-l*2)}e.strokeStyle="rgba(216,232,228,0.09)",e.lineWidth=1;for(let n=0;n<=4;n++){const i=l+n/4*(u-l*2);e.beginPath(),e.moveTo(l,i),e.lineTo(c-l,i),e.stroke()}for(const n of o.lines){e.beginPath(),e.setLineDash(n.dashed?[5,4]:[]);for(let i=0;i<=a;i++){const p=l+i/t*(c-l*2),f=u-l-G(Number(r[i][n.key])||0)*(u-l*2);i===0?e.moveTo(p,f):e.lineTo(p,f)}e.strokeStyle=n.color,e.lineWidth=n.width,e.lineCap="round",e.stroke()}e.setLineDash([]);const d=l+a/t*(c-l*2);e.strokeStyle="rgba(255,242,166,0.7)",e.lineWidth=1,e.beginPath(),e.moveTo(d,l-6),e.lineTo(d,u-l+6),e.stroke()}function P(e,r,a){const o=u;e.fillStyle="#0a1620",e.fillRect(0,o,c,g),e.strokeStyle="rgba(216,232,228,0.12)",e.lineWidth=1,e.beginPath(),e.moveTo(0,o+.5),e.lineTo(c,o+.5),e.stroke();const t=o+g/2;e.textBaseline="middle",e.font="600 11px ui-monospace, 'SFMono-Regular', Menlo, monospace",e.textAlign="left";let s=12;for(const i of a)e.strokeStyle=i.color,e.lineWidth=i.width,e.setLineDash(i.dashed?[4,3]:[]),e.beginPath(),e.moveTo(s,t),e.lineTo(s+16,t),e.stroke(),e.setLineDash([]),s+=21,e.fillStyle="#aebfbb",e.fillText(i.label,s,t),s+=e.measureText(i.label).width+14;let d=c-12;e.textAlign="right",e.font="800 10px ui-monospace, 'SFMono-Regular', Menlo, monospace",e.fillStyle="#ff9d9d",e.fillText("VIRTUAL",d,t),d-=e.measureText("VIRTUAL").width+9,e.font="600 11px ui-monospace, 'SFMono-Regular', Menlo, monospace",e.fillStyle="#7d918d";const n="monogatelectronics ·";e.fillText(n,d,t),d-=e.measureText(n).width+8,r&&e.drawImage(r,d-18,t-18/2,18,18)}async function q(){try{const e=new Image;return e.src="/electronics-lab/assets/monogatelogo.png",await e.decode(),e}catch{return null}}function $(e,r){if(e<=r)return Array.from({length:e},(t,s)=>s);const a=[],o=(e-1)/(r-1);for(let t=0;t<r;t++)a.push(Math.round(t*o));return a[a.length-1]=e-1,a}function V(e,r,a){const o=document.createElement("canvas");o.width=c,o.height=m;const t=o.getContext("2d",{willReadFrequently:!0});if(!t)throw new Error("2D canvas context unavailable");const s=S(),d=$(e.length,I);return d.forEach((n,i)=>{H(t,e,n,r),P(t,a,r.legend);const{data:p}=t.getImageData(0,0,c,m),f=E(p,256),_=M(p,f),A=i===d.length-1?v*8:v;s.writeFrame(_,c,m,{palette:f,delay:A})}),s.finish(),s.bytes()}async function w(e,r,a){if(e.length===0)return;const o=await q(),t=V(e,r,o),s=new Uint8Array(t.length);s.set(t);const d=new Blob([s],{type:"image/gif"}),n=URL.createObjectURL(d),i=document.createElement("a");i.href=n,i.download=a,i.click(),URL.revokeObjectURL(n)}function U(e,r){return w(y(e),N,r)}function W(e,r){return w(k(e),O,r)}export{j as a,D as b,W as c,U as e,K as r};
+`}async function N(e){const r=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(e));return Array.from(new Uint8Array(r)).map(a=>a.toString(16).padStart(2,"0")).join("")}async function x(e,r,a){const o=await N(L(e)),t={...M(a),trace_sha256:o};return T({frames:e,config:r,meta:t})}async function D(e,r){const a={...b,disclaimers:[...b.disclaimers,"Browser simulation — candidate-only; no Arty A7 was programmed or observed."]};return x(y(e),a,r)}const h={courseTitle:"Reflex Lab 01 — ESP32 Guard Virtual Replay",contractRule:"safe_output never exceeds the requested_output (the guard only reduces)",fields:{demandLabel:"pot_raw",requested:"requested_output",safe:"safe_output",limit:null,margin:"safety_margin",violation:null,guardAction:"guard_action",clampValue:"clamp_to_safe_output",button:"button_pressed"},contractCeilings:["requested_output"],trackLimitMoves:!1,traces:[{key:"pot_raw",label:"pot",color:"#7bdcff",width:2},{key:"requested_output",label:"request",color:"#ffb86b",width:2},{key:"safe_output",label:"safe",color:"#83e6ac",width:4}],provenance:[{key:"board_id",label:"Board"},{key:"kernel_id",label:"Kernel"},{key:"schema_version",label:"Schema"},{key:"source_mode",label:"Source"}],liveSourceValue:"live_board",deviceSignals:[{key:"led",label:"LED",onAt:.03},{key:"buzzer",label:"Buzzer",onAt:.03}],rubric:[{label:"Input swept toward full",test:{type:"maxAtLeast",field:"pot_raw",value:.85}},{label:"Guard clamp engaged",test:{type:"eventAtLeast",event:"CLAMP",n:1}},{label:"LED driven",test:{type:"maxAtLeast",field:"led",value:.5}},{label:"Buzzer activated",test:{type:"maxAtLeast",field:"buzzer",value:.5}},{label:"Mute button used",test:{type:"anyTrue",field:"button_pressed"}}],disclaimers:["Low-voltage educational evidence only."],about:{heading:"About this guard — and how to drive it",lede:"Firmware promise: output never exceeds the request; the guard only reduces.",sections:[{h:"Real life",body:"A dimmer / motor / setpoint capped before the load."}],operate:{intro:"Operating the contract",rows:[["Potentiometer","set the demand"],["Button","mute the buzzer"]]}}};function k(e){return e.map(r=>({schema_version:r.schema_version,sample_index:r.sample_index,timestamp_ms:r.timestamp_ms,pot_raw:r.pot_raw,source_mode:"browser_sim",board_id:"— (virtual)",kernel_id:r.kernel_id,button_pressed:r.button_pressed??!1,requested_output:r.outputs.requested_output,safe_output:r.outputs.safe_output,led:r.outputs.led,buzzer:r.outputs.buzzer,safety_margin:r.guard.safety_margin,guard_action:r.guard.guard_action}))}async function j(e,r){const a={...h,disclaimers:[...h.disclaimers,"Browser simulation — candidate-only; low-voltage educational evidence, not a hardware capture."]};return x(k(e),a,r)}function K(e){return e.toISOString().replace("T","_").replace(/[:.]/g,"-").slice(0,19)}const c=600,u=180,g=26,m=u+g,l=14,I=80,v=90,R={lines:[{key:"safe_limit",color:"#ffd166",width:2,dashed:!0},{key:"safety_margin",color:"#c4b5fd",width:2,dashed:!1},{key:"requested_output",color:"#f7b267",width:2,dashed:!1},{key:"safe_output",color:"#8ee0b2",width:4,dashed:!1}],legend:[{label:"request",color:"#f7b267",dashed:!1,width:2},{label:"safe",color:"#8ee0b2",dashed:!1,width:3},{label:"limit",color:"#ffd166",dashed:!0,width:2},{label:"margin",color:"#c4b5fd",dashed:!1,width:2}]},O={lines:[{key:"pot_raw",color:"#7bdcff",width:2,dashed:!1},{key:"requested_output",color:"#ffb86b",width:2,dashed:!1},{key:"safe_output",color:"#83e6ac",width:4,dashed:!1},{key:"buzzer",color:"#a893ff",width:2,dashed:!1},{key:"button_pressed",color:"#ff9d9d",width:2,dashed:!0}],legend:[{label:"pot",color:"#7bdcff",dashed:!1,width:2},{label:"request",color:"#ffb86b",dashed:!1,width:2},{label:"safe",color:"#83e6ac",dashed:!1,width:3},{label:"buzzer",color:"#a893ff",dashed:!1,width:2},{label:"btn",color:"#ff9d9d",dashed:!0,width:2}]};function G(e){return Math.max(0,Math.min(1,e))}function z(e){return e.guard_action==="clamp_to_safe_output"}function H(e,r,a,o){const t=Math.max(1,r.length-1),s=(c-l*2)/t;e.fillStyle="#00080c",e.fillRect(0,0,c,u),e.fillStyle="rgba(255,122,122,0.16)";for(let i=0;i<=a;i++)if(z(r[i])){const n=l+i/t*(c-l*2);e.fillRect(n-s/2,l,s+1,u-l*2)}e.strokeStyle="rgba(216,232,228,0.09)",e.lineWidth=1;for(let i=0;i<=4;i++){const n=l+i/4*(u-l*2);e.beginPath(),e.moveTo(l,n),e.lineTo(c-l,n),e.stroke()}for(const i of o.lines){e.beginPath(),e.setLineDash(i.dashed?[5,4]:[]);for(let n=0;n<=a;n++){const p=l+n/t*(c-l*2),f=u-l-G(Number(r[n][i.key])||0)*(u-l*2);n===0?e.moveTo(p,f):e.lineTo(p,f)}e.strokeStyle=i.color,e.lineWidth=i.width,e.lineCap="round",e.stroke()}e.setLineDash([]);const d=l+a/t*(c-l*2);e.strokeStyle="rgba(255,242,166,0.7)",e.lineWidth=1,e.beginPath(),e.moveTo(d,l-6),e.lineTo(d,u-l+6),e.stroke()}function P(e,r,a){const o=u;e.fillStyle="#0a1620",e.fillRect(0,o,c,g),e.strokeStyle="rgba(216,232,228,0.12)",e.lineWidth=1,e.beginPath(),e.moveTo(0,o+.5),e.lineTo(c,o+.5),e.stroke();const t=o+g/2;e.textBaseline="middle",e.font="600 11px ui-monospace, 'SFMono-Regular', Menlo, monospace",e.textAlign="left";let s=12;for(const n of a)e.strokeStyle=n.color,e.lineWidth=n.width,e.setLineDash(n.dashed?[4,3]:[]),e.beginPath(),e.moveTo(s,t),e.lineTo(s+16,t),e.stroke(),e.setLineDash([]),s+=21,e.fillStyle="#aebfbb",e.fillText(n.label,s,t),s+=e.measureText(n.label).width+14;let d=c-12;e.textAlign="right",e.font="800 10px ui-monospace, 'SFMono-Regular', Menlo, monospace",e.fillStyle="#ff9d9d",e.fillText("VIRTUAL",d,t),d-=e.measureText("VIRTUAL").width+9,e.font="600 11px ui-monospace, 'SFMono-Regular', Menlo, monospace",e.fillStyle="#7d918d";const i="monogatelectronics ·";e.fillText(i,d,t),d-=e.measureText(i).width+8,r&&e.drawImage(r,d-18,t-18/2,18,18)}async function $(){try{const e=new Image;return e.src="/electronics-lab/assets/monogatelogo.png",await e.decode(),e}catch{return null}}function q(e,r){if(e<=r)return Array.from({length:e},(t,s)=>s);const a=[],o=(e-1)/(r-1);for(let t=0;t<r;t++)a.push(Math.round(t*o));return a[a.length-1]=e-1,a}function B(e,r,a){const o=document.createElement("canvas");o.width=c,o.height=m;const t=o.getContext("2d",{willReadFrequently:!0});if(!t)throw new Error("2D canvas context unavailable");const s=A(),d=q(e.length,I);return d.forEach((i,n)=>{H(t,e,i,r),P(t,a,r.legend);const{data:p}=t.getImageData(0,0,c,m),f=E(p,256),_=F(p,f),S=n===d.length-1?v*8:v;s.writeFrame(_,c,m,{palette:f,delay:S})}),s.finish(),s.bytes()}async function w(e,r,a){if(e.length===0)return;const o=await $(),t=B(e,r,o),s=new Uint8Array(t.length);s.set(t);const d=new Blob([s],{type:"image/gif"}),i=URL.createObjectURL(d),n=document.createElement("a");n.href=i,n.download=a,n.click(),URL.revokeObjectURL(i)}function U(e,r){return w(y(e),R,r)}function W(e,r){return w(k(e),O,r)}export{j as a,D as b,W as c,U as e,K as r};
