@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-06-22T09:40:58.006995+00:00",
+  "generated_at": "2026-06-22T21:36:56.769188+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "cd71630977c73ea2bbd7c02a42645d4086bd08f6",
+  "source_commit": "e20fa1a2fe2799d9b2207168ccbbf31780604937",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -30,14 +30,29 @@
       "sha256": "ae1e30b895f7cf47a7c96dcc041d6ab45d4a1e49835da68b56a1e591e5ad3c79"
     },
     {
-      "path": "assets/ArtyA7Simulator-CIAkETnC.js",
-      "bytes": 53159,
-      "sha256": "264059db22ae8e09f25349c531a57c3923f0724e05436fdcb1e63563da2b224c"
+      "path": "assets/Arty002ContractLab-hzq_gzAb.js",
+      "bytes": 9004,
+      "sha256": "d9681035b4f28ad82998f5d1c95c69c86710ba612080f2220bac3cda4b65f25f"
     },
     {
-      "path": "assets/ArtyContractLab-0RgS2NJn.js",
-      "bytes": 11695,
-      "sha256": "ab082f1798ade7527927cd718390d83190eef839a4e990dc8bfd713910b4702e"
+      "path": "assets/ArtyA7Simulator-rfMXcjn4.js",
+      "bytes": 54473,
+      "sha256": "e8a9a3a89a2b96bb147fb895a217783f386a54571f9507b5f394171db9172854"
+    },
+    {
+      "path": "assets/artyContractLab-BFsAMKSl.js",
+      "bytes": 3659,
+      "sha256": "ea6938f28ea1872213ffd36db7bbe46ffd6921a7239534ba3fa8c297576fbde5"
+    },
+    {
+      "path": "assets/ArtyContractLab-DQItMrIC.js",
+      "bytes": 8130,
+      "sha256": "80cf1e06183f7c602351aeb0cfd4bb67020d9a182eca6de5e4de236cea600bc3"
+    },
+    {
+      "path": "assets/artyGuardModel-U4Vh1QIv.js",
+      "bytes": 731,
+      "sha256": "d761345d44d1dade7d3be2a4e5d2d821c51bda00c2cc9fb715a382a4bee4cc4a"
     },
     {
       "path": "assets/ArtyPhysicalBuild-CtBE_CT3.js",
@@ -50,9 +65,9 @@
       "sha256": "91098c843dc294342d5da6daadbf979d531f766d7a4f88dc4e85ea5202812d91"
     },
     {
-      "path": "assets/GlossaryHint-Clo6qM8R.js",
+      "path": "assets/GlossaryHint-CXLeDg2S.js",
       "bytes": 671,
-      "sha256": "b85bd76be00c37e0ee1a9ca1ab0cc21214e40d96733a4d17572ee9e269da92cd"
+      "sha256": "3c34b6ec7214aaabafab14db6354f5075119df70137018ff61de679cd4b16ed7"
     },
     {
       "path": "assets/icons-DPcia5ev.js",
@@ -60,14 +75,14 @@
       "sha256": "ee5eae41d914ec757320588a40b2934a842c88d327a40e7f73cf5c957d7a030d"
     },
     {
-      "path": "assets/index-BZmx10ij.css",
-      "bytes": 251511,
-      "sha256": "516bee089773f8bc51f607bcdac656dc37bd9e194609356b0ca01d36e4cbeb45"
+      "path": "assets/index-BERFkODq.js",
+      "bytes": 150819,
+      "sha256": "6dc2f75491d3f01c7cc1338ed285fa846cb7ebb353e9170d2d2d43b53201481e"
     },
     {
-      "path": "assets/index-yfBuYB94.js",
-      "bytes": 146853,
-      "sha256": "742594e2e2c372fee5868aa49768f91b067c15b049304a51861486afab835cca"
+      "path": "assets/index-lbKFFKJD.css",
+      "bytes": 252325,
+      "sha256": "600d37db5395d73113e3f001693a6a36c0b98e8bffcc42dc2c070d65e16f475f"
     },
     {
       "path": "assets/labEngine-BESM87HH.js",
@@ -110,9 +125,9 @@
       "sha256": "485ed41c606fb47a1c64eae6e945cd3fd948c583c9cfa6c1033b0f5d36367212"
     },
     {
-      "path": "assets/PhysicalBuildPanel-CzRu2ocJ.js",
+      "path": "assets/PhysicalBuildPanel-CPfkVcdu.js",
       "bytes": 15525,
-      "sha256": "ee738b920fda5ee3b6ba73a26051f1ba294df21d632e71580f537ca619280dd9"
+      "sha256": "ed9c099b9e7c5c85561fd0582d78b796a61aeab9074d162c0d8a7acdbf6300f8"
     },
     {
       "path": "assets/react-BGrcABR8.js",
@@ -130,9 +145,9 @@
       "sha256": "87376a058d65461820fe22517e6a62901eb0554c71b0c9cc329a233ae550a37e"
     },
     {
-      "path": "assets/SimulatorBench-CgB11kDl.js",
+      "path": "assets/SimulatorBench-1WPw1SSR.js",
       "bytes": 233210,
-      "sha256": "8077c0951f28c40c9569aadebed0d393c634eea7a4e1dea5ff085f8bf4cf27ec"
+      "sha256": "7ee807817e94e71858f0851c4a1a92d279bc3885a1b3fedf0df8aadb0cd46fd5"
     },
     {
       "path": "assets/three-CgggyWJi.js",
@@ -162,7 +177,7 @@
     {
       "path": "index.html",
       "bytes": 913,
-      "sha256": "3297ebc52bcb02a231de0572589c1875e89d2dd4ddc054f07e10f69f70a57748"
+      "sha256": "97616c0de573e12040666919081975e2ba602ae0110855c3e89b10e592081627"
     }
   ]
 }
