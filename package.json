@@ -9,7 +9,10 @@
     "check:first-impression": "node scripts/lint_first_impression.mjs",
     "check:first-impression:strict": "node scripts/lint_first_impression.mjs --strict",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:deploy": "opennextjs-cloudflare build && wrangler deploy",
+    "cf:preview": "opennextjs-cloudflare build && wrangler dev"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",
@@ -22,9 +25,11 @@
     "react-router-dom": "^7.14.1"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.15.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.104.0"
   }
 }

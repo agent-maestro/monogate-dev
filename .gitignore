@@ -31,6 +31,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare (build output + local state — never commit)
+/.open-next/
+/.wrangler/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
