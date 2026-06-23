@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-06-23T09:18:03.281668+00:00",
+  "generated_at": "2026-06-23T22:57:47.032922+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "0ad013f8396791318f475ff53c7750f9340f4bbe",
+  "source_commit": "ae3512c83e50bef98501099cfeb87290593ee912",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -35,9 +35,9 @@
       "sha256": "f1ab0cd722562bcd141cd5f9e6b9fdcf48bc8fc8f71e2774c4c72d51d1b54ebc"
     },
     {
-      "path": "assets/ArtyA7Simulator-5YnAsVcP.js",
-      "bytes": 61180,
-      "sha256": "786372446704ec416181ad735e090387542082f7819d030b6e03272922cd06e4"
+      "path": "assets/ArtyA7Simulator-Iw7EIn6c.js",
+      "bytes": 62852,
+      "sha256": "479e3b385f26790d64c0fd70f43fc27f0077fd08b6ee57dbb5a3146d5d97de3d"
     },
     {
       "path": "assets/artyContractLab-BFsAMKSl.js",
@@ -65,9 +65,9 @@
       "sha256": "91098c843dc294342d5da6daadbf979d531f766d7a4f88dc4e85ea5202812d91"
     },
     {
-      "path": "assets/GlossaryHint-D_dqn7Kp.js",
+      "path": "assets/GlossaryHint-mpGjSKV3.js",
       "bytes": 671,
-      "sha256": "7222735ce12c6609fa0c16cc3f497b83cbcffca078af21e37aa5ce6f3f30387d"
+      "sha256": "32bc0ea40cb1f9bcb73da534a993af38d1e1b2b2cfe701a69fce462e959ec417"
     },
     {
       "path": "assets/icons-DPcia5ev.js",
@@ -75,9 +75,9 @@
       "sha256": "ee5eae41d914ec757320588a40b2934a842c88d327a40e7f73cf5c957d7a030d"
     },
     {
-      "path": "assets/index-DSdWioXh.js",
+      "path": "assets/index-BPlkOZqp.js",
       "bytes": 162923,
-      "sha256": "d632de54c0f3e337b6f0c099f3279cb1b030720928f309c2631be57e8a8a1a3f"
+      "sha256": "bf5097b95f5dad8e285d85d6434823fb1308ec46e6d2fd09a0ae7693c6acc73d"
     },
     {
       "path": "assets/index-lbKFFKJD.css",
@@ -125,9 +125,9 @@
       "sha256": "485ed41c606fb47a1c64eae6e945cd3fd948c583c9cfa6c1033b0f5d36367212"
     },
     {
-      "path": "assets/PhysicalBuildPanel-DCPYJeqy.js",
+      "path": "assets/PhysicalBuildPanel-CMq0JGoq.js",
       "bytes": 15525,
-      "sha256": "084976fac6d5d3e0aa0b66493bc9b0fb1add19dc16841bbb50a30a1772bafdd7"
+      "sha256": "ea384b5d3d7bc58cb012fa27ed241e7265831d7164ad07a6c67f234766e55997"
     },
     {
       "path": "assets/react-BGrcABR8.js",
@@ -135,9 +135,9 @@
       "sha256": "65d2e1399c43d7850ee04cc7b910ac5e3f6ce988c00621622ae9e75bc56b8ca8"
     },
     {
-      "path": "assets/react-three-CZIu0Xz1.js",
+      "path": "assets/react-three-B-5kAkQ-.js",
       "bytes": 41427,
-      "sha256": "ea70789ca93e566608a74f32c04bec3c695f91fa382bf9b065882c4bf770d6e0"
+      "sha256": "8a971f83f269f919486737f7da4deb622c3b0f38e4f202d27802e92e30bca56f"
     },
     {
       "path": "assets/ReflexContractLab-AE_KEo7s.js",
@@ -145,24 +145,24 @@
       "sha256": "87376a058d65461820fe22517e6a62901eb0554c71b0c9cc329a233ae550a37e"
     },
     {
-      "path": "assets/SimulatorBench-BzdqWR5V.js",
+      "path": "assets/SimulatorBench-DnZ9q37h.js",
       "bytes": 233210,
-      "sha256": "ffbfd357209d0e6d4058a7f123a31cbb10a5d0247ecb86c972f7a2c6f31fefee"
+      "sha256": "c8ababfb2fd3ec0eba5459fd8e22661c3d92eff697bad761b6019c6c7d6c39ad"
     },
     {
-      "path": "assets/three-CgggyWJi.js",
-      "bytes": 689547,
-      "sha256": "09dba49439abce12dde26aea29f560fbac02929fc65b575c780c7234685c1be3"
+      "path": "assets/three-BT-5dV5y.js",
+      "bytes": 689555,
+      "sha256": "175ede19da0900f956b6e8183e4bbb7f8cf176d2677e7afb8dfe729b9837a0e9"
     },
     {
-      "path": "assets/traceClip-C2APo5GF.js",
+      "path": "assets/traceClip-BsUUw8Wa.js",
       "bytes": 44290,
-      "sha256": "7379239129b76f9363046411b11738ceeedccd87e30e0c5236050431311b419b"
+      "sha256": "396a32c28cecf1fb466f1f55bd3a64db4411a4ac97b2bfca6a42cbe29a4ae521"
     },
     {
-      "path": "assets/vendor-Bozx688T.js",
+      "path": "assets/vendor-Ddg3PoAf.js",
       "bytes": 243141,
-      "sha256": "4e7463fa48b8292766542d21fd2ce6022246e2400b7335f50a9e5132e4c1d1f1"
+      "sha256": "91e6bdb6551054cf834611eb844e88008b10e040a669e7db518fd4693f7f346d"
     },
     {
       "path": "downloads/arty001-switch-guard.zip",
@@ -177,7 +177,7 @@
     {
       "path": "index.html",
       "bytes": 913,
-      "sha256": "c2e7aa558ac44af5ca1e1cf5df9c252f85a721ed75119fc82dd77e7de02be5d6"
+      "sha256": "8dd0c5e715328a55f8a8be13c926fb6379d1d4c87bfde9af58d4a5880be9dc21"
     }
   ]
 }
