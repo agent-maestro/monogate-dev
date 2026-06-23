@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-06-22T21:36:56.769188+00:00",
+  "generated_at": "2026-06-23T04:34:14.630120+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "e20fa1a2fe2799d9b2207168ccbbf31780604937",
+  "source_commit": "1e445223eff4c3dd5e654ae033b51abbe2f162b1",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -30,14 +30,14 @@
       "sha256": "ae1e30b895f7cf47a7c96dcc041d6ab45d4a1e49835da68b56a1e591e5ad3c79"
     },
     {
-      "path": "assets/Arty002ContractLab-hzq_gzAb.js",
-      "bytes": 9004,
-      "sha256": "d9681035b4f28ad82998f5d1c95c69c86710ba612080f2220bac3cda4b65f25f"
+      "path": "assets/Arty002ContractLab-DbY0N22s.js",
+      "bytes": 9160,
+      "sha256": "766944b9d62b8f2a23a9759b94663e6cda7e7ec09ee0dbb97234f462104e5c80"
     },
     {
-      "path": "assets/ArtyA7Simulator-rfMXcjn4.js",
-      "bytes": 54473,
-      "sha256": "e8a9a3a89a2b96bb147fb895a217783f386a54571f9507b5f394171db9172854"
+      "path": "assets/ArtyA7Simulator-CdhCESnv.js",
+      "bytes": 56891,
+      "sha256": "20e016d62368836983e7f4dccaf68ccf4c45c00229d53e7dda4030301389a526"
     },
     {
       "path": "assets/artyContractLab-BFsAMKSl.js",
@@ -65,9 +65,9 @@
       "sha256": "91098c843dc294342d5da6daadbf979d531f766d7a4f88dc4e85ea5202812d91"
     },
     {
-      "path": "assets/GlossaryHint-CXLeDg2S.js",
+      "path": "assets/GlossaryHint-CBHqNILT.js",
       "bytes": 671,
-      "sha256": "3c34b6ec7214aaabafab14db6354f5075119df70137018ff61de679cd4b16ed7"
+      "sha256": "1f4b179c459fd9af3b43b6c664c718472c24114c7a4ef5c87896450e25760437"
     },
     {
       "path": "assets/icons-DPcia5ev.js",
@@ -75,9 +75,9 @@
       "sha256": "ee5eae41d914ec757320588a40b2934a842c88d327a40e7f73cf5c957d7a030d"
     },
     {
-      "path": "assets/index-BERFkODq.js",
-      "bytes": 150819,
-      "sha256": "6dc2f75491d3f01c7cc1338ed285fa846cb7ebb353e9170d2d2d43b53201481e"
+      "path": "assets/index-Cjmwj9bQ.js",
+      "bytes": 154812,
+      "sha256": "9e98f658e796cabbc13a7d603341d5abc79a4e459554a2a7e30fa7ed008ca9a2"
     },
     {
       "path": "assets/index-lbKFFKJD.css",
@@ -125,9 +125,9 @@
       "sha256": "485ed41c606fb47a1c64eae6e945cd3fd948c583c9cfa6c1033b0f5d36367212"
     },
     {
-      "path": "assets/PhysicalBuildPanel-CPfkVcdu.js",
+      "path": "assets/PhysicalBuildPanel-DxpxXkS_.js",
       "bytes": 15525,
-      "sha256": "ed9c099b9e7c5c85561fd0582d78b796a61aeab9074d162c0d8a7acdbf6300f8"
+      "sha256": "24c9f61d909e385042b2f842f9e8abbe78b59ce5740b2519150cea224b968f71"
     },
     {
       "path": "assets/react-BGrcABR8.js",
@@ -145,9 +145,9 @@
       "sha256": "87376a058d65461820fe22517e6a62901eb0554c71b0c9cc329a233ae550a37e"
     },
     {
-      "path": "assets/SimulatorBench-1WPw1SSR.js",
+      "path": "assets/SimulatorBench-B5tRwUkN.js",
       "bytes": 233210,
-      "sha256": "7ee807817e94e71858f0851c4a1a92d279bc3885a1b3fedf0df8aadb0cd46fd5"
+      "sha256": "43bf69c58b118df2cb5dc909872889d942c4fc61b56c5fce410d8a7e26239238"
     },
     {
       "path": "assets/three-CgggyWJi.js",
@@ -177,7 +177,7 @@
     {
       "path": "index.html",
       "bytes": 913,
-      "sha256": "97616c0de573e12040666919081975e2ba602ae0110855c3e89b10e592081627"
+      "sha256": "0a7606c16455a0c2f56b35d803652a2519705fe5dd080e830f670c3a1fcbaea5"
     }
   ]
 }
