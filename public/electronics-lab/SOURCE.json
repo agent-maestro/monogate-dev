@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-06-23T06:45:32.629937+00:00",
+  "generated_at": "2026-06-23T09:18:03.281668+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "57ea09694a521f2f4a87b2a81d7dc09eab043f7d",
+  "source_commit": "0ad013f8396791318f475ff53c7750f9340f4bbe",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -30,14 +30,14 @@
       "sha256": "ae1e30b895f7cf47a7c96dcc041d6ab45d4a1e49835da68b56a1e591e5ad3c79"
     },
     {
-      "path": "assets/Arty002ContractLab-DbH_hn64.js",
-      "bytes": 9280,
-      "sha256": "343a71501bfb25b93825ae1a001c0f7d63bb131666a8e6b96d7610fc8c55a8d9"
+      "path": "assets/Arty002ContractLab-CJM_vmPi.js",
+      "bytes": 9393,
+      "sha256": "f1ab0cd722562bcd141cd5f9e6b9fdcf48bc8fc8f71e2774c4c72d51d1b54ebc"
     },
     {
-      "path": "assets/ArtyA7Simulator-8r0viCEZ.js",
-      "bytes": 58602,
-      "sha256": "2e1c2eb810677b1c3dbbe3ec56be04d463844fa3de09309bb5cd9ed5c08f3718"
+      "path": "assets/ArtyA7Simulator-5YnAsVcP.js",
+      "bytes": 61180,
+      "sha256": "786372446704ec416181ad735e090387542082f7819d030b6e03272922cd06e4"
     },
     {
       "path": "assets/artyContractLab-BFsAMKSl.js",
@@ -50,9 +50,9 @@
       "sha256": "80cf1e06183f7c602351aeb0cfd4bb67020d9a182eca6de5e4de236cea600bc3"
     },
     {
-      "path": "assets/artyGuardModel-U4Vh1QIv.js",
-      "bytes": 731,
-      "sha256": "d761345d44d1dade7d3be2a4e5d2d821c51bda00c2cc9fb715a382a4bee4cc4a"
+      "path": "assets/artyGuardModel-oyLThbPX.js",
+      "bytes": 798,
+      "sha256": "50a6bb706981b10abdd296caf67db47db7d886ea407c53dce1f19c86d4601d6e"
     },
     {
       "path": "assets/ArtyPhysicalBuild-CtBE_CT3.js",
@@ -65,9 +65,9 @@
       "sha256": "91098c843dc294342d5da6daadbf979d531f766d7a4f88dc4e85ea5202812d91"
     },
     {
-      "path": "assets/GlossaryHint-DhorWxOz.js",
+      "path": "assets/GlossaryHint-D_dqn7Kp.js",
       "bytes": 671,
-      "sha256": "296526f7ccb3f0159b31266214c4844d0c01a2ba737ee2beb03de38de5bac245"
+      "sha256": "7222735ce12c6609fa0c16cc3f497b83cbcffca078af21e37aa5ce6f3f30387d"
     },
     {
       "path": "assets/icons-DPcia5ev.js",
@@ -75,9 +75,9 @@
       "sha256": "ee5eae41d914ec757320588a40b2934a842c88d327a40e7f73cf5c957d7a030d"
     },
     {
-      "path": "assets/index-DK0C0HJ_.js",
-      "bytes": 158757,
-      "sha256": "d164cf7d0d1d0098ab6f4f02d80c8f34f5e0eb150e5bca87bf53b2b35609a8d8"
+      "path": "assets/index-DSdWioXh.js",
+      "bytes": 162923,
+      "sha256": "d632de54c0f3e337b6f0c099f3279cb1b030720928f309c2631be57e8a8a1a3f"
     },
     {
       "path": "assets/index-lbKFFKJD.css",
@@ -125,9 +125,9 @@
       "sha256": "485ed41c606fb47a1c64eae6e945cd3fd948c583c9cfa6c1033b0f5d36367212"
     },
     {
-      "path": "assets/PhysicalBuildPanel-BOJN759A.js",
+      "path": "assets/PhysicalBuildPanel-DCPYJeqy.js",
       "bytes": 15525,
-      "sha256": "12f39de4937bc134d32ec592b65f4929673f83e127e42be17b80b5b2bcb55a90"
+      "sha256": "084976fac6d5d3e0aa0b66493bc9b0fb1add19dc16841bbb50a30a1772bafdd7"
     },
     {
       "path": "assets/react-BGrcABR8.js",
@@ -145,9 +145,9 @@
       "sha256": "87376a058d65461820fe22517e6a62901eb0554c71b0c9cc329a233ae550a37e"
     },
     {
-      "path": "assets/SimulatorBench-Cb3JZ4_1.js",
+      "path": "assets/SimulatorBench-BzdqWR5V.js",
       "bytes": 233210,
-      "sha256": "929d38398abd543d362aa8c7787e1481aac55a2a13d31167ed742767dfd84d40"
+      "sha256": "ffbfd357209d0e6d4058a7f123a31cbb10a5d0247ecb86c972f7a2c6f31fefee"
     },
     {
       "path": "assets/three-CgggyWJi.js",
@@ -177,7 +177,7 @@
     {
       "path": "index.html",
       "bytes": 913,
-      "sha256": "8694ac08a80549953bc4a802cc171551ee8aae0ab607b3e07b8bef7484a8e2f9"
+      "sha256": "c2e7aa558ac44af5ca1e1cf5df9c252f85a721ed75119fc82dd77e7de02be5d6"
     }
   ]
 }
