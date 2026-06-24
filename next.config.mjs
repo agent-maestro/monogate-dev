@@ -1,24 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["monogate"],
-  async rewrites() {
-    return [
-      // The public electronics section is owned by monogate-electronics and
-      // served from the synced Vite artifact in public/electronics-lab.
-      // Do not add an app/electronics route here; it will shadow these rewrites.
-      { source: "/electronics", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/:path*", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/trainer-board-v0", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/trainer-board-v0/:path*", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/arty-a7", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/other", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/other/:path*", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/othersystems", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/othersystems/:path*", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/optimization-boundary", destination: "/electronics-lab/index.html" },
-      { source: "/electronics/optimization-boundary/:path*", destination: "/electronics-lab/index.html" },
-    ];
-  },
+  // NOTE: /electronics is served by the catch-all route handler at
+  // app/electronics/[[...slug]]/route.ts, NOT by rewrites(). Next rewrites to a
+  // static public file (e.g. /electronics-lab/index.html) silently 404 on
+  // @opennextjs/cloudflare — the rewrite resolves in the server function, which
+  // can't serve a static asset (those live in the ASSETS binding). The route
+  // handler fetches the SPA shell from ASSETS instead. Real files under
+  // public/electronics/** are static assets and are served before the route.
   async redirects() {
     return [
       { source: "/search", destination: "/challenge/search", permanent: true },
