@@ -474,7 +474,7 @@ export default function LearnEMLHub() {
             Six tracks, one per industry vertical. Each track walks through
             the kinds of equations the vertical lives on — what the math is,
             why chain order matters there, what proofs ship, and which
-            targets the kernel lands on. The pre-verified kernels themselves
+            targets the kernel lands on. The pre-built kernels themselves
             are the proprietary product; tracks describe the surface without
             shipping the source. Upgrade to{" "}
             <a
