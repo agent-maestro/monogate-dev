@@ -49,6 +49,36 @@ function Cat({ v }: { v: string }) {
   return <span style={{ display: "inline-block", padding: "1px 6px", borderRadius: 3, fontSize: 10, fontWeight: 700, background: bg, color: col }}>{v}</span>;
 }
 
+// Provenance for the cost theory's named results, mechanised in MachLib/CostTheory.lean.
+type LeanStatus = "proven" | "structural" | "scope" | "conjecture";
+
+const STATUS: Record<LeanStatus, { label: string; bg: string; col: string }> = {
+  proven: { label: "machine-checked", bg: "rgba(94,196,122,0.15)", col: C.green },
+  structural: { label: "structural core", bg: "rgba(79,172,254,0.12)", col: C.accent },
+  scope: { label: "out of scope", bg: "rgba(78,81,104,0.22)", col: C.muted },
+  conjecture: { label: "conjecture", bg: "rgba(200,80,80,0.12)", col: C.red },
+};
+
+function StatusBadge({ s }: { s: LeanStatus }) {
+  const st = STATUS[s];
+  return <span style={{ display: "inline-block", padding: "1px 7px", borderRadius: 3, fontSize: 10, fontWeight: 700, background: st.bg, color: st.col, whiteSpace: "nowrap" }}>{st.label}</span>;
+}
+
+interface LeanResult { id: string; name: string; lean: string; status: LeanStatus; }
+
+const LEAN_THEOREMS: LeanResult[] = [
+  { id: "T38-NNP", name: "No-Nesting Penalty — composing operators is additive, no adapter/depth overhead", lean: "no_nesting_penalty", status: "proven" },
+  { id: "T38", name: "Cost = Naive − Pattern − Sharing — the two savings account for exactly the naive/actual gap", lean: "t38_decomposition", status: "proven" },
+  { id: "T40", name: "Additive Cost Law — independent branches sum exactly; sums are association-independent", lean: "additive_cost_law · sum_assoc_invariant", status: "proven" },
+  { id: "T41-ISO", name: "Cross-domain cost invariance — isomorphic DAG topologies cost the same (the 8 families' principle)", lean: "iso_cost", status: "proven" },
+  { id: "T42", name: "O(N) single-sum law — N equal-cost terms cost (α₀+3)·N − 3", lean: "cost_flatSum", status: "proven" },
+  { id: "T42²", name: "O(N²) double-sum law — a nested N×N sum is an exact quadratic", lean: "cost_doubleSum", status: "proven" },
+  { id: "P1–P3", name: "Basic properties — non-negativity, terminal characterisation, subadditivity", lean: "p1_nonneg · p2_*_cost_ge · p3_subadditive_*", status: "proven" },
+  { id: "T41", name: "Four structural classes — classification well-defined; rational is the cost floor, mixed the ceiling", lean: "classify · rational_floor · mixed_ceiling", status: "structural" },
+  { id: "P4", name: "Algebraic invariance — cost as a function of the computed FUNCTION, not the tree", lean: "—", status: "scope" },
+  { id: "T42-QCC", name: "Quadratic Ceiling Conjecture — no closed form exceeds O(N²); empirical over 187 equations", lean: "—", status: "conjecture" },
+];
+
 export default function SuperBESTPage() {
   const [domain, setDomain] = useState<"positive" | "general">("positive");
   const ops: Op[] = superbest.table;
@@ -255,6 +285,38 @@ export default function SuperBESTPage() {
                   <Td>{row.catalog}</Td>
                   <Td bold color={C.accent}>{row.layer1}</Td>
                   <Td bold color={C.green}>{row.layer2}</Td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Machine-checked theorems */}
+        <SectionHead>Machine-Checked Theorems (Lean 4)</SectionHead>
+        <p style={{ fontSize: 12, color: C.muted, marginBottom: 14, lineHeight: 1.7 }}>
+          The cost theory&apos;s named results, mechanised in{" "}
+          <a href="https://github.com/agent-maestro/machlib/blob/master/foundations/MachLib/CostTheory.lean" style={{ color: C.accent }}>MachLib/CostTheory.lean&nbsp;↗</a>
+          {" "}— pure <code>Nat</code>, <code>#print axioms</code> shows only <code>propext</code> / <code>Quot.sound</code>,
+          no <code>sorryAx</code>, no MachLib field axioms. Status is honest: the empirical mean-cost ordering
+          (C&nbsp;&lt;&nbsp;B&nbsp;&lt;&nbsp;A&nbsp;&lt;&nbsp;D) and the T42-QCC conjecture are <em>not</em> claimed as proven.
+        </p>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr>
+                <Th>Result</Th>
+                <Th>Statement</Th>
+                <Th color={C.green}>Lean theorem</Th>
+                <Th>Status</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {LEAN_THEOREMS.map((t) => (
+                <tr key={t.id}>
+                  <Td bold><code style={{ color: C.text, fontSize: 12 }}>{t.id}</code></Td>
+                  <Td small color={C.muted} maxW={300}>{t.name}</Td>
+                  <Td><code style={{ fontSize: 11, color: t.lean === "—" ? C.muted : C.green }}>{t.lean}</code></Td>
+                  <Td><StatusBadge s={t.status} /></Td>
                 </tr>
               ))}
             </tbody>
