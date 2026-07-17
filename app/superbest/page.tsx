@@ -70,7 +70,7 @@ const LEAN_THEOREMS: LeanResult[] = [
   { id: "T38-NNP", name: "No-Nesting Penalty — composing operators is additive, no adapter/depth overhead", lean: "no_nesting_penalty", status: "proven" },
   { id: "T38", name: "Cost = Naive − Pattern − Sharing — the two savings account for exactly the naive/actual gap", lean: "t38_decomposition", status: "proven" },
   { id: "T40", name: "Additive Cost Law — independent branches sum exactly; sums are association-independent", lean: "additive_cost_law · sum_assoc_invariant", status: "proven" },
-  { id: "T41-ISO", name: "Cross-domain cost invariance — isomorphic DAG topologies cost the same (the 8 families' principle)", lean: "iso_cost", status: "proven" },
+  { id: "T41-ISO", name: "Cross-domain cost invariance — isomorphic DAG topologies cost the same (the 10 confirmed tower families' principle)", lean: "iso_cost", status: "proven" },
   { id: "T42", name: "O(N) single-sum law — N equal-cost terms cost (α₀+3)·N − 3", lean: "cost_flatSum", status: "proven" },
   { id: "T42²", name: "O(N²) double-sum law — a nested N×N sum is an exact quadratic", lean: "cost_doubleSum", status: "proven" },
   { id: "P1–P3", name: "Basic properties — non-negativity, terminal characterisation, subadditivity", lean: "p1_nonneg · p2_*_cost_ge · p3_subadditive_*", status: "proven" },
