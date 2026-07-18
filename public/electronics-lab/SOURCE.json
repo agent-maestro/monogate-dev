@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-06-23T22:57:47.032922+00:00",
+  "generated_at": "2026-07-18T22:44:41.636560+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "ae3512c83e50bef98501099cfeb87290593ee912",
+  "source_commit": "365bfdc5a3ba43d9790357364d6f4f702b870ba8",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -25,19 +25,84 @@
   },
   "artifacts": [
     {
-      "path": "assets/AnalogContractLab-DRdxP75f.js",
-      "bytes": 11983,
-      "sha256": "ae1e30b895f7cf47a7c96dcc041d6ab45d4a1e49835da68b56a1e591e5ad3c79"
+      "path": "assets/AnalogContractLab-deCSelBv.js",
+      "bytes": 11984,
+      "sha256": "fc11fb8f4c13a04d67772e858da060e75eaa127e509ad8c7bde0b103029656b7"
     },
     {
-      "path": "assets/Arty002ContractLab-CJM_vmPi.js",
-      "bytes": 9393,
-      "sha256": "f1ab0cd722562bcd141cd5f9e6b9fdcf48bc8fc8f71e2774c4c72d51d1b54ebc"
+      "path": "assets/Arty002ContractLab-BnfkDxZb.js",
+      "bytes": 9500,
+      "sha256": "20b4891181a3fb4035f3f0f3b27a859c93c124549d0f2b3f344729bad839464f"
     },
     {
-      "path": "assets/ArtyA7Simulator-Iw7EIn6c.js",
-      "bytes": 62852,
-      "sha256": "479e3b385f26790d64c0fd70f43fc27f0077fd08b6ee57dbb5a3146d5d97de3d"
+      "path": "assets/ArtyA7Simulator-B-wjnjUS.js",
+      "bytes": 64914,
+      "sha256": "3b89d84962463c07b61ebdb3d27f6620913dc92d3d7a7581e8bbc32d56963e3f"
+    },
+    {
+      "path": "assets/ArtyContractLab-BZDEdKsE.js",
+      "bytes": 8131,
+      "sha256": "58e9f789136607bfceb446e8eea65a6e2af958079804466699361de5cc4c44ba"
+    },
+    {
+      "path": "assets/ArtyPhysicalBuild-BxxS7cKh.js",
+      "bytes": 9796,
+      "sha256": "bdcde79fa0391d3958ece541c34238d404440f778c918cf9496d15aa7d89b3c3"
+    },
+    {
+      "path": "assets/ArtyServoGuardSim-DBM3W9eP.js",
+      "bytes": 8725,
+      "sha256": "a19e87cb2b2205d1778078417f5dde998013d8a121d3e7355bbd2c7cb40a7385"
+    },
+    {
+      "path": "assets/EmlProvenancePanel-S6yrSJ3q.js",
+      "bytes": 5533,
+      "sha256": "063646baa5a525efbed866dec8c2a687ccd7e2fa591348c463c46b0b6f3998ed"
+    },
+    {
+      "path": "assets/GlossaryHint-DAqiEwu0.js",
+      "bytes": 671,
+      "sha256": "8ba722577d49283faef70538f5012d48672e1b27d07893d7f47288771e0b4a01"
+    },
+    {
+      "path": "assets/MonogateArtyEduLiveTool-Bgcq2kdg.js",
+      "bytes": 5254,
+      "sha256": "28cb2c0c17d430998ce4c9449bd15f764f6db2a619df3acc5ee86764a2504c1a"
+    },
+    {
+      "path": "assets/MonogateEduLiveTool-CRAJR-fM.js",
+      "bytes": 5233,
+      "sha256": "d704d9a1168b62827ad6c255f1c37b63bd403f9d5e26cdc38ffa6a05d2b2dd52"
+    },
+    {
+      "path": "assets/MonogateEduTool-Dc3etvvG.js",
+      "bytes": 25603,
+      "sha256": "7606a3087db9806c9f3c2955651301e14cd4ade40424e0fb8de656f3533d336d"
+    },
+    {
+      "path": "assets/MonogateEduVideoTool-D-u95uR8.js",
+      "bytes": 6113,
+      "sha256": "69fa47fae562ef4cb42e4729fb3f6b0756c9883023c872ddf10c8ab0c6e60aff"
+    },
+    {
+      "path": "assets/OptimizationBoundaryLab-mvfgy67p.js",
+      "bytes": 13252,
+      "sha256": "7502904a95653c6a44329a9e7fb12c73ec8d876b60455d6fed3b4621e89e9f0b"
+    },
+    {
+      "path": "assets/PhysicalBuildPanel-CtN6mgon.js",
+      "bytes": 15530,
+      "sha256": "e6aaae9e8833e258c0a6bf38eb15793c579b184fa80281651357d4866bd1e798"
+    },
+    {
+      "path": "assets/ReflexContractLab-BT2pwHOg.js",
+      "bytes": 10969,
+      "sha256": "dbdffa5315903478b2148ccdbc4833ac50c56ce334eed257e3f24a50de034fc2"
+    },
+    {
+      "path": "assets/SimulatorBench-BgJ-YAJg.js",
+      "bytes": 233214,
+      "sha256": "8fafe13cd2fd2a9722548385c3ec5a729cf6a76413c0d82603b8b24d55de2f15"
     },
     {
       "path": "assets/artyContractLab-BFsAMKSl.js",
@@ -45,69 +110,29 @@
       "sha256": "ea6938f28ea1872213ffd36db7bbe46ffd6921a7239534ba3fa8c297576fbde5"
     },
     {
-      "path": "assets/ArtyContractLab-DQItMrIC.js",
-      "bytes": 8130,
-      "sha256": "80cf1e06183f7c602351aeb0cfd4bb67020d9a182eca6de5e4de236cea600bc3"
-    },
-    {
       "path": "assets/artyGuardModel-oyLThbPX.js",
       "bytes": 798,
       "sha256": "50a6bb706981b10abdd296caf67db47db7d886ea407c53dce1f19c86d4601d6e"
     },
     {
-      "path": "assets/ArtyPhysicalBuild-CtBE_CT3.js",
-      "bytes": 9796,
-      "sha256": "366617c29b0e0b3a0a7f28ab551e02a424795dd63bd7737ff91d9c204b5d364a"
+      "path": "assets/icons-DJoHXF9r.js",
+      "bytes": 36383,
+      "sha256": "3eb80f66c7e85b6cd42b86117fe68e7a44dace08724fd09c298a38987aaa3234"
     },
     {
-      "path": "assets/EmlProvenancePanel-TNLo3XGa.js",
-      "bytes": 5533,
-      "sha256": "91098c843dc294342d5da6daadbf979d531f766d7a4f88dc4e85ea5202812d91"
+      "path": "assets/index-DGzST2A9.js",
+      "bytes": 272073,
+      "sha256": "8dd5c9b5ca468fcd740185513ecbca373cda09b47e74c5eb07281d710a26a733"
     },
     {
-      "path": "assets/GlossaryHint-mpGjSKV3.js",
-      "bytes": 671,
-      "sha256": "32bc0ea40cb1f9bcb73da534a993af38d1e1b2b2cfe701a69fce462e959ec417"
-    },
-    {
-      "path": "assets/icons-DPcia5ev.js",
-      "bytes": 32089,
-      "sha256": "ee5eae41d914ec757320588a40b2934a842c88d327a40e7f73cf5c957d7a030d"
-    },
-    {
-      "path": "assets/index-BPlkOZqp.js",
-      "bytes": 162923,
-      "sha256": "bf5097b95f5dad8e285d85d6434823fb1308ec46e6d2fd09a0ae7693c6acc73d"
-    },
-    {
-      "path": "assets/index-lbKFFKJD.css",
-      "bytes": 252325,
-      "sha256": "600d37db5395d73113e3f001693a6a36c0b98e8bffcc42dc2c070d65e16f475f"
+      "path": "assets/index-DbZKv0zV.css",
+      "bytes": 261885,
+      "sha256": "24883345e3687f86a320d3301d50483e1a0901578c82bb23093366142cb46e2f"
     },
     {
       "path": "assets/labEngine-BESM87HH.js",
       "bytes": 9869,
       "sha256": "e747963bd741ef4298698947bf7cdce02c082179a052bc4c95fc4dab1dcd23cc"
-    },
-    {
-      "path": "assets/MonogateArtyEduLiveTool-8onvLSlT.js",
-      "bytes": 5252,
-      "sha256": "39afd9c63024adff265f5dd432534727a24a56f89537eceb5037d8bc0b8bd522"
-    },
-    {
-      "path": "assets/MonogateEduLiveTool-ByZkWW9I.js",
-      "bytes": 5236,
-      "sha256": "ec8044abc6f67a4cf05327c5fa7ed9f3cfc1a337f1ba8cd0369e7a68658bac70"
-    },
-    {
-      "path": "assets/MonogateEduTool-C-62aq1N.js",
-      "bytes": 25602,
-      "sha256": "0fa5fa8359d608837b55ba84b2b19d7592fcada9ac57eda0d11fc6df6d118e72"
-    },
-    {
-      "path": "assets/MonogateEduVideoTool-HA8HV2u-.js",
-      "bytes": 6112,
-      "sha256": "900d9e030050d35e032f37a9cc3577c693989e425fe8400f55f9823e9abb4270"
     },
     {
       "path": "assets/monogatelogo.png",
@@ -120,49 +145,29 @@
       "sha256": "702292d17edc77204aadf130b0cc6560995027a653f47f188372efa4ee92aee9"
     },
     {
-      "path": "assets/OptimizationBoundaryLab-U9KfmaLE.js",
-      "bytes": 13255,
-      "sha256": "485ed41c606fb47a1c64eae6e945cd3fd948c583c9cfa6c1033b0f5d36367212"
-    },
-    {
-      "path": "assets/PhysicalBuildPanel-CMq0JGoq.js",
-      "bytes": 15525,
-      "sha256": "ea384b5d3d7bc58cb012fa27ed241e7265831d7164ad07a6c67f234766e55997"
-    },
-    {
       "path": "assets/react-BGrcABR8.js",
       "bytes": 142956,
       "sha256": "65d2e1399c43d7850ee04cc7b910ac5e3f6ce988c00621622ae9e75bc56b8ca8"
     },
     {
-      "path": "assets/react-three-B-5kAkQ-.js",
+      "path": "assets/react-three-Cw8XSiZv.js",
       "bytes": 41427,
-      "sha256": "8a971f83f269f919486737f7da4deb622c3b0f38e4f202d27802e92e30bca56f"
+      "sha256": "b159efc83040336dba8d3e45cac8b6df3924f7f8cb44c2ea151fda60854b910b"
     },
     {
-      "path": "assets/ReflexContractLab-AE_KEo7s.js",
-      "bytes": 10968,
-      "sha256": "87376a058d65461820fe22517e6a62901eb0554c71b0c9cc329a233ae550a37e"
+      "path": "assets/three-CcCjNTrj.js",
+      "bytes": 689571,
+      "sha256": "362d615f866402069456348cac4d7095aa2e1a9a7d837c914f28b80da2cfe5b8"
     },
     {
-      "path": "assets/SimulatorBench-DnZ9q37h.js",
-      "bytes": 233210,
-      "sha256": "c8ababfb2fd3ec0eba5459fd8e22661c3d92eff697bad761b6019c6c7d6c39ad"
+      "path": "assets/traceClip-C-j1tHXo.js",
+      "bytes": 43118,
+      "sha256": "f50ec7ffaf07d16148a3e48a526eaad83c3a0bce8acd70a48fc4978a5015658b"
     },
     {
-      "path": "assets/three-BT-5dV5y.js",
-      "bytes": 689555,
-      "sha256": "175ede19da0900f956b6e8183e4bbb7f8cf176d2677e7afb8dfe729b9837a0e9"
-    },
-    {
-      "path": "assets/traceClip-BsUUw8Wa.js",
-      "bytes": 44290,
-      "sha256": "396a32c28cecf1fb466f1f55bd3a64db4411a4ac97b2bfca6a42cbe29a4ae521"
-    },
-    {
-      "path": "assets/vendor-Ddg3PoAf.js",
-      "bytes": 243141,
-      "sha256": "91e6bdb6551054cf834611eb844e88008b10e040a669e7db518fd4693f7f346d"
+      "path": "assets/vendor-D_gfsaub.js",
+      "bytes": 400917,
+      "sha256": "88a9c36954baceecefe9825d9c945ee286c71e30baa469e60ab5b279b661bee5"
     },
     {
       "path": "downloads/arty001-switch-guard.zip",
@@ -170,14 +175,269 @@
       "sha256": "d99177d167e81fcfe86dd285b306bec54d0ab3067c5b93cc81fdac7cc39866c9"
     },
     {
+      "path": "electronics/esp32/reflex-guard/hardware/bom.md",
+      "bytes": 1525,
+      "sha256": "853121cfc7ecf8b031c8e30c6415f10f87dfcd2fd6790504f35c83980b2f5559"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/hardware/bom.pdf",
+      "bytes": 56715,
+      "sha256": "c89391523e5844b5c3d6c79a23f504f0b5c6f29ff5a214e3a50ebc5893a17d22"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/hardware/build-guide.md",
+      "bytes": 1412,
+      "sha256": "c138a6d0c4b780e1de43f02816031329ed478d03ba48b04667398bf72047ae9d"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/hardware/build-guide.pdf",
+      "bytes": 64696,
+      "sha256": "5e2d95773a909c2f7b558deb011a1c09f9b1eb98886a7f6b422df23c5c924535"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/hardware/schematic.md",
+      "bytes": 1456,
+      "sha256": "37a88830c536bc225433d22f75abc1563c27d1d1eba45ea33088ee1c995f3af6"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/hardware/schematic.pdf",
+      "bytes": 70768,
+      "sha256": "81c187875f9d16228240dfbe26cd0e49bcafb698dca3328ec5f1d29206008f59"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/images/hero-breadboard.png",
+      "bytes": 1314680,
+      "sha256": "65f37c4424e3d0faff8ee52c32de97018cb53a36a3537019db77c7cc9a9cb5a5"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/images/step-01-power-rails.jpg",
+      "bytes": 145753,
+      "sha256": "90a107aabf12fd870c9f45e2f36c5559d7ace8a55a64dba22b65a1bfccc63a5f"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/images/step-02-pot-on-gpio34.jpg",
+      "bytes": 153681,
+      "sha256": "66df4be3d947a39a6be9d26ec175b61c085f5d4d000db049f781772829dfc9ff"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/images/step-03-led-on-gpio25.jpg",
+      "bytes": 160827,
+      "sha256": "0cd5d40152b23e597b429788540d392ab68567e74ebb3c530db1a90e73019beb"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/images/step-04-buzzer-on-gpio26.jpg",
+      "bytes": 161602,
+      "sha256": "1177f0eef1216623be7812568f1b3c2b5bfa57e39bc89c2329bdd3e898ce6b36"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/images/step-05-button-on-gpio27.jpg",
+      "bytes": 145875,
+      "sha256": "c7dfcc262c59849d16390fa5a1a4da6c468f11a8b75e703545a146d0adcab8a9"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/lab-bundle/README.md",
+      "bytes": 2231,
+      "sha256": "9884c99ce936b23778a11bb673b26631671d6c5f592326fea160441ce002edaf"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/lab-bundle/README.pdf",
+      "bytes": 76631,
+      "sha256": "14fd448b031489fa2fe4c2fc306e84c3bb371bac6d69b7bc44e8c6e0e6c00282"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/lab-bundle/start-reflex-dashboard.bat",
+      "bytes": 115,
+      "sha256": "14c4b675a61607b5ad90432752ca0545107b3a3c2ed967055ae1e45cd2182d1e"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/lab-bundle/start-reflex-dashboard.ps1",
+      "bytes": 2133,
+      "sha256": "3c1d77e971cfb9fd1042347587fee9ddb12208d41aa149e6402b35093e857e42"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/resources/evidence-packet-guide.md",
+      "bytes": 2979,
+      "sha256": "3918bca54da0818e009622f4147c4a7d06dfff7bacd8cca9fe5585c16f23152a"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/resources/evidence-packet-guide.pdf",
+      "bytes": 81661,
+      "sha256": "05b1d5efb61706ab13fd992a626bae65fb21621c92f5cfef1dfe23de6a532a2b"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/resources/lab-packet.md",
+      "bytes": 12481,
+      "sha256": "e0d3f1d56f92c1cb9b00cdba5a584a24f0bb3467888f6d3fbb6ad6768076c73a"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/resources/lab-packet.pdf",
+      "bytes": 147773,
+      "sha256": "4646b60f49d7290a5c2319ad243012a98e9d67235b9a5ce45d1bfc7642cfef1a"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/resources/quick-start.pdf",
+      "bytes": 112421,
+      "sha256": "35360c718675923c89e921f912eeca6114d03abc6302c7eea9d90feed849dee8"
+    },
+    {
+      "path": "electronics/esp32/reflex-guard/resources/setup-guide.pdf",
+      "bytes": 11067,
+      "sha256": "07bff07bab67bda87040298a04f8d6ef84d02a0f2cd21cea55d6a9e793c06045"
+    },
+    {
+      "path": "electronics/foundations/foundations-overview.pdf",
+      "bytes": 156525,
+      "sha256": "192b203ce5177848da31a0cc9a7e0d4b403ff8a9a185427f16201c9009924b12"
+    },
+    {
+      "path": "electronics/foundations/rung-00-orientation.pdf",
+      "bytes": 76877,
+      "sha256": "e5293313b5f2ebf0c572b2feebb69709437858031acd55178d3f019fadb148e3"
+    },
+    {
+      "path": "electronics/foundations/rung-01-how-wrong-is-it.pdf",
+      "bytes": 173319,
+      "sha256": "a346474e0d233bb829080b7c1c3bc81df80bb26fe12d3895d6fa7cb59ccc488b"
+    },
+    {
+      "path": "electronics/foundations/rung-02-where-the-x6-comes-from.pdf",
+      "bytes": 181810,
+      "sha256": "fdd3be370150a770a863725e9139bf09db6af5e791481008275d5eb46f98e097"
+    },
+    {
+      "path": "electronics/foundations/rung-03-composing-error-bounds.pdf",
+      "bytes": 152464,
+      "sha256": "f673da43e8039661d528abd1a87deaeb66961f39e604f1e55abd607f160f44f1"
+    },
+    {
+      "path": "electronics/foundations/rung-04-make-lean-check-it.pdf",
+      "bytes": 137319,
+      "sha256": "edfcd80e8a85a1d8126fd5f4220ed2e0fd4726df2ccae25327935485dd1cc31e"
+    },
+    {
+      "path": "electronics/foundations/rung-05-why-the-loop-cant-escape.pdf",
+      "bytes": 130816,
+      "sha256": "03c8d95dd91182a08316c331aa2089867f76f1efd8b8907ad531bebb3ea94e1e"
+    },
+    {
+      "path": "electronics/foundations/rung-06-what-can-be-certified.pdf",
+      "bytes": 130117,
+      "sha256": "6020d15c6d7368c8b3b43333ebca1a3d48f487560ad2f96b43e91cd8fefb5fa4"
+    },
+    {
+      "path": "electronics/foundations/rung-1_5-what-is-a-proof.pdf",
+      "bytes": 165554,
+      "sha256": "bc1a887b03a510d26d84d3eb86d0fbe6feadcaf2dd133575b3543f836835fe55"
+    },
+    {
       "path": "evidence/evidence_bridge_2026_05_27.json",
-      "bytes": 2353,
-      "sha256": "7ec254c8711f206ddccecd28487152a3e3d4f8cfb4b0ec62c361bbb068ec4d5e"
+      "bytes": 2286,
+      "sha256": "cb26cd7676067328998af8ec2a8d807433a8dc4d76800ec2ffc59f83234535fd"
     },
     {
       "path": "index.html",
-      "bytes": 913,
-      "sha256": "8dd0c5e715328a55f8a8be13c926fb6379d1d4c87bfde9af58d4a5880be9dc21"
+      "bytes": 901,
+      "sha256": "ea921538f6b73b5252c98a933669fb98d0e04834ee8cbeec3e4cfa1ce5822c6d"
+    },
+    {
+      "path": "lessons/addressable-led.pdf",
+      "bytes": 136098,
+      "sha256": "ebfeebc72dd8315868502e8644f575bfe3bb3cc7896f3205bcd7205d75c039c7"
+    },
+    {
+      "path": "lessons/arty-servo-guard.pdf",
+      "bytes": 160667,
+      "sha256": "9fefb8a1a8e1144137a5dee267b225440bae51d625aef0e4039f98f2d8fb42f8"
+    },
+    {
+      "path": "lessons/closed-loop-speed.pdf",
+      "bytes": 142032,
+      "sha256": "9d6d431cb6d6bfaef0eca3819da5ea6c007671d3033bfb0bce8dcf6ddcc973c4"
+    },
+    {
+      "path": "lessons/closed-loop.pdf",
+      "bytes": 117828,
+      "sha256": "4cba88ed41459b7286df4d2984a6802441937b80b44eb13fb3ca07ba2211b962"
+    },
+    {
+      "path": "lessons/guarded-instrument.pdf",
+      "bytes": 118614,
+      "sha256": "5d027f5d15b40391d650e2742323f915b153e27d28077bb561ce1f12f45c9e8d"
+    },
+    {
+      "path": "lessons/heading.pdf",
+      "bytes": 149325,
+      "sha256": "ce4af8a5f572cd4b6cfa9bac7085073149fe03f6cfb147a2065afde9ddf607ba"
+    },
+    {
+      "path": "lessons/i2c-display.pdf",
+      "bytes": 143787,
+      "sha256": "a8b6d778c5752d50f59351eb58f17fb47c5623eae10a5d868a6dbcda9b38219f"
+    },
+    {
+      "path": "lessons/i2s-audio.pdf",
+      "bytes": 138797,
+      "sha256": "9bc70ec80c9fb0b127c7e25f5f562fade447c38f5cfe96d00cba711f895cae1a"
+    },
+    {
+      "path": "lessons/live-dashboard.pdf",
+      "bytes": 117569,
+      "sha256": "8fcc2f0d2d9b966189de270adaabaa55838e7a6aea064ccfcc3f2a1b8e3240c4"
+    },
+    {
+      "path": "lessons/navigation.pdf",
+      "bytes": 116094,
+      "sha256": "ac1663e4c000dab18f33f581120b5368651f4c5832af7ea4c6c5e151e354fa6a"
+    },
+    {
+      "path": "lessons/odometry.pdf",
+      "bytes": 115813,
+      "sha256": "c662f94ea9beed1bb791c7597968420f863551dac0e3a350c7c5955f5f7456be"
+    },
+    {
+      "path": "lessons/reading-the-world.pdf",
+      "bytes": 130122,
+      "sha256": "8465538a5df329a3a886705c0b5e3ca41d765229f6b5e3e17dd4234a50775d5c"
+    },
+    {
+      "path": "lessons/rover.pdf",
+      "bytes": 138387,
+      "sha256": "59c8111b96b58677825d5f0324528f686ac9d8334c23637bd33cdd56796afb05"
+    },
+    {
+      "path": "lessons/sensor-trust.pdf",
+      "bytes": 120663,
+      "sha256": "2b1c876e1f0e3c6bd51532101083cdc931cb6a5697990eefc937b7dcfc7db3a0"
+    },
+    {
+      "path": "lessons/servo-from-pot.pdf",
+      "bytes": 127505,
+      "sha256": "2441ade5ab322df2e09612f81432490a0faded8e08c154c3eed61fb3d95e06bb"
+    },
+    {
+      "path": "lessons/servo-guard.pdf",
+      "bytes": 154593,
+      "sha256": "20210bafcb896d3ce4b32f26fe7af96da771283768a1b6be273b1860b929ca42"
+    },
+    {
+      "path": "lessons/sigil-playground.pdf",
+      "bytes": 147257,
+      "sha256": "9bf222dab035160859e82ac49c8a4f417b90c52051a3fe4d52efac8625e8a7e3"
+    },
+    {
+      "path": "lessons/switching-power.pdf",
+      "bytes": 135075,
+      "sha256": "00ab8b90d3efffc519762dc4a7f9f3f00d6efee7a9bab5a1038a390472d3a94c"
+    },
+    {
+      "path": "lessons/telemetry.pdf",
+      "bytes": 126191,
+      "sha256": "5b8b51933c0b5e39f5691ff67ed2f38f77ec69c2494cf601975590b10587f93b"
+    },
+    {
+      "path": "lessons/wifi-web.pdf",
+      "bytes": 116078,
+      "sha256": "28e7ac817aac3119308339074834601725eccff6c1547185ef48bbd3ed1d5e36"
     }
   ]
 }
