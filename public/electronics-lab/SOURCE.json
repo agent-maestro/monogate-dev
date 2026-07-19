@@ -1,13 +1,15 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-07-18T22:44:41.636560+00:00",
+  "generated_at": "2026-07-19T00:05:25.899389+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "365bfdc5a3ba43d9790357364d6f4f702b870ba8",
-  "source_dirty": false,
-  "source_status": [],
+  "source_commit": "90580e4693a23f2b586058d9c2b4e47190a5ef27",
+  "source_dirty": true,
+  "source_status": [
+    "M apps/electronics-lab/src/replay/skeleton.generated.ts"
+  ],
   "build_command": "python scripts/sync_electronics_lab_public.py",
   "artifact_repo": "https://github.com/agent-maestro/monogate-dev",
   "artifact_path": "public/electronics-lab",
@@ -25,29 +27,29 @@
   },
   "artifacts": [
     {
-      "path": "assets/AnalogContractLab-deCSelBv.js",
+      "path": "assets/AnalogContractLab-pwMrtMP5.js",
       "bytes": 11984,
-      "sha256": "fc11fb8f4c13a04d67772e858da060e75eaa127e509ad8c7bde0b103029656b7"
+      "sha256": "7027cc29bfe28e0f44c4e0c5287e1ecda0ae43850824279b913d7a95445756f0"
     },
     {
-      "path": "assets/Arty002ContractLab-BnfkDxZb.js",
+      "path": "assets/Arty002ContractLab-DmMHVl7E.js",
       "bytes": 9500,
-      "sha256": "20b4891181a3fb4035f3f0f3b27a859c93c124549d0f2b3f344729bad839464f"
+      "sha256": "ac15a182401025cd0fcc92ddffbf79c6127e4c5fec3c092e0641f422fcf53efe"
     },
     {
-      "path": "assets/ArtyA7Simulator-B-wjnjUS.js",
-      "bytes": 64914,
-      "sha256": "3b89d84962463c07b61ebdb3d27f6620913dc92d3d7a7581e8bbc32d56963e3f"
+      "path": "assets/ArtyA7Simulator-NBu78NhP.js",
+      "bytes": 64915,
+      "sha256": "c8630fc69910091b93a81ba6ebcf81b85c6572b72a6232db5022b4e3afc41a35"
     },
     {
-      "path": "assets/ArtyContractLab-BZDEdKsE.js",
+      "path": "assets/ArtyContractLab-IJ09Nl0W.js",
       "bytes": 8131,
-      "sha256": "58e9f789136607bfceb446e8eea65a6e2af958079804466699361de5cc4c44ba"
+      "sha256": "b0d5b28c66cad332ae2a602aab2d4761e0fa0cd9c31ee383bd81f1c0b29b24c3"
     },
     {
-      "path": "assets/ArtyPhysicalBuild-BxxS7cKh.js",
+      "path": "assets/ArtyPhysicalBuild-CEUnA8YZ.js",
       "bytes": 9796,
-      "sha256": "bdcde79fa0391d3958ece541c34238d404440f778c918cf9496d15aa7d89b3c3"
+      "sha256": "058ca65256b2a20bb46a335ffe431a694ee6e297c1890cb70f1d46e483c392b2"
     },
     {
       "path": "assets/ArtyServoGuardSim-DBM3W9eP.js",
@@ -55,54 +57,54 @@
       "sha256": "a19e87cb2b2205d1778078417f5dde998013d8a121d3e7355bbd2c7cb40a7385"
     },
     {
-      "path": "assets/EmlProvenancePanel-S6yrSJ3q.js",
+      "path": "assets/EmlProvenancePanel-CRxk6bBx.js",
       "bytes": 5533,
-      "sha256": "063646baa5a525efbed866dec8c2a687ccd7e2fa591348c463c46b0b6f3998ed"
+      "sha256": "cea2af6820e77cac31c14661ee8aed7f5bb3e5a1bbe35b8383a2d2a0e4af8d9d"
     },
     {
-      "path": "assets/GlossaryHint-DAqiEwu0.js",
+      "path": "assets/GlossaryHint-42ESfyil.js",
       "bytes": 671,
-      "sha256": "8ba722577d49283faef70538f5012d48672e1b27d07893d7f47288771e0b4a01"
+      "sha256": "82e9c5b8c9f46f67e8f06efcf354c07ac0d48a7962607d1700168aff411abc7b"
     },
     {
-      "path": "assets/MonogateArtyEduLiveTool-Bgcq2kdg.js",
-      "bytes": 5254,
-      "sha256": "28cb2c0c17d430998ce4c9449bd15f764f6db2a619df3acc5ee86764a2504c1a"
+      "path": "assets/MonogateArtyEduLiveTool-d2OigSfG.js",
+      "bytes": 5249,
+      "sha256": "e9e974ebf0c3b3c1aa48a72de8f45ea337b382d8f27e45b041725a033caf26a8"
     },
     {
-      "path": "assets/MonogateEduLiveTool-CRAJR-fM.js",
-      "bytes": 5233,
-      "sha256": "d704d9a1168b62827ad6c255f1c37b63bd403f9d5e26cdc38ffa6a05d2b2dd52"
+      "path": "assets/MonogateEduLiveTool-DBN44QC5.js",
+      "bytes": 5238,
+      "sha256": "bda408ddddf91f5d5402be2c86a2320e8f76d2715dd69e3d287ede401b8072f1"
     },
     {
-      "path": "assets/MonogateEduTool-Dc3etvvG.js",
+      "path": "assets/MonogateEduTool-BAo1TrTK.js",
       "bytes": 25603,
-      "sha256": "7606a3087db9806c9f3c2955651301e14cd4ade40424e0fb8de656f3533d336d"
+      "sha256": "11a1e7a0d1d7d060b19632514b5dbac14836e99d87dc20be6317566d2d1e2855"
     },
     {
-      "path": "assets/MonogateEduVideoTool-D-u95uR8.js",
+      "path": "assets/MonogateEduVideoTool-BaqDM0kc.js",
       "bytes": 6113,
-      "sha256": "69fa47fae562ef4cb42e4729fb3f6b0756c9883023c872ddf10c8ab0c6e60aff"
+      "sha256": "355feadfc4e7b5506011617cab321595408decde6c1a4d9a2e4240d31d03bb48"
     },
     {
-      "path": "assets/OptimizationBoundaryLab-mvfgy67p.js",
-      "bytes": 13252,
-      "sha256": "7502904a95653c6a44329a9e7fb12c73ec8d876b60455d6fed3b4621e89e9f0b"
+      "path": "assets/OptimizationBoundaryLab-YaKseH-a.js",
+      "bytes": 13257,
+      "sha256": "9b7e569452388622dbec820e1701439e69ef3eefda789654388771b64f873a88"
     },
     {
-      "path": "assets/PhysicalBuildPanel-CtN6mgon.js",
+      "path": "assets/PhysicalBuildPanel-D7sSzr8D.js",
       "bytes": 15530,
-      "sha256": "e6aaae9e8833e258c0a6bf38eb15793c579b184fa80281651357d4866bd1e798"
+      "sha256": "34e52085f4a14501490bfd44d018d7e86fa6071a3cda00a4f1aca2860396c9c3"
     },
     {
-      "path": "assets/ReflexContractLab-BT2pwHOg.js",
+      "path": "assets/ReflexContractLab-Bk_dbKJI.js",
       "bytes": 10969,
-      "sha256": "dbdffa5315903478b2148ccdbc4833ac50c56ce334eed257e3f24a50de034fc2"
+      "sha256": "2833f18cf13d75568baef4f25feb34da32b122f9572d6c36eaf4266b069cf0b3"
     },
     {
-      "path": "assets/SimulatorBench-BgJ-YAJg.js",
-      "bytes": 233214,
-      "sha256": "8fafe13cd2fd2a9722548385c3ec5a729cf6a76413c0d82603b8b24d55de2f15"
+      "path": "assets/SimulatorBench-DzEz4eDZ.js",
+      "bytes": 233215,
+      "sha256": "df087c038299fcd27c7f71b956b7421b464b999ddc710ad2e1ccf109bd31aba2"
     },
     {
       "path": "assets/artyContractLab-BFsAMKSl.js",
@@ -115,19 +117,19 @@
       "sha256": "50a6bb706981b10abdd296caf67db47db7d886ea407c53dce1f19c86d4601d6e"
     },
     {
-      "path": "assets/icons-DJoHXF9r.js",
-      "bytes": 36383,
-      "sha256": "3eb80f66c7e85b6cd42b86117fe68e7a44dace08724fd09c298a38987aaa3234"
+      "path": "assets/icons-BL0AuQzJ.js",
+      "bytes": 36901,
+      "sha256": "35a47f32536a6d284d4c8905e7e4916a09dce05cdee8f367fd7feec97ab62b18"
     },
     {
-      "path": "assets/index-DGzST2A9.js",
-      "bytes": 272073,
-      "sha256": "8dd5c9b5ca468fcd740185513ecbca373cda09b47e74c5eb07281d710a26a733"
+      "path": "assets/index-Y0l0zVxC.css",
+      "bytes": 266462,
+      "sha256": "b4435a18fe1e1090f0fd85be54dc51cde6b028c1581c3f9ec5b753b80331e943"
     },
     {
-      "path": "assets/index-DbZKv0zV.css",
-      "bytes": 261885,
-      "sha256": "24883345e3687f86a320d3301d50483e1a0901578c82bb23093366142cb46e2f"
+      "path": "assets/index-t7XhTr1z.js",
+      "bytes": 276894,
+      "sha256": "57abf34099c9eacf4d0b36b9d1373438feb33b8a1896faaba6b9020428f5be69"
     },
     {
       "path": "assets/labEngine-BESM87HH.js",
@@ -337,7 +339,7 @@
     {
       "path": "index.html",
       "bytes": 901,
-      "sha256": "ea921538f6b73b5252c98a933669fb98d0e04834ee8cbeec3e4cfa1ce5822c6d"
+      "sha256": "b735ed0923174069cb0463cafdd36f9a642a47ec7e6c4e123c33108f257b59d0"
     },
     {
       "path": "lessons/addressable-led.pdf",
