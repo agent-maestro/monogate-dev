@@ -1,15 +1,13 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-07-19T00:05:25.899389+00:00",
+  "generated_at": "2026-07-23T23:37:04.846453+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "90580e4693a23f2b586058d9c2b4e47190a5ef27",
-  "source_dirty": true,
-  "source_status": [
-    "M apps/electronics-lab/src/replay/skeleton.generated.ts"
-  ],
+  "source_commit": "9076bd18fb74da92373bf22ef9c4d1681e0fd1ac",
+  "source_dirty": false,
+  "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
   "artifact_repo": "https://github.com/agent-maestro/monogate-dev",
   "artifact_path": "public/electronics-lab",
@@ -175,161 +173,6 @@
       "path": "downloads/arty001-switch-guard.zip",
       "bytes": 175488,
       "sha256": "d99177d167e81fcfe86dd285b306bec54d0ab3067c5b93cc81fdac7cc39866c9"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/hardware/bom.md",
-      "bytes": 1525,
-      "sha256": "853121cfc7ecf8b031c8e30c6415f10f87dfcd2fd6790504f35c83980b2f5559"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/hardware/bom.pdf",
-      "bytes": 56715,
-      "sha256": "c89391523e5844b5c3d6c79a23f504f0b5c6f29ff5a214e3a50ebc5893a17d22"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/hardware/build-guide.md",
-      "bytes": 1412,
-      "sha256": "c138a6d0c4b780e1de43f02816031329ed478d03ba48b04667398bf72047ae9d"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/hardware/build-guide.pdf",
-      "bytes": 64696,
-      "sha256": "5e2d95773a909c2f7b558deb011a1c09f9b1eb98886a7f6b422df23c5c924535"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/hardware/schematic.md",
-      "bytes": 1456,
-      "sha256": "37a88830c536bc225433d22f75abc1563c27d1d1eba45ea33088ee1c995f3af6"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/hardware/schematic.pdf",
-      "bytes": 70768,
-      "sha256": "81c187875f9d16228240dfbe26cd0e49bcafb698dca3328ec5f1d29206008f59"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/images/hero-breadboard.png",
-      "bytes": 1314680,
-      "sha256": "65f37c4424e3d0faff8ee52c32de97018cb53a36a3537019db77c7cc9a9cb5a5"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/images/step-01-power-rails.jpg",
-      "bytes": 145753,
-      "sha256": "90a107aabf12fd870c9f45e2f36c5559d7ace8a55a64dba22b65a1bfccc63a5f"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/images/step-02-pot-on-gpio34.jpg",
-      "bytes": 153681,
-      "sha256": "66df4be3d947a39a6be9d26ec175b61c085f5d4d000db049f781772829dfc9ff"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/images/step-03-led-on-gpio25.jpg",
-      "bytes": 160827,
-      "sha256": "0cd5d40152b23e597b429788540d392ab68567e74ebb3c530db1a90e73019beb"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/images/step-04-buzzer-on-gpio26.jpg",
-      "bytes": 161602,
-      "sha256": "1177f0eef1216623be7812568f1b3c2b5bfa57e39bc89c2329bdd3e898ce6b36"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/images/step-05-button-on-gpio27.jpg",
-      "bytes": 145875,
-      "sha256": "c7dfcc262c59849d16390fa5a1a4da6c468f11a8b75e703545a146d0adcab8a9"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/lab-bundle/README.md",
-      "bytes": 2231,
-      "sha256": "9884c99ce936b23778a11bb673b26631671d6c5f592326fea160441ce002edaf"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/lab-bundle/README.pdf",
-      "bytes": 76631,
-      "sha256": "14fd448b031489fa2fe4c2fc306e84c3bb371bac6d69b7bc44e8c6e0e6c00282"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/lab-bundle/start-reflex-dashboard.bat",
-      "bytes": 115,
-      "sha256": "14c4b675a61607b5ad90432752ca0545107b3a3c2ed967055ae1e45cd2182d1e"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/lab-bundle/start-reflex-dashboard.ps1",
-      "bytes": 2133,
-      "sha256": "3c1d77e971cfb9fd1042347587fee9ddb12208d41aa149e6402b35093e857e42"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/resources/evidence-packet-guide.md",
-      "bytes": 2979,
-      "sha256": "3918bca54da0818e009622f4147c4a7d06dfff7bacd8cca9fe5585c16f23152a"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/resources/evidence-packet-guide.pdf",
-      "bytes": 81661,
-      "sha256": "05b1d5efb61706ab13fd992a626bae65fb21621c92f5cfef1dfe23de6a532a2b"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/resources/lab-packet.md",
-      "bytes": 12481,
-      "sha256": "e0d3f1d56f92c1cb9b00cdba5a584a24f0bb3467888f6d3fbb6ad6768076c73a"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/resources/lab-packet.pdf",
-      "bytes": 147773,
-      "sha256": "4646b60f49d7290a5c2319ad243012a98e9d67235b9a5ce45d1bfc7642cfef1a"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/resources/quick-start.pdf",
-      "bytes": 112421,
-      "sha256": "35360c718675923c89e921f912eeca6114d03abc6302c7eea9d90feed849dee8"
-    },
-    {
-      "path": "electronics/esp32/reflex-guard/resources/setup-guide.pdf",
-      "bytes": 11067,
-      "sha256": "07bff07bab67bda87040298a04f8d6ef84d02a0f2cd21cea55d6a9e793c06045"
-    },
-    {
-      "path": "electronics/foundations/foundations-overview.pdf",
-      "bytes": 156525,
-      "sha256": "192b203ce5177848da31a0cc9a7e0d4b403ff8a9a185427f16201c9009924b12"
-    },
-    {
-      "path": "electronics/foundations/rung-00-orientation.pdf",
-      "bytes": 76877,
-      "sha256": "e5293313b5f2ebf0c572b2feebb69709437858031acd55178d3f019fadb148e3"
-    },
-    {
-      "path": "electronics/foundations/rung-01-how-wrong-is-it.pdf",
-      "bytes": 173319,
-      "sha256": "a346474e0d233bb829080b7c1c3bc81df80bb26fe12d3895d6fa7cb59ccc488b"
-    },
-    {
-      "path": "electronics/foundations/rung-02-where-the-x6-comes-from.pdf",
-      "bytes": 181810,
-      "sha256": "fdd3be370150a770a863725e9139bf09db6af5e791481008275d5eb46f98e097"
-    },
-    {
-      "path": "electronics/foundations/rung-03-composing-error-bounds.pdf",
-      "bytes": 152464,
-      "sha256": "f673da43e8039661d528abd1a87deaeb66961f39e604f1e55abd607f160f44f1"
-    },
-    {
-      "path": "electronics/foundations/rung-04-make-lean-check-it.pdf",
-      "bytes": 137319,
-      "sha256": "edfcd80e8a85a1d8126fd5f4220ed2e0fd4726df2ccae25327935485dd1cc31e"
-    },
-    {
-      "path": "electronics/foundations/rung-05-why-the-loop-cant-escape.pdf",
-      "bytes": 130816,
-      "sha256": "03c8d95dd91182a08316c331aa2089867f76f1efd8b8907ad531bebb3ea94e1e"
-    },
-    {
-      "path": "electronics/foundations/rung-06-what-can-be-certified.pdf",
-      "bytes": 130117,
-      "sha256": "6020d15c6d7368c8b3b43333ebca1a3d48f487560ad2f96b43e91cd8fefb5fa4"
-    },
-    {
-      "path": "electronics/foundations/rung-1_5-what-is-a-proof.pdf",
-      "bytes": 165554,
-      "sha256": "bc1a887b03a510d26d84d3eb86d0fbe6feadcaf2dd133575b3543f836835fe55"
     },
     {
       "path": "evidence/evidence_bridge_2026_05_27.json",
