@@ -1,4 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { injectSeo } from "./seo";
 
 /**
  * Serve the electronics-lab SPA at /electronics and any /electronics/* client
@@ -13,6 +14,12 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
  *
  * Real files under public/electronics/** (e.g. the ESP32 PDFs) are static
  * assets served by ASSETS *before* this route runs, so they're unaffected.
+ *
+ * Because the shell's body is just `<div id="root"></div>`, every non-JS
+ * reader (crawlers, link unfurlers, agents) saw a blank page. Since this
+ * handler already materializes the HTML as a string server-side, it is also
+ * where per-route <title>/meta/OG tags and a <noscript> summary get injected —
+ * see ./seo.ts.
  */
 
 export const runtime = "nodejs";
@@ -38,7 +45,8 @@ async function readShell(request: Request): Promise<string> {
 }
 
 export async function GET(request: Request): Promise<Response> {
-  const html = await readShell(request);
+  const shell = await readShell(request);
+  const html = injectSeo(shell, new URL(request.url).pathname);
   return new Response(html, {
     status: 200,
     headers: {
