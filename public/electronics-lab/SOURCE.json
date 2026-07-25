@@ -1,27 +1,67 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-07-25T20:18:06.865494+00:00",
+  "generated_at": "2026-07-25T21:42:38.655291+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "07b0fae8183f6da20b922f4baa0ef1b444f60add",
+  "source_commit": "be11f24c7376d6581028dc0fed42fe6d3bb0771a",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
   "artifact_repo": "https://github.com/agent-maestro/monogate-dev",
   "artifact_path": "public/electronics-lab",
   "boundary_flags": {
-    "hardware_observed": false,
     "simulated": true,
-    "live_serial_capture_performed": false,
-    "hardware_action_performed": false,
+    "hardware_observed": true,
+    "hardware_observed_all_tracks": false,
+    "hardware_observed_tracks": [
+      "artya7"
+    ],
+    "live_serial_capture_performed": true,
+    "hardware_action_performed": true,
     "esp32_flash_performed": false,
-    "fpga_programming_performed": false,
+    "fpga_programming_performed": true,
     "medical_claim": false,
     "therapy_claim": false,
     "certified_safety_claim": false,
     "production_controller_claim": false
+  },
+  "hardware_evidence": {
+    "generated_at": "2026-07-25T21:24:08.444947+00:00",
+    "packets_scanned": 23,
+    "tracks": {
+      "artya7": {
+        "label": "FPGA / Arty A7",
+        "hardware_observed": true,
+        "live_capture_packets": 16,
+        "total_captured_frames": 39233,
+        "devices": [
+          "Digilent Arty A7-100T"
+        ],
+        "first_capture": "2026-06-14",
+        "latest_capture": "2026-07-19"
+      },
+      "esp32": {
+        "label": "ESP32 / Arduino",
+        "hardware_observed": false,
+        "live_capture_packets": 0,
+        "total_captured_frames": 0,
+        "devices": [],
+        "first_capture": null,
+        "latest_capture": null
+      },
+      "other": {
+        "label": "Other",
+        "hardware_observed": false,
+        "live_capture_packets": 0,
+        "total_captured_frames": 0,
+        "devices": [],
+        "first_capture": null,
+        "latest_capture": null
+      }
+    },
+    "note": "Derived from evidence packets in this repo, not asserted. A track reads hardware_observed only where a packet records capture_mode live_hardware AND claim_flags.hardware_observed. Simulator runs inside the lab remain hardware_observed=false per run; that is a different claim."
   },
   "artifacts": [
     {
@@ -60,9 +100,9 @@
       "sha256": "d93e110e3e4787524d4592b0d014ce94ccd823e272010676a633da5c1d62b027"
     },
     {
-      "path": "assets/GlossaryHint-aQBXUSYD.js",
+      "path": "assets/GlossaryHint-J4cSnLkM.js",
       "bytes": 671,
-      "sha256": "556dff5992d6c53bfcdec143b922c9f87fdf026ce86c84235767b3152909d8df"
+      "sha256": "a92a49698d1ccf546b0aad446e08c05a9f3bacaae8f6e841800882bf7afacfbb"
     },
     {
       "path": "assets/MonogateArtyEduLiveTool-BF8nmnb-.js",
@@ -90,9 +130,9 @@
       "sha256": "b4ab4a25088fa2d7db7965134f84de98a3f91e62b4093a7759ac5d1f0c959706"
     },
     {
-      "path": "assets/PhysicalBuildPanel-CnXqQqgI.js",
+      "path": "assets/PhysicalBuildPanel-DRMbGOPz.js",
       "bytes": 15530,
-      "sha256": "d1c1acb626f399ce1b9faa4d66251066500d1511777c19f4dfe6465e48e32845"
+      "sha256": "6f9f710f1b98a281aef788ca6d28ca8cd4a750855cc193f46aa371f54d7cae1d"
     },
     {
       "path": "assets/ReflexContractLab-WKzLW-Pu.js",
@@ -100,9 +140,9 @@
       "sha256": "689a01d2310d9be8e8485726fd052016ac55690aa615d418b8f9f9328311b240"
     },
     {
-      "path": "assets/SimulatorBench-CK2uR-LM.js",
+      "path": "assets/SimulatorBench-Cj7UF1NL.js",
       "bytes": 233758,
-      "sha256": "6dc5b145b80423e6538911d05fa98671c1327d98a7c703a35177d6aff1831e19"
+      "sha256": "4f9978f01b02f1e9489de32bb02ba0faaac375cb22a6a87f4006c8c796aa63c0"
     },
     {
       "path": "assets/artyContractLab-BFsAMKSl.js",
@@ -120,9 +160,9 @@
       "sha256": "8f6b8b1ff4dc3448c82434c04a1f84a0feb85d4200671586668d775e116d255c"
     },
     {
-      "path": "assets/index-B5H9-eWC.js",
-      "bytes": 276895,
-      "sha256": "6b9f60af8a2e750bdc845a194a99a3a53ba502c9269f9408b59092a335e2f020"
+      "path": "assets/index-4Ho568iQ.js",
+      "bytes": 279209,
+      "sha256": "7b7115202a6e17a502b9563d1ff1513e2492cdd9df2085ce96257b317d57aa14"
     },
     {
       "path": "assets/index-BAC1eMyx.css",
@@ -182,7 +222,7 @@
     {
       "path": "index.html",
       "bytes": 901,
-      "sha256": "b38551ab38816f88877fd487d4a6918c8112257847f35d64d897b1b7a5493c55"
+      "sha256": "8e2faf373d505681b406731cc1068bb01eea2f78a163e9bfc255eddb947fcbb7"
     },
     {
       "path": "lessons/addressable-led.pdf",
