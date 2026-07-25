@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-07-25T18:41:36.456236+00:00",
+  "generated_at": "2026-07-25T19:07:43.148690+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "074f90f369dc378270726ae4631a6badae423222",
+  "source_commit": "15b0edfa9fb6ae202741399e6143b6a96ad108e4",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -60,9 +60,9 @@
       "sha256": "cea2af6820e77cac31c14661ee8aed7f5bb3e5a1bbe35b8383a2d2a0e4af8d9d"
     },
     {
-      "path": "assets/GlossaryHint-ABSKUekT.js",
+      "path": "assets/GlossaryHint-C0lNdI2v.js",
       "bytes": 671,
-      "sha256": "e023ccaa55c4a23adbe9eb20ac29e06d6b8a29db2bfb2e3a253a8a2da4e60f49"
+      "sha256": "d342fca33770828693140aa305cb3eec369a04deb68d3922c2daf490aaf26118"
     },
     {
       "path": "assets/MonogateArtyEduLiveTool-d2OigSfG.js",
@@ -90,9 +90,9 @@
       "sha256": "9b7e569452388622dbec820e1701439e69ef3eefda789654388771b64f873a88"
     },
     {
-      "path": "assets/PhysicalBuildPanel-D3nyfV-F.js",
+      "path": "assets/PhysicalBuildPanel-DO_lc7hh.js",
       "bytes": 15530,
-      "sha256": "8297ce6217f76cbfa9b8a0c99530960b6f45d7547829612e7e72391e6feea9aa"
+      "sha256": "fdb3fc8aea62bec3a29bfe106d98f6796174b088bba6b1a3352e2b2b3f124a71"
     },
     {
       "path": "assets/ReflexContractLab-Bk_dbKJI.js",
@@ -100,9 +100,9 @@
       "sha256": "2833f18cf13d75568baef4f25feb34da32b122f9572d6c36eaf4266b069cf0b3"
     },
     {
-      "path": "assets/SimulatorBench-BR1-FBWD.js",
+      "path": "assets/SimulatorBench-BImUPpNm.js",
       "bytes": 233647,
-      "sha256": "a73079e1ae1d62497751960cdd29874d3d6a41ef6556d35fe11f404f4935651e"
+      "sha256": "121daa22d6e45cd3c63f017c80e57b95f570605d7d70096a60809eecc050be09"
     },
     {
       "path": "assets/artyContractLab-BFsAMKSl.js",
@@ -120,14 +120,14 @@
       "sha256": "35a47f32536a6d284d4c8905e7e4916a09dce05cdee8f367fd7feec97ab62b18"
     },
     {
-      "path": "assets/index-6mRyiQq-.css",
-      "bytes": 266983,
-      "sha256": "e094d2fa4e8b4d775be79f947947464e3308f825a76035a680267297362cbb2a"
+      "path": "assets/index-BhsqV9Na.js",
+      "bytes": 276894,
+      "sha256": "9bd0a2e51f05f15206a1269fc01867b7dfee167c99c2dc21cabdb4fd7e9c2bb2"
     },
     {
-      "path": "assets/index-amCC4XIn.js",
-      "bytes": 276894,
-      "sha256": "a6600e0c180a9d8f5708328c03a07427b8e14a3aec573c5d54f6f55829559f55"
+      "path": "assets/index-CFPjfHjI.css",
+      "bytes": 267695,
+      "sha256": "1b208b1793bc8e0d63cb7deb29549d96ddcc8a8d97a3bf2a991b97058e480efb"
     },
     {
       "path": "assets/labEngine-BESM87HH.js",
@@ -182,7 +182,7 @@
     {
       "path": "index.html",
       "bytes": 901,
-      "sha256": "7ddd0d1e8af99d9c92e60152de1d3fa874a894fcfc2b381d71361847f026c151"
+      "sha256": "b1b1b53acbcedc062310e080fc8a3a23fb48c541e6aa58ae05d9a4d7c8ecb9d0"
     },
     {
       "path": "lessons/addressable-led.pdf",
