@@ -1,11 +1,11 @@
 {
   "schema_version": "monogate.electronics_lab_source.v0",
-  "generated_at": "2026-07-26T00:19:05.014356+00:00",
+  "generated_at": "2026-07-26T00:29:59.724703+00:00",
   "public_route": "https://monogate.dev/electronics",
   "public_rewrite_target": "/electronics-lab/index.html",
   "source_repo": "https://github.com/agent-maestro/monogate-electronics",
   "source_path": "apps/electronics-lab",
-  "source_commit": "525053387eb8bd6e52522ee9c68efac8bb5b01ce",
+  "source_commit": "687988c264f79c00e42fe509e8a7e9a8c9ba1281",
   "source_dirty": false,
   "source_status": [],
   "build_command": "python scripts/sync_electronics_lab_public.py",
@@ -75,9 +75,9 @@
       "sha256": "8fbe7b8c2e0c9c675ba46c50dd135f50acb6f3311721d6e024ab123000267dea"
     },
     {
-      "path": "assets/ArtyA7Simulator-CCFCA_25.js",
-      "bytes": 64916,
-      "sha256": "346aad02a7eae79d88d7546e0762f607325b1d4a997872e895b011bc745192ad"
+      "path": "assets/ArtyA7Simulator-CRK24MK8.js",
+      "bytes": 68078,
+      "sha256": "76a6d2a9039319366a8a7b8e502d4c8c575e4362f38a3a89fd433de9c1cb00dd"
     },
     {
       "path": "assets/ArtyContractLab-DcgPQ4W_.js",
@@ -100,9 +100,9 @@
       "sha256": "d93e110e3e4787524d4592b0d014ce94ccd823e272010676a633da5c1d62b027"
     },
     {
-      "path": "assets/GlossaryHint-BIw1r0mq.js",
+      "path": "assets/GlossaryHint-CfTvyxZa.js",
       "bytes": 671,
-      "sha256": "6e9f13485a40c3c6208b186fd770c1362423ea5af80596552136093a8f2641aa"
+      "sha256": "ce3844afb7e9d1f9b152cbb17a27db1ade318d16edada94e5014085771557116"
     },
     {
       "path": "assets/MonogateArtyEduLiveTool-BF8nmnb-.js",
@@ -130,9 +130,9 @@
       "sha256": "b4ab4a25088fa2d7db7965134f84de98a3f91e62b4093a7759ac5d1f0c959706"
     },
     {
-      "path": "assets/PhysicalBuildPanel-BoQHuMIj.js",
+      "path": "assets/PhysicalBuildPanel-D16IaNES.js",
       "bytes": 15530,
-      "sha256": "50f4784946336179750b2b39d0bc356b9ff866738b2bbf21d04f8d321b2bc74b"
+      "sha256": "7790b88af745231d3318d16001d0aaa2479f50f2269150edc82a1e4dd5f3111a"
     },
     {
       "path": "assets/ReflexContractLab-BCnqVhq2.js",
@@ -140,9 +140,9 @@
       "sha256": "b29f5978076620e65df2ae79550b0be8429bc8e136d846428c0ffebd6d44ab58"
     },
     {
-      "path": "assets/SimulatorBench-Dp_elO7B.js",
-      "bytes": 236424,
-      "sha256": "69277317219f84de7d2de514ff68f2414496c7b5a0c5225a83cbc8c3edf5b299"
+      "path": "assets/SimulatorBench-DsRVQtvL.js",
+      "bytes": 234007,
+      "sha256": "0c84137f99ef0cd81ab318c7d1105eb7e2385f87e6e64a3f86b17b195353e0ff"
     },
     {
       "path": "assets/artyContractLab-BFsAMKSl.js",
@@ -160,14 +160,14 @@
       "sha256": "8f6b8b1ff4dc3448c82434c04a1f84a0feb85d4200671586668d775e116d255c"
     },
     {
+      "path": "assets/index-BrWLMm8e.js",
+      "bytes": 306667,
+      "sha256": "2cecb2a49918130712e2f04ae8fe314a4eed851cc8524d571df9834f444d88c3"
+    },
+    {
       "path": "assets/index-CThluLC-.css",
       "bytes": 278316,
       "sha256": "9bc92ed8060fb27255b616da6f8ea5b19c14e1dd8ddc06591879c763fc2b0bbd"
-    },
-    {
-      "path": "assets/index-DkYZVbIL.js",
-      "bytes": 306667,
-      "sha256": "f86638ee91108c8d03895521b268ad5b2b14349ec762b138de89233d624b8626"
     },
     {
       "path": "assets/labEngine-BESM87HH.js",
@@ -200,9 +200,9 @@
       "sha256": "362d615f866402069456348cac4d7095aa2e1a9a7d837c914f28b80da2cfe5b8"
     },
     {
-      "path": "assets/traceClip-C-j1tHXo.js",
-      "bytes": 43118,
-      "sha256": "f50ec7ffaf07d16148a3e48a526eaad83c3a0bce8acd70a48fc4978a5015658b"
+      "path": "assets/traceClip-C5xYalfo.js",
+      "bytes": 45659,
+      "sha256": "9cf6c1e978c130ec644ac80abc63e6f3e3e2e986df0440bdab975612c42e461c"
     },
     {
       "path": "assets/vendor-D_gfsaub.js",
@@ -222,7 +222,7 @@
     {
       "path": "index.html",
       "bytes": 901,
-      "sha256": "ce823d3536c05537ca277da1aadfdbb98a858c69da3a3cb4f38fb7bec1626810"
+      "sha256": "6582e9f53f255c33b88052ee4cdf2ac4dae55c1a38bde94f397507fd4a464304"
     },
     {
       "path": "lessons/addressable-led.pdf",
