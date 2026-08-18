@@ -484,7 +484,13 @@ add             → the name (you pick this)
 }               → end`}</Code>
 
         <Heading>Compile it</Heading>
-        <Code lang="bash">{`python tools/cli/main.py hello.eml --target python,c -o ./my_first`}</Code>
+        <P>
+          Install the compiler once — it is free, and every target is
+          included:
+        </P>
+        <Code lang="bash">{`pip install monogate-forge`}</Code>
+        <P>Then compile:</P>
+        <Code lang="bash">{`eml-compile hello.eml --target python,c -o ./my_first`}</Code>
 
         <Heading>What you get</Heading>
         <Code>{`my_first/
@@ -586,7 +592,7 @@ pow(x, y)      x to the y                   0 to 1
 eml(x, y)      exp(x) - ln(y)               adds 1`}</Code>
 
         <Heading>Compile and read the profile</Heading>
-        <Code lang="bash">{`python tools/cli/main.py transcendental.eml --explain`}</Code>
+        <Code lang="bash">{`eml-compile transcendental.eml --explain`}</Code>
         <P>The compiler tells you about each function:</P>
         <Code>{`exponential_decay:
   chain_order: 1            ← one transcendental layer (exp)
@@ -644,7 +650,7 @@ fn pid(error: Real, integral: Real, derivative: Real) -> Real {
         <P>That&apos;s a complete PID controller.</P>
 
         <Heading>Compile it</Heading>
-        <Code lang="bash">{`python tools/cli/main.py pid_controller.eml --target python,c --explain -o ./pid_out`}</Code>
+        <Code lang="bash">{`eml-compile pid_controller.eml --target python,c --explain -o ./pid_out`}</Code>
 
         <Heading>What the compiler tells you</Heading>
         <Code>{`pid:
@@ -733,7 +739,7 @@ ensures (abs(result) < max_output)
   → The artifact records a proof obligation for that property`}</Code>
 
         <Heading>Compile with verification</Heading>
-        <Code lang="bash">{`python tools/cli/main.py safe_pid.eml --target lean -o ./verified.lean`}</Code>
+        <Code lang="bash">{`eml-compile safe_pid.eml --target lean -o ./verified.lean`}</Code>
         <P>
           Open <Inline>verified.lean</Inline>:
         </P>
@@ -778,9 +784,9 @@ WITH @verify:
           target still needs its own validation; emitting a scaffold is not the
           same thing as discharging a proof.
         </P>
-        <Code lang="bash">{`python tools/cli/main.py safe_pid.eml --target coq      -o ./safe.v
-python tools/cli/main.py safe_pid.eml --target isabelle -o ./Safe.thy
-python tools/cli/main.py safe_pid.eml --target ada      -o ./safe.adb`}</Code>
+        <Code lang="bash">{`eml-compile safe_pid.eml --target coq      -o ./safe.v
+eml-compile safe_pid.eml --target isabelle -o ./Safe.thy
+eml-compile safe_pid.eml --target ada      -o ./safe.adb`}</Code>
 
         <Exercise>
           Write a function for temperature conversion:{" "}
@@ -815,8 +821,8 @@ fn hardware_pid(error: Real, integral: Real) -> Real {
 }`}</Code>
 
         <Heading>Emit a hardware-shaped artifact</Heading>
-        <Code lang="bash">{`python tools/cli/main.py fpga_pid.eml --target verilog -o ./hw/pid.v
-python tools/cli/main.py fpga_pid.eml --target systemverilog -o ./hw/pid.sv`}</Code>
+        <Code lang="bash">{`eml-compile fpga_pid.eml --target verilog -o ./hw/pid.v
+eml-compile fpga_pid.eml --target systemverilog -o ./hw/pid.sv`}</Code>
         <P>The compiler tells you:</P>
         <Code>{`hardware_pid:
   FPGA allocation:
@@ -963,7 +969,7 @@ fn realtime_spring(x: Real, v: Real) -> Real {
 }`}</Code>
 
         <Heading>Compile the selected lesson artifacts</Heading>
-        <Code lang="bash">{`python tools/cli/main.py my_project.eml --target python,c --explain -o ./my_build`}</Code>
+        <Code lang="bash">{`eml-compile my_project.eml --target python,c --explain -o ./my_build`}</Code>
 
         <Heading>What you just did</Heading>
         <Code>{`In 30 minutes you:
@@ -1033,10 +1039,10 @@ ANNOTATIONS
   ensures  CONDITION               output postcondition
 
 COMPILE
-  python tools/cli/main.py file.eml --target python,c -o ./out
-  python tools/cli/main.py file.eml --target c -o out.c
-  python tools/cli/main.py file.eml --target lean -o out.lean       preview scaffold
-  python tools/cli/main.py file.eml --target verilog -o out.v       preview artifact
+  eml-compile file.eml --target python,c -o ./out
+  eml-compile file.eml --target c -o out.c
+  eml-compile file.eml --target lean -o out.lean       needs @verify(lean)
+  eml-compile file.eml --target verilog -o out.v       needs @target(fpga)
 
 PROFILE READING
   chain_order: 0   polynomial (usually low drift risk)

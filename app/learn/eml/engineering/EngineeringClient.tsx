@@ -449,11 +449,11 @@ cd lean-project && lake build  # checks only completed proofs
 eml-compile controller.eml --target rust -o controller.rs
 cargo build --release
 
-# Step 4: Generate Ada/SPARK-shaped artifacts (safety review, Pro tier)
+# Step 4: Generate Ada/SPARK-shaped artifacts (safety review)
 eml-compile controller.eml --target ada -o controller.ads
 gnatprove -P controller.gpr  # SPARK formal analysis
 
-# Step 5: Emit and synthesize FPGA candidate (hardware review, Pro tier)
+# Step 5: Emit and synthesize FPGA candidate (hardware review)
 eml-compile controller.eml --target verilog -o controller.v
 vivado -mode batch -source synth.tcl  # synthesis
 
@@ -1102,13 +1102,6 @@ export default function EngineeringClient() {
           <a href="https://monogate.dev" style={{ color: TEXT_DIM }}>
             monogate.dev
           </a>{" "}
-          ·{" "}
-          <a
-            href="https://github.com/agent-maestro/forge"
-            style={{ color: TEXT_DIM }}
-          >
-            GitHub
-          </a>
         </div>
       </div>
     </div>

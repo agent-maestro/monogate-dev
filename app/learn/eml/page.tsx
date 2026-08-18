@@ -476,14 +476,14 @@ export default function LearnEMLHub() {
             why chain order matters there, what proofs ship, and which
             targets the kernel lands on. The pre-built kernels themselves
             are the proprietary product; tracks describe the surface without
-            shipping the source. Upgrade to{" "}
+            shipping the source. The compiler itself is free —{" "}
             <a
               href="https://monogateforge.com/get-started"
               style={{ color: ACCENT_GOLD, textDecoration: "underline" }}
             >
-              Forge Pro
+              install Forge
             </a>{" "}
-            for access.
+            and every target is available with no license.
           </p>
           <div
             style={{
@@ -598,13 +598,6 @@ export default function LearnEMLHub() {
           <a href="https://1op.io" style={{ color: MUTED }}>
             1op.io
           </a>{" "}
-          &nbsp;·&nbsp;{" "}
-          <a
-            href="https://github.com/agent-maestro/forge"
-            style={{ color: MUTED }}
-          >
-            github
-          </a>
         </div>
       </div>
     </main>
