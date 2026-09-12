@@ -17,6 +17,26 @@ const nextConfig = {
       { source: "/games", destination: "/lab", permanent: true },
       { source: "/play", destination: "/lab", permanent: true },
       { source: "/play/:path*", destination: "/lab/:path*", permanent: true },
+      // Research workbenches, explorers and Lean lanes archived 2026-09-12 (git tag
+      // attic/research-stack-2026-06). `:path*` also matches the bare route. Temporary
+      // redirects, so a surface can come back without fighting cached permanent ones.
+      ...[
+        "/evidence",
+        "/proof-digestion",
+        "/case-study",
+        "/explorer/eml-packets",
+        "/explorer/rescue-suite",
+        "/explorer/eml-ir-bridge",
+        "/explorer/eml-atlas-annex",
+        "/explorer/eml-advantage",
+        "/explorer/eml-prime-residual",
+        "/explorer/eml-symbolic-regression",
+        "/learn/lane-1",
+        "/learn/lane-2",
+        "/learn/lean",
+        "/learn/cert",
+        "/learn/leaderboard",
+      ].map((base) => ({ source: `${base}/:path*`, destination: "/archive", permanent: false })),
     ];
   },
 };

@@ -277,7 +277,6 @@ export default function EmlIntroPage() {
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <LinkButton href="/electronics/esp32/reflex-guard/lab">Guard Trace Console</LinkButton>
-          <LinkButton href="/explorer/eml-packets/builder">Evidence Packet Builder</LinkButton>
           <LinkButton href="https://github.com/agent-maestro/monogate-electronics/blob/main/kernels/threshold_reflex_v0/kernel.eml">
             threshold_reflex_v0.eml
           </LinkButton>
@@ -343,7 +342,6 @@ export default function EmlIntroPage() {
           {[
             "Rewrite the body as if request > limit { limit } else { request }. The theorem is just as true. Does #print axioms still say proved?",
             `Run ${compileVerilog} and compare the hardware-shaped logic.`,
-            "Paste the guard expression into the Evidence Packet Builder."
           ].map((item) => (
             <div key={item} style={{ border: `1px solid ${BORDER}`, borderRadius: 6, padding: 14, background: SURFACE_2, color: TEXT, fontSize: 14, lineHeight: 1.55 }}>
               {item}

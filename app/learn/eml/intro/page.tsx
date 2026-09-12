@@ -1156,15 +1156,15 @@ PROFILE READING
           }}
         >
           <li>
-            <strong style={{ color: "#fff" }}>Build one bounded packet.</strong>{" "}
-            Take one equation from this lesson, emit selected Python/C
-            artifacts, save the chain-order profile, and write down which
-            claims are still blocked.
+            <strong style={{ color: "#fff" }}>Prove one property.</strong>{" "}
+            Take one equation from this course, give it requires and ensures,
+            compile it to Lean, and check with <Inline>#print axioms</Inline>{" "}
+            whether it is proved.
           </li>
         </ol>
         <p style={{ marginTop: 18 }}>
           <a
-            href="/explorer/eml-packets/builder"
+            href="/learn/eml/intro/guard"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -1175,23 +1175,6 @@ PROFILE READING
               padding: "10px 14px",
               fontWeight: 700,
               textDecoration: "none",
-            }}
-          >
-            Open the packet builder
-          </a>
-          <a
-            href="/learn/eml/intro/guard"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              color: ACCENT_GOLD,
-              border: `1px solid ${ACCENT_GOLD}`,
-              borderRadius: 4,
-              padding: "10px 14px",
-              fontWeight: 700,
-              textDecoration: "none",
-              marginLeft: 10,
             }}
           >
             Continue to the first guard kernel

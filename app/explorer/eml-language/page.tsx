@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { C, pill } from "../../evidence/data";
+import { C, pill } from "./ui";
 import { emlCanonicalComparisons, emlLanguageCostLab, emlLanguageManifest, emlLanguagePrograms } from "./data";
 
 export const metadata: Metadata = {
@@ -28,8 +28,6 @@ export default function EmlLanguageKernelPage() {
         <nav style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28, fontSize: 12 }}>
           <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
-          <a href="/explorer/eml-packets" style={{ color: C.muted, textDecoration: "none" }}>EML Packets</a>
-          <a href="/explorer/eml-atlas-annex" style={{ color: C.muted, textDecoration: "none" }}>Atlas Annex</a>
         </nav>
 
         <header style={{ marginBottom: 28 }}>

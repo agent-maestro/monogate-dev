@@ -64,7 +64,6 @@ const BRAND_ONLY = ["monogate", "Monogate", "monogate.dev"];
 // vocabulary).
 const RELAXED_PATHS = [
   "app/learn/eml/", // deep within a tutorial — context is set
-  "app/proof-digestion/page.tsx", // internal tool; nav-linked from research stack
 ];
 
 // --- File walker ---

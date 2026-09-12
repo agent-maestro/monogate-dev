@@ -1,27 +1,14 @@
 import type { Metadata } from "next";
-import data from "./petal_eml.json";
-import { type PetalDataset } from "./petal-types";
 import LearnHubClient from "./LearnHubClient";
 
 export const metadata: Metadata = {
   title: "Learn — monogate.dev",
   description:
-    "Two learning tracks: EML-lang (write math, inspect profiles, emit selected targets, no prerequisites beyond algebra) and Lean (proof practice across 6 lanes, powered by the PETAL dataset).",
+    "Learn EML: write math, inspect its cost profile, compile it to C, Verilog and Lean, and check what is proved. No prerequisites beyond algebra.",
 };
 
+// The Lean track (PETAL lanes, /learn/lean) was archived on 2026-09-12; its
+// dataset went with it. See /archive and git tag attic/research-stack-2026-06.
 export default function LearnHubPage() {
-  const dataset = data as unknown as PetalDataset;
-  // byLane drives the locked/unlocked logic on the Lean card so the hub
-  // can show "X of N exercises done" using the same record IDs that
-  // /learn/lean's LaneIndexClient writes to localStorage.
-  const byLane: Record<number, number> = {};
-  for (const r of dataset.records) {
-    byLane[r.lane] = (byLane[r.lane] ?? 0) + 1;
-  }
-  return (
-    <LearnHubClient
-      laneRecordCount={byLane}
-      totalLeanExercises={dataset.records.length}
-    />
-  );
+  return <LearnHubClient />;
 }

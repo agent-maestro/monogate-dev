@@ -24,34 +24,34 @@ const C = {
 const FLOW_STEPS: { n: string; text: string; sub: string }[] = [
   {
     n: "01",
-    text: "Open a live tool",
-    sub: "Start with the EML Explorer, Electronics Lab, Learn pages, or a research-stack workbench.",
+    text: "Write a kernel",
+    sub: "A function with requires and ensures. Learn EML starts here.",
   },
   {
     n: "02",
-    text: "Inspect the artifact",
-    sub: "Read the expression, trace, replay frames, guard decisions, supporting evidence, and non-claims.",
+    text: "Compile it",
+    sub: "pip install monogate-forge, then eml-compile to C, Verilog, Lean and more.",
   },
   {
     n: "03",
-    text: "Export or follow the packet",
-    sub: "Use generated JSON and reports as reviewable handoff material, not automatic approval.",
+    text: "Ask Lean what is proved",
+    sub: "Run #print axioms against MachLib. No sorryAx in the list means the theorem is proved.",
   },
   {
     n: "04",
-    text: "Check the boundary",
-    sub: "Every surface marks what is simulated, candidate-only, blocked, checked, or public-ready.",
+    text: "Run it on hardware",
+    sub: "The Electronics Lab takes kernels onto ESP32 trainer boards and FPGA bitstreams.",
   },
   {
     n: "05",
-    text: "Go deeper on monogate.org",
-    sub: "The public research story, Atlas, and essays live on the .org site.",
+    text: "Go deeper",
+    sub: "The research record lives on monogate.org, and the Lean library behind the proofs on machlib.org.",
   },
 ];
 
 // Primary spotlights — what a first-time visitor should try.
 // Order matters: Explorer first (what is EML), Electronics (the differentiator),
-// Learn (where to go next), Advantage (why it matters).
+// Learn (where to go next).
 const PRIMARY_SPOTLIGHTS = [
   {
     href: "/explorer/eml-language",
@@ -76,18 +76,9 @@ const PRIMARY_SPOTLIGHTS = [
     title: "Learn EML",
     eyebrow: "tutorials · quick start",
     text:
-      "Step-by-step paths into EML, Forge, and the certificate system. " +
-      "Start with the language, then follow the lanes that interest you.",
+      "Step-by-step courses in EML and Forge: write a kernel, compile it, " +
+      "and check its proof.",
     color: C.purple,
-  },
-  {
-    href: "/explorer/eml-advantage",
-    title: "EML Advantage Lab",
-    eyebrow: "compare · why eml",
-    text:
-      "Side-by-side fixtures: where EML helps, where standard math wins, " +
-      "where claims stay blocked. The honest comparison view.",
-    color: C.orange,
   },
 ];
 
@@ -109,63 +100,6 @@ const EXPLORE_FURTHER = [
       "Construct sin, cos, π, i from eml(x,y) = exp(x) − ln(y). " +
       "Submit a construction, get credited permanently.",
     color: C.orange,
-  },
-  {
-    href: "/explorer/eml-symbolic-regression",
-    title: "EML Template Search",
-    eyebrow: "research frontier · compare",
-    text:
-      "Compare fixed EML, standard, control, and baseline templates on the " +
-      "prime residual fixture.",
-    color: C.orange,
-  },
-];
-
-// Under-the-hood surfaces — the research stack. Demoted from "start here" to
-// "available if you want to go deep" — these are the tools that make sense
-// AFTER you understand what Monogate is doing.
-const RESEARCH_STACK = [
-  {
-    href: "/evidence",
-    title: "Evidence Browser",
-    sub: "Inspect artifacts by validation, replay, semantic strength, and claim flags.",
-    color: C.green,
-  },
-  {
-    href: "/explorer/eml-packets/builder",
-    title: "Bundle Builder",
-    sub: "Draft Evidence Bundle JSON from AI answers, proofs, traces, and hardware artifacts.",
-    color: C.orange,
-  },
-  {
-    href: "/explorer/rescue-suite",
-    title: "Rescue Suite",
-    sub: "Optimization-failure rescue packets, replay status, MachLib obligation routing.",
-    color: C.green,
-  },
-  {
-    href: "/proof-digestion",
-    title: "Proof Digestion",
-    sub: "Turn artifacts into core ideas, examples, reuse paths, and open questions.",
-    color: C.orange,
-  },
-  {
-    href: "/explorer/eml-ir-bridge",
-    title: "EML IR Bridge",
-    sub: "One EML expression as shared DAG, replay packet, and non-claim boundary.",
-    color: C.orange,
-  },
-  {
-    href: "/explorer/eml-packets",
-    title: "Bundle Gallery",
-    sub: "Candidate EML expression bundles from the private builder flow.",
-    color: C.green,
-  },
-  {
-    href: "/explorer/eml-atlas-annex",
-    title: "Atlas Annex",
-    sub: "Atlas-style identities, claim boundaries, and MachLib witness targets.",
-    color: C.blue,
   },
 ];
 
@@ -308,7 +242,7 @@ export default function LandingPage() {
         ))}
       </section>
 
-      {/* Primary spotlights — the four cards a first-time visitor should try. */}
+      {/* Primary spotlights — the three cards a first-time visitor should try. */}
       <section style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
           Start here
@@ -375,11 +309,11 @@ export default function LandingPage() {
           How it works
         </div>
         <h2 style={{ fontSize: 20, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.3 }}>
-          Use the dev site as a workbench, not a claim engine.
+          From a formula to a checked proof and a running board.
         </h2>
         <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.7, marginBottom: 24 }}>
-          The useful move is always the same: try a tool, inspect the evidence,
-          export a packet, and keep unsupported claims blocked.
+          The loop is always the same: write the kernel, compile it, ask Lean
+          what is proved, then measure it on hardware.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {FLOW_STEPS.map((step, i) => (
@@ -408,51 +342,16 @@ export default function LandingPage() {
         <div style={{ marginTop: 24, padding: "16px 20px", background: "rgba(232,160,32,0.08)", border: `1px solid rgba(232,160,32,0.18)`, borderRadius: 6, fontFamily: "monospace", fontSize: 12, color: C.text, lineHeight: 1.6 }}>
           Surface split: <strong style={{ color: C.orange }}>monogate.dev</strong> is the workbench,{" "}
           <a href="https://monogate.org" style={{ color: C.orange, fontWeight: 700 }}>monogate.org</a> is the research record,{" "}
+          <a href="https://machlib.org" style={{ color: C.orange, fontWeight: 700 }}>machlib.org</a> is the Lean library the proofs rest on,{" "}
           <a href="https://monogate.net" style={{ color: C.orange, fontWeight: 700 }}>monogate.net</a> is the CI-emitted verification dashboard, and{" "}
           <a href="https://1op.io" style={{ color: C.orange, fontWeight: 700 }}>1op.io</a> is games and visualization.
         </div>
       </section>
 
-      {/* Research stack — the previously-prominent internal nouns (Evidence
-          Packets, Rescue Traces, Proof Digestion, EML IR Bridge, Atlas Annex,
-          Packet Gallery). Demoted from "start here" to "the tools that make
-          sense after you understand Monogate". Visually smaller, set apart by
-          its own heading and a thin divider strip. */}
-      <section style={{ marginBottom: 56 }}>
-        <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 28 }}>
-          <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
-            Research stack
-          </div>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.3 }}>
-            Under the hood — the evidence machinery.
-          </h2>
-          <p style={{ fontSize: 12, color: C.muted, lineHeight: 1.7, marginBottom: 18, maxWidth: 600 }}>
-            Once you know what EML is, these are the workbenches that make
-            Monogate&apos;s claims auditable. Each surface is bounded — what is
-            simulated, candidate-only, or public-ready is marked inline.
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 8 }}>
-            {RESEARCH_STACK.map(({ href, title, sub, color }) => (
-              <a
-                key={href}
-                href={href}
-                style={{
-                  display: "block",
-                  background: C.surface,
-                  border: `1px solid ${C.border}`,
-                  borderRadius: 6,
-                  padding: "12px 14px",
-                  textDecoration: "none",
-                  color: "inherit",
-                }}
-              >
-                <div style={{ fontSize: 13, color, fontWeight: 700, marginBottom: 5 }}>{title}</div>
-                <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.55 }}>{sub}</div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* The research-stack section (Evidence Browser, Bundle Builder, Rescue
+          Suite, Proof Digestion, IR Bridge, Bundle Gallery, Atlas Annex) was
+          archived on 2026-09-12; see /archive and git tag
+          attic/research-stack-2026-06. */}
 
       {/* Footer links */}
       <footer style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10, fontSize: 10, color: C.muted }}>
