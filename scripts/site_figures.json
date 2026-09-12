@@ -62,7 +62,7 @@
         {
           "file": "app/theorems/page.tsx",
           "line": "Strict i-Unconstructibility (Lean-verified)",
-          "reason": "names one theorem (T17), not every kernel; NOT re-checked on 2026-09-12. next.config.mjs redirects /theorems to monogate.org, so this page is not served."
+          "reason": "names one theorem (T17), not every kernel. Re-checked 2026-09-12: T17's statement is T19_i_unconstructible_strict (private monogate-research StrictBarrier.lean), which compiles against Mathlib with no sorryAx. The lean4/i_unconstructibility.lean the page cited never existed; the evidence text now says so. next.config.mjs redirects /theorems to monogate.org, so this page is not served."
         },
         {
           "file": "lib/explorer/ExplorerApp.jsx",

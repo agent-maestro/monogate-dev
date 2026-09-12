@@ -325,89 +325,126 @@ fn altitude_hold(
     title: "Hardware targeting in depth",
     time: "10 min",
     intro:
-      "Level 1 showed @target(fpga) as a one-liner. Real hardware targeting "
-      + "means understanding what the FPGA allocator is doing, why precision "
-      + "matters, and how to fit your design into a budget.",
+      "Level 1 showed @target(fpga) as a one-liner. This lesson reads what the "
+      + "compiler does with it: the allocator's resource plan, the fixed-point "
+      + "width it picks for a module, and one kernel planned for five parts. "
+      + "Every figure below is output from monogate-forge 0.14.4.",
     sections: [
       {
         heading: "FPGA resource budgets",
-        code: `@target(fpga, clock_mhz = 100, precision = float32)
-fn pid_f32(error: Real, integral: Real) -> Real {
-    2.5 * error + 0.1 * integral
-}
-# chain: 0 | mac_units: 2 | trig_units: 0 | latency: 4 cycles
+        code: `module pid_fpga;
 
-@target(fpga, clock_mhz = 100, precision = float64)
-fn pid_f64(error: Real, integral: Real) -> Real {
+@target(fpga, clock_mhz = 100)
+fn pid(error: Real, integral: Real) -> Real {
     2.5 * error + 0.1 * integral
-}
-# chain: 0 | mac_units: 2 | trig_units: 0 | latency: 6 cycles
-#   (float64 still uses 2 MACs but each MAC is 2x wider)
-
-# For chain-0 arithmetic, float32 has ZERO drift risk.
-# Use float32. Save the resources for functions that need them.`,
+}`,
         explanation: [
-          "mac_units: multiply-accumulate slots. Maps to FPGA DSP blocks (Artix-7: 240 total).",
-          "trig_units: dedicated transcendental hardware. Chain order ≥ 1 needs these.",
-          "exp_units, ln_units: similar to trig but for exp/log families.",
-          "latency: clock cycles from input valid to output valid. Determines your control loop rate.",
+          "@target(fpga, ...) marks the function for the FPGA allocator, which needs at least one such function. clock_mhz is the clock the plan assumes.",
+          "Save this as pid_fpga.eml. The next section asks the allocator what it costs.",
         ],
       },
       {
-        heading: "When precision matters",
-        code: `# Chain 0 · drift: LOW
-@target(fpga, precision = float32)
+        heading: "Reading the allocation plan",
+        code: `$ eml-compile pid_fpga.eml --allocate
+
+  FPGA allocation plan for Arty A7-100
+  Pipeline depth: 2 stages
+  Clock target:   100 MHz
+  Throughput:     50.0 Msamples/s
+
+  Resources:    100 LUTs     2 DSPs      0 KB BRAM
+  MAC units:  2
+  Transcendental units: none (pure-polynomial design)`,
+        explanation: [
+          "With no --fpga-target, the plan is for the Arty A7-100 board (xilinx.artix7). The allocator's budget for it is 63,400 LUTs and 240 DSP slices; this design uses 100 and 2.",
+          "MAC units are multipliers. 2.5 * error and 0.1 * integral are two products, and each gets a DSP slice.",
+          "Throughput is the clock divided by the pipeline depth: 100 MHz over 2 stages is 50 Msamples/s. The depth follows the design, not the clock. At clock_mhz = 50, 200 and 500 it stays at 2 stages, and only the throughput changes.",
+          "The costs are estimates from a per-part table, not a synthesis report. Synthesize the Verilog before you choose a part.",
+        ],
+      },
+      {
+        heading: "Who picks the precision",
+        code: `module precision_demo;
+
+// chain 0 · drift LOW
+@target(fpga)
 fn gravity(m1: Real, m2: Real, r: Real) -> Real {
     6.674e-11 * m1 * m2 / (r * r)
 }
 
-# Chain 2 · drift: MEDIUM
-@target(fpga, precision = float32)
+// chain 2 · drift MEDIUM
+@target(fpga)
 fn oscillator(t: Real, freq: Real) -> Real {
     sin(freq * t)
 }
 
-# Chain 3 · drift: HIGH
-@target(fpga, precision = float64)
+// chain 3 · drift HIGH
+@target(fpga)
 fn damped_osc(t: Real, d: Real, f: Real) -> Real {
     exp(-d * t) * sin(f * t)
 }`,
         explanation: [
-          "The drift flag is per evaluation. What matters in a real system is whether error ACCUMULATES over time.",
-          "A game at 60fps for 1 minute makes 3,600 evaluations; a flight controller at 1kHz for 8 hours makes 28.8 million.",
-          "Error only accumulates when an output feeds back into the next step, so check the loop, not just the function.",
-          "Match precision to your application's time horizon, not just the function's complexity.",
+          "The comments repeat the chain order and drift flag the profiler prints for each function.",
+          "The drift flag describes a single evaluation. Error only piles up when an output feeds back into the next step, so check the loop, not just the function.",
+          "You don't set the width. @target accepts precision = float32 or float64, but in 0.14.4 that changes nothing: the Verilog is byte-identical either way, apart from the module name.",
         ],
       },
       {
-        heading: "Multi-target hardware",
-        code: `# Same function, three hardware profiles
-@target(fpga, device = "artix7_100t", clock_mhz = 100)
-@target(fpga, device = "zynq_7020", clock_mhz = 200)
-@target(fpga, device = "asic_28nm")
-fn autopilot_inner(roll_err: Real, pitch_err: Real) -> (Real, Real) {
-    let aileron = clamp(2.5 * roll_err, -1.0, 1.0);
-    let elevator = clamp(1.8 * pitch_err, -1.0, 1.0);
-    (aileron, elevator)
-}
+        heading: "One wide function widens the module",
+        code: `$ eml-compile precision_demo.eml --target verilog -o precision_demo.v
+$ grep -A2 "^module" precision_demo.v
+module gravity_pipeline #(
+    parameter WIDTH = 64,
+    parameter FRAC  = 32
+--
+module oscillator_pipeline #(
+    parameter WIDTH = 64,
+    parameter FRAC  = 32
+--
+module damped_osc_pipeline #(
+    parameter WIDTH = 64,
+    parameter FRAC  = 32
 
-# Artix-7:  2 DSP, 2 cycles @ 100MHz = 20ns
-# Zynq:     2 DSP, 2 cycles @ 200MHz = 10ns
-# ASIC 28nm: ~300 gates, 1 cycle @ 500MHz = 2ns`,
+# Delete damped_osc and compile again:
+#   gravity_pipeline and oscillator_pipeline get WIDTH = 32, FRAC = 16`,
         explanation: [
-          "Same math targets different hardware automatically.",
-          "The FPGA allocator adjusts pipeline depth for the target clock speed.",
-          "ASIC mode is roadmap/planning language until synthesis and measurement evidence exists.",
-          "You design the math ONCE. Forge handles the hardware mapping.",
+          "The HDL backends are fixed point, with no float in the RTL. WIDTH 64 with FRAC 32 is Q32.32; WIDTH 32 with FRAC 16 is Q16.16.",
+          "The profiler sizes gravity and oscillator at 32 bits and only damped_osc at 64. The Verilog puts all three pipelines at 64.",
+          "The plan shows the cost. On the Artix-7 this module needs 8,550 LUTs and 29 DSPs; without damped_osc it needs 1,700 LUTs and 10 DSPs. The sin unit alone goes from 1,400 LUTs at 32 bits to 2,800 at 64.",
+          "Moving damped_osc into a module of its own keeps the other two at 32 bits.",
+        ],
+      },
+      {
+        heading: "Five parts, one kernel",
+        code: `$ eml-compile pid_fpga.eml --allocate --fpga-target xilinx.artix7
+$ eml-compile pid_fpga.eml --allocate --fpga-target intel.cyclone10
+$ eml-compile pid_fpga.eml --allocate --fpga-target lattice.ecp5
+$ eml-compile pid_fpga.eml --allocate --fpga-target lattice.ice40
+$ eml-compile pid_fpga.eml --allocate --fpga-target asic.sky130
+
+# The Resources line of each plan. All five: 2 stages, 50 Msamples/s.
+#   Arty A7-100                  100 LUTs   2 DSPs
+#   Cyclone 10 LP 10CL025        120 LUTs   2 DSPs
+#   ECP5 LFE5UM-85F              100 LUTs   2 DSPs
+#   iCE40 UltraPlus 5K           160 LUTs   2 DSPs
+#   SkyWater SKY130 (open-PDK)  8000 LUTs   0 DSPs`,
+        explanation: [
+          "--fpga-target picks the part. The pipeline stays the same and the cost table changes.",
+          "asic.sky130 is a 130 nm ASIC process, not an FPGA. Its plan keeps the FPGA field names, but its LUTs are NAND2-equivalent gates, and with no DSP slices the multipliers are built from standard cells.",
+          "Choose the part on the command line. @target has no working device option in 0.14.4: device = \"zynq_7020\" is accepted and ignored, and the plan is still for the Arty A7-100.",
+          "A plan does not mean the RTL exists. A function that returns a tuple, (Real, Real), gets a plan from --allocate, but --target verilog stops with an emission-gate error: unsupported construct NodeKind.TUPLE.",
         ],
       },
     ],
     exercise:
-      "Take the altitude_hold controller from Lesson 3. Target it to an "
-      + "Artix-7 at float32 and float64. Compare resource usage. Now add "
-      + "exp(-decay * t) to the output (simulating a transient response). How "
-      + "does the FPGA estimate change? At what chain order does the Artix-7 "
-      + "run out of exp hardware units?",
+      "Take altitude_hold from Lesson 3 and put @target(fpga, clock_mhz = 100) "
+      + "above its @verify line. --allocate should report 4 MAC units, 200 LUTs, "
+      + "4 DSPs and 4 stages. Add an input t and multiply the controller's sum by "
+      + "exp(-0.5 * t) inside the clamp. What does the exp unit cost on each of "
+      + "the five parts, and what happens to the depth? Then write a kernel that "
+      + "adds several exp terms with different decay rates. At how many terms "
+      + "does the Artix-7 plan switch from dedicated to shared exp units, and "
+      + "what does the iCE40 plan do at that count?",
   },
   {
     id: "l5",
