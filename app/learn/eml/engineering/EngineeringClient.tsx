@@ -358,7 +358,8 @@ fn pid(error: Real, integral: Real) -> Real {
         explanation: [
           "With no --fpga-target, the plan is for the Arty A7-100 board (xilinx.artix7). The allocator's budget for it is 63,400 LUTs and 240 DSP slices; this design uses 100 and 2.",
           "MAC units are multipliers. 2.5 * error and 0.1 * integral are two products, and each gets a DSP slice.",
-          "Throughput is the clock divided by the pipeline depth: 100 MHz over 2 stages is 50 Msamples/s. The depth follows the design, not the clock. At clock_mhz = 50, 200 and 500 it stays at 2 stages, and only the throughput changes.",
+          "The plan's throughput is its own formula, clock ÷ pipeline depth: 100 MHz over 2 stages gives 50. The depth comes from the design, and it stays at 2 at clock_mhz = 50, 200 and 500.",
+          "Check the RTL, not the plan. Simulated in Verilator, the emitted pid_pipeline takes a new sample on every clock edge and returns each result 3 cycles later, as its header says (\"Total latency: 3 cycles\"). That is 100 Msamples/s at 100 MHz, twice the plan's figure.",
           "The costs are estimates from a per-part table, not a synthesis report. Synthesize the Verilog before you choose a part.",
         ],
       },
@@ -410,7 +411,7 @@ module damped_osc_pipeline #(
         explanation: [
           "The HDL backends are fixed point, with no float in the RTL. WIDTH 64 with FRAC 32 is Q32.32; WIDTH 32 with FRAC 16 is Q16.16.",
           "The profiler sizes gravity and oscillator at 32 bits and only damped_osc at 64. The Verilog puts all three pipelines at 64.",
-          "The plan shows the cost. On the Artix-7 this module needs 8,550 LUTs and 29 DSPs; without damped_osc it needs 1,700 LUTs and 10 DSPs. The sin unit alone goes from 1,400 LUTs at 32 bits to 2,800 at 64.",
+          "The plan prices it. On the Artix-7 it estimates 8,550 LUTs and 29 DSPs for this module, and 1,700 LUTs and 10 DSPs without damped_osc. Its sin unit estimate doubles, from 1,400 LUTs at 32 bits to 2,800 at 64.",
           "Moving damped_osc into a module of its own keeps the other two at 32 bits.",
         ],
       },
@@ -440,11 +441,13 @@ $ eml-compile pid_fpga.eml --allocate --fpga-target asic.sky130
       "Take altitude_hold from Lesson 3 and put @target(fpga, clock_mhz = 100) "
       + "above its @verify line. --allocate should report 4 MAC units, 200 LUTs, "
       + "4 DSPs and 4 stages. Add an input t and multiply the controller's sum by "
-      + "exp(-0.5 * t) inside the clamp. What does the exp unit cost on each of "
-      + "the five parts, and what happens to the depth? Then write a kernel that "
-      + "adds several exp terms with different decay rates. At how many terms "
-      + "does the Artix-7 plan switch from dedicated to shared exp units, and "
-      + "what does the iCE40 plan do at that count?",
+      + "exp(-0.5 * t) inside the clamp. What does the plan say the exp unit "
+      + "costs on each of the five parts? Then write a kernel that adds three exp "
+      + "terms with different decay rates. The Artix-7 plan marks the three exp "
+      + "units shared and prices them as one, and the iCE40 plan refuses the "
+      + "design. Now emit the Verilog: count the eml_exp instances, and compare "
+      + "the header's Total latency with the plan's pipeline depth. Which numbers "
+      + "describe the hardware?",
   },
   {
     id: "l5",

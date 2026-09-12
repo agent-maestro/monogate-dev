@@ -946,8 +946,13 @@ module hardware_pid_pipeline #(
 DSPs:      Dedicated multiplier blocks. 2 out of 240 available.
            One for each multiplication (Kp*error, Ki*integral).
 
-Latency:   Estimated clock cycles from input valid to output valid.
-           Simulation and synthesis must confirm timing.
+Pipeline depth, Throughput:
+           The allocator's model, not a measurement: throughput is the
+           clock divided by the depth. Simulated, pid.v takes a new
+           sample on every clock edge and answers 3 cycles later (its
+           header says "Total latency: 3 cycles"), so it runs at the
+           clock rate: 100 Msamples/s at 100 MHz, not 50. Whether a
+           part closes timing at 100 MHz is for synthesis to say.
 
 For comparison:
   Software path: run and test first.
