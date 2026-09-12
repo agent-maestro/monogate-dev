@@ -67,7 +67,7 @@
         {
           "file": "lib/explorer/ExplorerApp.jsx",
           "line": "under principal-branch semantics. Lean-verified.",
-          "reason": "names one theorem (T19), not every kernel. Re-checked 2026-09-12: T19_i_unconstructible_strict in monogate-research/lean/EML/StrictBarrier.lean compiles against Mathlib (monogate-lean, Lean v4.32.2) with axioms [propext, Classical.choice, Quot.sound] and no sorryAx. It holds because the strict evaluator is typed into the reals; the file's last two lines (a #check after a doc comment) fail to compile, which does not touch the theorems."
+          "reason": "names one theorem (T19), not every kernel. Re-checked 2026-09-12: T19_i_unconstructible_strict in monogate-research/lean/EML/StrictBarrier.lean compiles against Mathlib (monogate-lean, Lean v4.32.2) with axioms [propext, Classical.choice, Quot.sound] and no sorryAx. It holds because the strict evaluator is typed into the reals. The whole file compiles since monogate-research ce5cd70b, which replaced its last two lines (a #check after a doc comment)."
         }
       ]
     },
