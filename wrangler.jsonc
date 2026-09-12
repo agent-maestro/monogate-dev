@@ -1,5 +1,8 @@
 {
   "name": "monogate-dev",
+  // Pinned 2026-09-12: the wrangler login sees two accounts, and a non-interactive deploy
+  // refuses to pick one ("More than one account available"). The Worker lives in this one.
+  "account_id": "b85f3bd44235280353630a6426c02ba4",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-09-01",
   "compatibility_flags": ["nodejs_compat"],
