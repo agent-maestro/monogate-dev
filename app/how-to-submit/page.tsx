@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "How to Submit — monogate.dev",
@@ -58,7 +59,7 @@ export default function HowToSubmitPage() {
 
       <header style={{ borderBottom: `1px solid ${C.border}`, padding: "28px 0 22px", marginBottom: 36 }}>
         <div style={{ fontSize: 11, color: C.muted, marginBottom: 8 }}>
-          <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
+          <Link href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</Link>
           {" / how to submit"}
         </div>
         <div style={{ fontSize: 22, fontWeight: 700, color: C.text, letterSpacing: "-0.02em" }}>
@@ -230,7 +231,7 @@ export default function HowToSubmitPage() {
         display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10,
         fontSize: 10, color: C.muted,
       }}>
-        <a href="/challenge" style={{ color: C.muted }}>← All challenges</a>
+        <Link href="/challenge" style={{ color: C.muted }}>← All challenges</Link>
         <a href="https://github.com/agent-maestro/monogate" target="_blank" rel="noopener noreferrer" style={{ color: C.muted }}>
           github.com/agent-maestro/monogate
         </a>

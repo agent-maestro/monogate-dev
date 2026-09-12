@@ -184,6 +184,7 @@ export default function LandingPage() {
           >
             Try the Explorer →
           </a>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- /electronics is a route handler serving the Vite electronics app, not a Next page: it needs a full page load */}
           <a
             href="/electronics"
             style={{

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { Challenge } from "@/types";
 
@@ -214,15 +215,15 @@ export default async function HomePage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 12 }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: C.orange, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>
-              <a href="/" style={{ color: C.orange, textDecoration: "none" }}>monogate.dev</a>
+              <Link href="/" style={{ color: C.orange, textDecoration: "none" }}>monogate.dev</Link>
             </div>
             <div style={{ fontSize: 22, fontWeight: 700, color: C.text, letterSpacing: "-0.02em", lineHeight: 1.2 }}>
               Challenge Board
             </div>
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-            <a href="/challenge/search" className="nav-link">Search</a>
-            <a href="/challenge/leaderboard" className="nav-link">Leaderboard</a>
+            <Link href="/challenge/search" className="nav-link">Search</Link>
+            <Link href="/challenge/leaderboard" className="nav-link">Leaderboard</Link>
             <a href="/how-to-submit" className="nav-link">Submit</a>
           </div>
         </div>

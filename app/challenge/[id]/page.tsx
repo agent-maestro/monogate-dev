@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Challenge, Submission } from "@/types";
@@ -99,9 +100,9 @@ export default async function ChallengePage({ params }: { params: { id: string }
       {/* Header */}
       <header style={{ borderBottom: `1px solid ${C.border}`, padding: "28px 0 22px", marginBottom: 36 }}>
         <div style={{ fontSize: 11, color: C.muted, marginBottom: 8 }}>
-          <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
+          <Link href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</Link>
           {" / "}
-          <a href="/challenge" style={{ color: C.muted, textDecoration: "none" }}>challenges</a>
+          <Link href="/challenge" style={{ color: C.muted, textDecoration: "none" }}>challenges</Link>
           {" / "}
           <span style={{ color: C.text }}>{challenge.name}</span>
         </div>
@@ -310,7 +311,7 @@ export default async function ChallengePage({ params }: { params: { id: string }
         display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10,
         fontSize: 10, color: C.muted,
       }}>
-        <a href="/challenge" style={{ color: C.muted }}>← All challenges</a>
+        <Link href="/challenge" style={{ color: C.muted }}>← All challenges</Link>
         <a href="https://arxiv.org/abs/2603.21852" target="_blank" rel="noopener noreferrer" style={{ color: C.muted }}>
           arXiv:2603.21852
         </a>

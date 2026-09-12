@@ -556,6 +556,7 @@ export default function LearnEMLHub() {
                 Want to build hardware?
               </strong>{" "}
               Finish Level 0, then jump to{" "}
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- /electronics is a route handler serving the Vite electronics app, not a Next page: it needs a full page load */}
               <a href="/electronics" style={{ color: ACCENT_GOLD }}>
                 Monogate Electronics
               </a>{" "}

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 // Metadata can't be exported from client components, handled via layout.
 // Title set in layout.
@@ -640,7 +641,7 @@ export default function TheoremsPage() {
 
       <header style={{ borderBottom: `1px solid ${C.border}`, padding: "28px 0 22px", marginBottom: 28 }}>
         <div style={{ fontSize: 11, color: C.muted, marginBottom: 8 }}>
-          <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>{" / theorems"}
+          <Link href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</Link>{" / theorems"}
         </div>
         <div style={{ fontSize: 22, fontWeight: 700, color: C.text, letterSpacing: "-0.02em" }}>Theorem Catalog</div>
         <div style={{ marginTop: 8, fontSize: 11, color: C.muted, lineHeight: 1.8, maxWidth: 560 }}>
@@ -689,7 +690,7 @@ export default function TheoremsPage() {
         display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10,
         fontSize: 10, color: C.muted,
       }}>
-        <a href="/" style={{ color: C.muted }}>← All challenges</a>
+        <Link href="/" style={{ color: C.muted }}>← All challenges</Link>
         <a href="https://arxiv.org/abs/2603.21852" target="_blank" rel="noopener noreferrer" style={{ color: C.muted }}>
           arXiv:2603.21852
         </a>

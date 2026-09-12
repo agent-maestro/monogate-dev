@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -27,7 +28,7 @@ export default function Nav() {
   return (
     <>
       <nav className="site-nav">
-        <a href="/" className="site-nav__brand">monogate</a>
+        <Link href="/" className="site-nav__brand">monogate</Link>
 
         <div className="site-nav__links">
           {LINKS.map(({ href, label, external }) => (

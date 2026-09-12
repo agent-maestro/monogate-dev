@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 const eml = (x: number, y: number) => {
   if (y <= 0) return Math.exp(x);
@@ -244,7 +245,7 @@ export default function OneOperator() {
     <div style={{ fontFamily: "'Newsreader', 'Georgia', serif", maxWidth: 640, margin: "0 auto", padding: "2rem 1.2rem 3rem", color: "#d4d4d4" }}>
 
       <div style={{ textAlign: "center", marginBottom: 40 }}>
-        <a href="/" style={{ fontSize: 11, letterSpacing: 4, textTransform: "uppercase", color: "#A78BFA", fontWeight: 600, fontFamily: "monospace", marginBottom: 8, display: "block", textDecoration: "none" }}>monogate</a>
+        <Link href="/" style={{ fontSize: 11, letterSpacing: 4, textTransform: "uppercase", color: "#A78BFA", fontWeight: 600, fontFamily: "monospace", marginBottom: 8, display: "block", textDecoration: "none" }}>monogate</Link>
         <h1 style={{ fontSize: "clamp(28px, 8vw, 42px)", fontWeight: 400, margin: "0 0 8px", lineHeight: 1.2, letterSpacing: -1, color: "#d4d4d4" }}>One Operator</h1>
         <p style={{ fontSize: 16, color: "#6b7280", fontStyle: "italic", margin: 0 }}>
           How a single equation generates all elementary functions

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Docs — monogate",
@@ -114,7 +115,7 @@ python tools/build_intake_gallery.py`}</Code>
       </p>
 
       <footer style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20, marginTop: 48, fontSize: 10, color: C.muted }}>
-        <a href="/" style={{ color: C.muted }}>← monogate.dev</a>
+        <Link href="/" style={{ color: C.muted }}>← monogate.dev</Link>
       </footer>
     </div>
   );

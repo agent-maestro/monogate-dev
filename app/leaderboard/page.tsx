@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { Challenge, SubmissionWithChallenge } from "@/types";
 
@@ -55,7 +56,7 @@ export default async function LeaderboardPage() {
       {/* Header */}
       <header style={{ borderBottom: `1px solid ${C.border}`, padding: "28px 0 22px", marginBottom: 36 }}>
         <div style={{ fontSize: 11, color: C.muted, marginBottom: 8 }}>
-          <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
+          <Link href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</Link>
           {" / leaderboard"}
         </div>
         <div style={{ fontSize: 22, fontWeight: 700, color: C.text, letterSpacing: "-0.02em" }}>
@@ -164,7 +165,7 @@ export default async function LeaderboardPage() {
           padding: "48px 24px", textAlign: "center", color: C.muted, fontSize: 12,
         }}>
           No valid submissions yet across any challenge.{" "}
-          <a href="/challenge" style={{ color: C.orange }}>Pick a problem and submit the first construction.</a>
+          <Link href="/challenge" style={{ color: C.orange }}>Pick a problem and submit the first construction.</Link>
         </div>
       )}
 
@@ -173,7 +174,7 @@ export default async function LeaderboardPage() {
         display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10,
         fontSize: 10, color: C.muted,
       }}>
-        <a href="/challenge" style={{ color: C.muted }}>← All challenges</a>
+        <Link href="/challenge" style={{ color: C.muted }}>← All challenges</Link>
         <a href="https://arxiv.org/abs/2603.21852" target="_blank" rel="noopener noreferrer" style={{ color: C.muted }}>
           arXiv:2603.21852
         </a>

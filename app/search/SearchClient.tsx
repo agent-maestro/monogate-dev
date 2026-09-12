@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useRef, useCallback } from "react";
 import {
   runSearch,
@@ -105,7 +106,7 @@ export default function SearchClient() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 12 }}>
           <div>
             <div style={{ fontSize: 11, color: C.muted, marginBottom: 8 }}>
-              <a href="/" style={{ color: C.muted }}>monogate.dev</a>
+              <Link href="/" style={{ color: C.muted }}>monogate.dev</Link>
               {" / search"}
             </div>
             <div style={{ fontSize: 22, fontWeight: 700, color: C.text, letterSpacing: "-0.02em" }}>
@@ -214,7 +215,7 @@ export default function SearchClient() {
             Under strict principal-branch grammar with real arithmetic, no EML tree can
             evaluate to i. This is the deepest open problem — search is disabled.
             See{" "}
-            <a href="/challenge/i-strict" style={{ color: C.red }}>the challenge page</a> for context.
+            <Link href="/challenge/i-strict" style={{ color: C.red }}>the challenge page</Link> for context.
           </div>
         )}
 
@@ -437,7 +438,7 @@ export default function SearchClient() {
         display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10,
         fontSize: 10, color: C.muted,
       }}>
-        <a href="/" style={{ color: C.muted }}>← All challenges</a>
+        <Link href="/" style={{ color: C.muted }}>← All challenges</Link>
         <a href="/how-to-submit" style={{ color: C.muted }}>Submit manually →</a>
       </footer>
     </div>

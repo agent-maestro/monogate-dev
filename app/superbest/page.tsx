@@ -8,7 +8,10 @@ const C = {
   green: "#5ec47a", red: "#c85050", mono: "monospace",
 };
 
-type Op = (typeof superbest.table)[number];
+// The JSON table is heterogeneous: most rows carry a numeric `v4_cost`, one
+// carries `v4_cost_add_pos`/`v4_cost_add_gen` instead. Intersect in the
+// optional field rather than casting to `any` so the lookup below stays typed.
+type Op = (typeof superbest.table)[number] & { v4_cost?: number };
 
 function SectionHead({ children, mt = 48 }: { children: React.ReactNode; mt?: number }) {
   return (
@@ -179,7 +182,7 @@ export default function SuperBESTPage() {
                   <tr key={row.op}>
                     <Td><code style={{ color: C.text, fontSize: 13 }}>{row.op}</code></Td>
                     <Td bold color={isNum ? C.accent : C.muted}>{isNum ? `${cost}n` : "—"}</Td>
-                    <Td color={C.muted}>{(row as any).v4_cost ?? "—"}</Td>
+                    <Td color={C.muted}>{row.v4_cost ?? "—"}</Td>
                     <Td><code style={{ fontSize: 11, color: C.muted }}>{String(constr)}</code></Td>
                     <Td small color={C.muted} maxW={200}>{row.notes}</Td>
                   </tr>

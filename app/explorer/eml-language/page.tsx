@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { C, pill } from "./ui";
 import { emlCanonicalComparisons, emlLanguageCostLab, emlLanguageManifest, emlLanguagePrograms } from "./data";
 
@@ -26,7 +27,7 @@ export default function EmlLanguageKernelPage() {
     <main style={{ minHeight: "100vh", background: C.bg, color: C.text }}>
       <div style={{ maxWidth: 1080, margin: "0 auto", padding: "32px 18px 72px" }}>
         <nav style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28, fontSize: 12 }}>
-          <a href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</a>
+          <Link href="/" style={{ color: C.muted, textDecoration: "none" }}>monogate.dev</Link>
           <a href="/explorer" style={{ color: C.muted, textDecoration: "none" }}>Explorer</a>
         </nav>
 
