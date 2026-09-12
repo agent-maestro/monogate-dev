@@ -1,0 +1,103 @@
+{
+  "_comment": "Figures on monogate.dev and the claims retired from it, checked by scripts/check_site_figures.mjs. A claim names a repo file, a regex whose FIRST capture group is the figure as written, a source, and a relation: `equal`, or `floor` for a figure written N+ (the source must be at least N). A `url` source fetches text and extracts a number; a `count` source counts regex matches in a repo file. An unevaluable source is UNAVAILABLE (exit 2), never a pass. A claim whose pattern stops matching FAILS. To put a number on a page, add its claim here in the same change.",
+  "sources": {
+    "machlib_core_theorems": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/machlib/master/README.md",
+      "extract": "\\| theorems outside `Discovered/` \\| ([0-9 ,\\u202f]+) \\|",
+      "_note": "machlib's own prose gate keeps this README row equal to `python3 tools/count_theorems.py --scope core`; 7 672 on 2026-09-12."
+    },
+    "level1_lessons": {
+      "kind": "count",
+      "file": "app/learn/eml/intro/page.tsx",
+      "pattern": "<Lesson\\s+num=\\{"
+    },
+    "level2_lessons": {
+      "kind": "count",
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "pattern": "^\\s+id: \"l\\d+\",$",
+      "flags": "m"
+    }
+  },
+  "claims": [
+    {
+      "id": "home.machlib_theorems",
+      "file": "app/page.tsx",
+      "pattern": "label: \"MachLib theorems\",\\s*value: \"([0-9 ,\\u202f]+)\\+\"",
+      "source": "machlib_core_theorems",
+      "relation": "floor",
+      "_note": "Written as a floor so every new machlib theorem does not fail the deploy; a correction that drops the count below it does."
+    },
+    {
+      "id": "learn_hub.level1_lessons",
+      "file": "app/learn/eml/page.tsx",
+      "pattern": "time: \"30 min · (\\d+) lessons\"",
+      "source": "level1_lessons",
+      "relation": "equal"
+    },
+    {
+      "id": "learn_hub.level2_lessons",
+      "file": "app/learn/eml/page.tsx",
+      "pattern": "time: \"60 min · (\\d+) lessons\"",
+      "source": "level2_lessons",
+      "relation": "equal"
+    },
+    {
+      "id": "learn_hub_client.level1_badge",
+      "file": "app/learn/LearnHubClient.tsx",
+      "pattern": "badge=\"(\\d+) lessons · 30 minutes · beginner\"",
+      "source": "level1_lessons",
+      "relation": "equal"
+    }
+  ],
+  "retired": [
+    {
+      "phrase": "ships with a Lean",
+      "why": "Retired 2026-09-12: not every kernel has a proof. eml-stdlib's hann_in_unit_interval depends on sorryAx, and the compiler's shipped stdlib carries no @verify contract at all."
+    },
+    {
+      "phrase": "Lean-verified",
+      "why": "Retired 2026-09-12: reads as 'every proof closed'. Say 'Lean theorem' and show #print axioms, which is what tells proved from stated.",
+      "allow": [
+        {
+          "file": "app/theorems/page.tsx",
+          "line": "Strict i-Unconstructibility (Lean-verified)",
+          "reason": "names one theorem (T17), not every kernel; NOT re-checked on 2026-09-12. next.config.mjs redirects /theorems to monogate.org, so this page is not served."
+        },
+        {
+          "file": "lib/explorer/ExplorerApp.jsx",
+          "line": "under principal-branch semantics. Lean-verified.",
+          "reason": "names one theorem (T19), not every kernel; NOT re-checked on 2026-09-12."
+        }
+      ]
+    },
+    {
+      "phrase": "verified in Lean",
+      "why": "Retired 2026-09-12: same as Lean-verified."
+    },
+    {
+      "phrase": "prove against MachLib",
+      "why": "Retired 2026-09-12: the invented `sorry -- TODO: prove against MachLib` output. Real Forge output ends in `| sorry -- out of reach` as the LAST tactic arm, present whether or not an earlier arm closed the goal."
+    },
+    {
+      "phrase": "means the proof is still open",
+      "why": "Retired 2026-09-12: the word sorry in an emitted file says nothing. sorryAx in #print axioms is the signal."
+    },
+    {
+      "phrase": "sorry means the proof",
+      "why": "Retired 2026-09-12: same."
+    },
+    {
+      "phrase": "WebAssembly Pro",
+      "why": "No paid tier exists: ALL_TIERS_FREE is True in the compiler, and monogateforge.com says every target is free."
+    },
+    {
+      "phrase": "Forge Pro",
+      "why": "Same: no paid tier exists."
+    },
+    {
+      "phrase": "--target python,c",
+      "why": "argparse rejects a comma list. One target per command, or --target all."
+    }
+  ]
+}

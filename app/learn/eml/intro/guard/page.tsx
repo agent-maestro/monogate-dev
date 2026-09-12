@@ -5,7 +5,7 @@ import CopyButton from "../CopyButton";
 export const metadata: Metadata = {
   title: "EML Intro: Your First Guard Kernel",
   description:
-    "Write a Reflex Guard function in EML, compile it toward ESP32 C, inspect the proof obligation, and watch the guard fire in the Monogate Electronics visualizer.",
+    "Write a Reflex Guard function in EML, compile it toward ESP32 C, check its Lean proof with #print axioms, and watch the guard fire in the Monogate Electronics visualizer.",
 };
 
 const GREEN = "#4ADE80";
@@ -18,37 +18,49 @@ const BORDER = "#1c1f2e";
 const TEXT = "#d4d4d4";
 const MUTED = "#7f8499";
 
+// Named reflex_guard, not guard: `guard` is already taken in Lean, and a
+// kernel named guard emits Lean that does not compile ("already declared").
 const emlSource = `module threshold_reflex;
 
-fn guard(request: Real, limit: Real) -> Real
+@verify(lean, theorem = "guard_output_bounded")
+@target(fpga, clock_mhz = 100)
+fn reflex_guard(request: Real, limit: Real) -> Real
     requires (limit > 0.0)
-    ensures (return <= limit)
+    ensures (result <= limit)
 {
-    let clamped = request - (request - limit);
-    if request > limit { limit } else { request }
+    min(request, limit)
 }`;
 
-const compileC = `eml-compile threshold_reflex_v0.eml --target c --profile esp32`;
-const compileLean = `eml-compile threshold_reflex_v0.eml --target lean`;
-const compileVerilog = `eml-compile threshold_reflex_v0.eml --target verilog`;
+const compileC = `eml-compile threshold_reflex_v0.eml --target c -o threshold_reflex_v0.c`;
+const compileLean = `eml-compile threshold_reflex_v0.eml --target lean -o threshold_reflex_v0.lean`;
+const compileVerilog = `eml-compile threshold_reflex_v0.eml --target verilog -o threshold_reflex_v0.v`;
 
-const generatedC = `#include <assert.h>
+// Real output of monogate-forge 0.14.4 for emlSource, file header trimmed.
+const generatedC = `#include "libmonogate.h"
+#include <stdint.h>
+#include <math.h>
+#include <assert.h>
 
-double threshold_reflex_guard(double request, double limit) {
-    assert(limit > 0.0);
-    if (request > limit) {
-        return limit;
-    }
-    return request;
+/*
+ * reflex_guard
+ * Chain order: 0     Cost class: p0-d1-w0-c0
+ * EML depth:   1  Drift risk: LOW
+ * Dynamics:    0 osc, 0 decay  (predicted_r=0)
+ * FPGA est:   1 MAC, 0 exp, 0 ln, 0 trig -> 2 cy @ 32-bit
+ */
+double reflex_guard(double request, double limit) {
+    assert(((limit > 0.0)) && "reflex_guard: requires ((limit > 0.0))");
+    return min(request, limit);
 }`;
 
-const inoAdapter = `#include "threshold_reflex_v0.h"
+const inoAdapter = `// threshold_reflex_v0.c, libmonogate.h and libmonogate.c sit beside this sketch.
+extern "C" double reflex_guard(double request, double limit);
 
 void loop() {
     int raw = analogRead(34);
     double pot_raw = raw / 4095.0;
     double requested_output = pot_raw;
-    double safe_output = threshold_reflex_guard(requested_output, 0.85);
+    double safe_output = reflex_guard(requested_output, 0.85);
     const char* guard_action =
         requested_output > safe_output ? "clamp_to_safe_output" : "pass_through";
 
@@ -61,18 +73,39 @@ void loop() {
     );
 }`;
 
-const leanOutput = `def guard (request limit : Real) : Real :=
-  if request > limit then limit else request
+// Real output of monogate-forge 0.14.4 (excerpt), and the axiom check run
+// against MachLib on 2026-09-12.
+const leanOutput = `import MachLib.EML
+import MachLib.Trig
+import MachLib.Forge
+import MachLib.Linarith
+import MachLib.FixedPoint
+import MachLib.SignTactic
 
-theorem guard_output_bounded
-    (request limit : Real)
-    (h_limit : limit > 0.0) :
-    guard request limit <= limit := by
-  unfold guard
-  by_cases h : request > limit
-  . simp [h]
-  . simp [h]
-    exact le_of_not_gt h`;
+open MachLib
+open MachLib.Real
+
+noncomputable def reflex_guard (request : Real) (limit : Real) : Real :=
+  (min request limit)
+
+theorem guard_output_bounded (request : Real) (limit : Real)
+    (h1 : (limit > (0 : Real))) :
+    ((reflex_guard request limit) <= limit) := by
+  unfold reflex_guard
+  first
+  | (apply lo_le_clamp <;> (first | assumption | mach_positivity))
+  | apply clamp_le_hi
+  -- ... 13 more tactics, tried in order ...
+  | sorry  -- out of reach; left for the prover`;
+
+const checkAxioms = `git clone https://github.com/agent-maestro/machlib
+cd machlib/foundations
+lake build          # needs elan; about ten minutes the first time
+echo '#print axioms guard_output_bounded' >> /path/to/threshold_reflex_v0.lean
+lake env lean /path/to/threshold_reflex_v0.lean`;
+
+const axiomsOutput = `'guard_output_bounded' depends on axioms: [propext, Classical.choice, Real,
+ Quot.sound, leR, le_iff_lt_or_eq, ltR, zeroR]`;
 
 const jsonFrame = `{
   "pot_raw": 0.97,
@@ -262,9 +295,9 @@ export default function EmlIntroPage() {
       </Section>
 
       <Section id="math" kicker="Section 2" title="The guard kernel in plain math">
-        <CodeBlock code={"safe(request, limit) = if request > limit then limit else request"} lang="math" />
+        <CodeBlock code={"safe(request, limit) = min(request, limit)"} lang="math" />
         <P>
-          The domain is <Inline>limit &gt; 0</Inline>. The guarantee is <Inline>safe output &lt;= limit</Inline>. The proof obligation is the exact thing a reviewer would ask: show that the clamped path never returns a value above the limit.
+          The domain is <Inline>limit &gt; 0</Inline>. The guarantee is <Inline>safe output &lt;= limit</Inline>: whatever the request, the output never goes above the limit. <Inline>min</Inline> is the same function as <Inline>if request &gt; limit then limit else request</Inline>.
         </P>
       </Section>
 
@@ -272,7 +305,7 @@ export default function EmlIntroPage() {
         <P>Save this file beside the Reflex Guard lesson files.</P>
         <CodeBlock code={emlSource} lang="eml" filename="threshold_reflex_v0.eml" />
         <P>
-          <Inline>requires</Inline> and <Inline>ensures</Inline> are not comments. They become obligations that MachLib/Lean can close later.
+          <Inline>requires</Inline> and <Inline>ensures</Inline> are not comments. <Inline>requires</Inline> becomes a runtime check in C and a hypothesis in Lean; <Inline>ensures</Inline> becomes the theorem. Name the function <Inline>reflex_guard</Inline>, not <Inline>guard</Inline>: <Inline>guard</Inline> is already taken in Lean, and the emitted Lean would not compile.
         </P>
       </Section>
 
@@ -281,15 +314,20 @@ export default function EmlIntroPage() {
         <CodeBlock code={generatedC} lang="c" filename="threshold_reflex_v0.c" />
         <CodeBlock code={inoAdapter} lang="cpp" filename="threshold_reflex_adapter.ino" />
         <P>
-          The current hand-written firmware reference remains in <Inline>kernels/threshold_reflex_v0/esp32/threshold_reflex_v0</Inline>. Generated C should match the same guard boundary and serial fields.
+          <Inline>libmonogate.h</Inline> and <Inline>libmonogate.c</Inline> ship inside the <Inline>monogate-forge</Inline> package under <Inline>software/runtime/c/</Inline>; <Inline>pip show -f monogate-forge</Inline> lists where. The hand-written firmware in <Inline>kernels/threshold_reflex_v0/esp32/threshold_reflex_v0</Inline> is still the reference: this adapter has not yet been built on a board from the generated file.
         </P>
       </Section>
 
-      <Section id="proof" kicker="Section 5" title="The proof obligation">
+      <Section id="proof" kicker="Section 5" title="The proof">
         <CodeBlock code={compileLean} lang="bash" command />
-        <CodeBlock code={leanOutput} lang="lean" filename="threshold_reflex_v0.lean" />
+        <CodeBlock code={leanOutput} lang="lean" filename="threshold_reflex_v0.lean (excerpt)" />
         <P>
-          If your generated Lean contains <Inline>sorry</Inline>, that means the proof is still open. The important win is that the compiler named the exact property to prove.
+          The file ends in <Inline>sorry</Inline> whether or not the proof worked: Forge emits a list of tactics to try in order, and <Inline>sorry</Inline> is the last resort. So the word tells you nothing. Ask Lean what the theorem depends on:
+        </P>
+        <CodeBlock code={checkAxioms} lang="bash" command />
+        <CodeBlock code={axiomsOutput} lang="output" />
+        <P>
+          No <Inline>sorryAx</Inline> in the list: <Inline>guard_output_bounded</Inline> is proved, resting on Lean&apos;s own axioms and MachLib&apos;s axioms for the real numbers. It proves the function never returns more than <Inline>limit</Inline>. It says nothing about the ADC, the firmware, or the board.
         </P>
       </Section>
 
@@ -303,7 +341,7 @@ export default function EmlIntroPage() {
       <Section id="next" kicker="Section 7" title="What is next">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
           {[
-            "Add a minimum threshold and inspect the new proof obligations.",
+            "Rewrite the body as if request > limit { limit } else { request }. The theorem is just as true. Does #print axioms still say proved?",
             `Run ${compileVerilog} and compare the hardware-shaped logic.`,
             "Paste the guard expression into the Evidence Packet Builder."
           ].map((item) => (
@@ -316,7 +354,7 @@ export default function EmlIntroPage() {
 
       <footer style={{ marginTop: 24, border: "1px solid rgba(232,160,32,0.28)", borderRadius: 6, background: "rgba(232,160,32,0.07)", padding: 16 }}>
         <p style={{ margin: 0, color: "#fff2a6", fontSize: 13, lineHeight: 1.6 }}>
-          This course shows the EML -&gt; C -&gt; ESP32 path and the proof obligation shape. The generated Lean proof uses sorry placeholders. Discharging those placeholders requires MachLib and is covered in the advanced course. No claim is made that the guard is formally verified until the proof is closed.
+          This course shows the EML -&gt; C -&gt; ESP32 path and a checked proof. With monogate-forge 0.14.4 and MachLib, guard_output_bounded is proved (checked 2026-09-12 with #print axioms). The proof covers the function, not the firmware or the hardware; those need their own evidence.
         </p>
       </footer>
     </Shell>

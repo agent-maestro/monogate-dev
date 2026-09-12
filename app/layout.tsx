@@ -11,12 +11,12 @@ export const metadata: Metadata = {
     template: "%s — monogate.dev",
   },
   description:
-    "EML — a single-operator math language verified in Lean and running from " +
-    "your browser to ESP32 to FPGA. Explore the language, try the hardware lab, " +
-    "and learn EML.",
+    "EML — a single-operator math language whose contracts compile to Lean " +
+    "theorems, running from your browser to ESP32 to FPGA. Explore the language, " +
+    "try the hardware lab, and learn EML.",
   keywords: [
     "EML operator", "elementary functions", "exp minus log", "arXiv:2603.21852",
-    "math language", "Lean-verified", "ESP32", "FPGA", "monogate",
+    "math language", "Lean 4", "ESP32", "FPGA", "monogate",
     "hardware-validated math", "evidence bundles", "reproducible claims",
   ],
   authors: [{ name: "monogate.dev" }],
@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     siteName: "monogate.dev",
     title: "monogate.dev — Math you can verify. Hardware that confirms it.",
     description:
-      "EML is a single-operator math language. Every kernel ships with a Lean " +
-      "proof and runs from your browser to ESP32 to FPGA. Try the Explorer, " +
-      "open the Electronics Lab, or learn EML.",
+      "EML is a single-operator math language. A kernel's contract compiles to a " +
+      "Lean theorem, and the kernel runs from your browser to ESP32 to FPGA. Try " +
+      "the Explorer, open the Electronics Lab, or learn EML.",
     url: siteUrl,
     images: [
       {
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "monogate.dev — Math you can verify. Hardware that confirms it.",
     description:
-      "EML — a single-operator math language verified in Lean and running on " +
-      "browser, ESP32, and FPGA. Try the Explorer or Electronics Lab.",
+      "EML — a single-operator math language whose contracts compile to Lean " +
+      "theorems, running on browser, ESP32, and FPGA. Try the Explorer or Electronics Lab.",
     images: ["/og-image.jpg"],
   },
   icons: {

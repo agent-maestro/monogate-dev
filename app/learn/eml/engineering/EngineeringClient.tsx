@@ -81,41 +81,39 @@ fn vpd_safe(temp_c: Real, humidity_pct: Real) -> Real
         heading: "Importing modules",
         code: `module greenhouse;
 
-use climate_control;
-use stdlib::math;
+use local::climate_control;
 
 const TARGET_VPD: Real = 1.2
 
 fn fan_speed(temp_c: Real, humidity_pct: Real) -> Real {
-    let current = climate_control::vpd_safe(temp_c, humidity_pct);
+    let current = vpd_safe(temp_c, humidity_pct);
     let error = current - TARGET_VPD;
-    math::clamp(error * 0.5, 0.0, 1.0)
+    clamp(error * 0.5, 0.0, 1.0)
 }`,
         explanation: [
-          "use climate_control; — imports the module you just wrote.",
-          "climate_control::vpd_safe() — fully qualified call to the imported function.",
-          "use stdlib::math; — EML's standard library. Contains clamp, lerp, and more.",
+          "use local::climate_control; — imports climate_control.eml from the same directory.",
+          "Imported functions are called by their plain name: vpd_safe(...). A qualified call like climate_control::vpd_safe(...) does not parse.",
+          "clamp is built in. The standard library imports the same way: use stdlib::math::{lerp}; (Lesson 6).",
           "The greenhouse module doesn't reimplement VPD math — it calls it. One source of truth.",
         ],
       },
       {
         heading: "Compile the system",
-        code: `# Compile both files together
-eml-compile climate_control.eml greenhouse.eml --target all -o ./build
+        code: `# One source per command: greenhouse.eml pulls in climate_control.eml itself
+eml-compile greenhouse.eml --target c -o greenhouse.c
+eml-compile greenhouse.eml --target python -o greenhouse.py
 
-# Output: each target gets both modules
-# build/climate_control.c   + build/greenhouse.c
-# build/climate_control.rs  + build/greenhouse.rs
-# build/climate_control.lean + build/greenhouse.lean
-# ... selected configured targets`,
+# The climate_control code greenhouse needs (its constants and vpd)
+# is compiled into greenhouse.c.`,
         explanation: [],
       },
     ],
     exercise:
       "Split your PID controller from Level 1 into two modules: pid_core "
-      + "(the math) and pid_safe (verified wrapper with contracts). Import "
-      + "pid_core from pid_safe. Compile both. Verify the Lean output shows "
-      + "the composition.",
+      + "(the math) and pid_safe (the wrapper with contracts). Import "
+      + "pid_core from pid_safe with use local::pid_core;, compile "
+      + "pid_safe.eml to Lean, and look at how pid_core's math appears in "
+      + "the theorem.",
   },
   {
     id: "l2",
@@ -133,73 +131,66 @@ eml-compile climate_control.eml greenhouse.eml --target all -o ./build
         code: `# Run the profiler on any .eml file
 eml-compile my_function.eml --profile-only
 
-# Output:
-# my_function:
-#   chain_order: 2
-#   cost_class:  p2-d5-w2-c1
-#                │  │  │  └─ c1: 1 oscillation mode (cos/sin)
-#                │  │  └──── w2: width 2 (widest level has 2 nodes)
-#                │  └─────── d5: eml_depth 5 (longest root-to-leaf path)
-#                └────────── p2: 2 transcendental layers (chain order)
-#   drift_risk:  MEDIUM
-#   fpga_estimate:
-#     mac_units: ~7
-#     trig_units: 1
-#     latency:   14 cycles`,
+# Output for damped_wave, exp(-decay * t) * cos(freq * t):
+#   damped_wave
+#     status: ok    chain_order: 3    cost_class: p3-d5-w2-c0    eml_depth: 5    drift: HIGH
+#     dynamics: 1 osc, 1 decay  (predicted_r=3)
+#     fpga: 5 MAC, 1 exp, 0 ln, 1 trig (10 cy @ 64-bit)
+#
+# cost_class p3-d5-w2-c0
+#            │  │  │  └─ c0: no primitive outside EML
+#            │  │  └──── w2: chain order along the deepest single path
+#            │  └─────── d5: eml_depth, the longest root-to-leaf path
+#            └────────── p3: chain order of the whole function`,
         explanation: [
-          "p (Pfaffian depth) = chain order. Roughly 2× the transcendental count.",
-          "d (eml_depth) = longest path in the EML tree. Predicts pipeline latency.",
-          "w (width) = widest level. Predicts parallel hardware resources needed.",
-          "c (oscillation count) = number of sin/cos pairs. Predicts numerical instability.",
+          "p = chain order: how many transcendental layers the function stacks. It matches chain_order.",
+          "d = eml_depth, the longest path in the EML tree. The FPGA estimate tracks it: 2 cycles per level in these examples.",
+          "w = the chain order along the deepest single path. In damped_wave, exp and cos sit on different branches, so w is 2 while p is 3.",
+          "c = 1 when the function uses a primitive that is Pfaffian but not expressible in EML (Bessel, Airy, Lambert W); 0 otherwise.",
         ],
       },
       {
-        heading: "Chain order as a design tool",
-        code: `# VERSION 1: Naive (chain order higher)
+        heading: "Cost as a design tool",
+        code: `# VERSION 1: three transcendentals (exp, cos, sin)
 fn damped_wave_v1(t: Real, decay: Real, freq: Real) -> Real {
     exp(-decay * t) * cos(freq * t) * sin(freq * t)
 }
-# 3 transcendentals — exp, cos, sin
+# chain_order: 3    fpga: 5 MAC, 1 exp, 0 ln, 2 trig
 
-# VERSION 2: Trig identity (chain order lower)
+# VERSION 2: trig identity (exp, sin)
 fn damped_wave_v2(t: Real, decay: Real, freq: Real) -> Real {
     exp(-decay * t) * sin(2.0 * freq * t) * 0.5
 }
-# 2 transcendentals — exp, sin
+# chain_order: 3    fpga: 5 MAC, 1 exp, 0 ln, 1 trig
 
-# Same output. Identical math. One transcendental fewer.
-# On an FPGA that's one fewer trig_unit — the difference between
-# fitting on a $30 chip and needing a $200 chip.`,
+# Same output, same chain order. One trig unit fewer.`,
         explanation: [
           "sin(x)·cos(x) = ½ sin(2x) — a trig identity drops one transcendental.",
+          "Chain order does not move here (both are 3). The FPGA estimate does: 2 trig units become 1.",
           "This isn't micro-optimization. trig_units are scarce hardware.",
-          "Run --profile-only to see the cost before you build anything.",
-          "Rule of thumb: if your function is chain order 4+, look for identities.",
+          "Run --profile-only on both versions to see the cost before you build anything.",
         ],
       },
       {
         heading: "Drift risk and precision",
-        code: `# CHAIN 0: Safe at any precision
+        code: `# What --profile-only reports for each:
+
+# CHAIN 0 · drift: LOW
 fn add(a: Real, b: Real) -> Real { a + b }
-# drift: NONE — use float16 if you want
 
-# CHAIN 1: Safe at float32+
+# CHAIN 1 · drift: MEDIUM
 fn decay(t: Real, k: Real) -> Real { exp(-k * t) }
-# drift: LOW — float32 is fine
 
-# CHAIN 2: Needs float32, prefer float64 for safety-critical
+# CHAIN 2 · drift: MEDIUM
 fn oscillation(t: Real, f: Real) -> Real { sin(f * t) }
-# drift: MEDIUM — float32 ok for short-running, float64 safer
 
-# CHAIN 4+: Use float64; FPGA needs DP hardware
-fn nested(x: Real) -> Real { exp(sin(x)) }
-# drift: HIGH — float32 will accumulate error`,
+# CHAIN 3 · drift: HIGH
+fn nested(x: Real) -> Real { exp(sin(x)) }`,
         explanation: [
-          "Every transcendental layer amplifies floating-point error.",
-          "Chain 0–1: use whatever precision you want.",
-          "Chain 2: float32 minimum, float64 preferred for safety-critical.",
-          "Chain 4+: float64 required. FPGA needs double-precision hardware.",
-          "The compiler emits a drift_risk flag. Listen to it.",
+          "Every transcendental layer amplifies floating-point error, and the drift flag rises with chain order: LOW, MEDIUM, MEDIUM, HIGH for these four.",
+          "A single exp is already MEDIUM. Even chain 1 deserves a check of its domain and exponent size.",
+          "For damped_wave (HIGH, above) the FPGA estimate is already 64-bit.",
+          "The compiler emits the drift flag for every function. Listen to it.",
         ],
       },
     ],
@@ -254,40 +245,36 @@ fn safe_output(error: Real, integral: Real) -> Real
     saturate(raw, -100.0, 100.0)
 }`,
         explanation: [
-          "pid() is proven bounded. saturate() is proven to clamp. safe_output() composes both.",
-          "The compiler generates THREE theorems. The third one's proof USES the first two.",
-          "This is how you build trust: small proofs compose into system guarantees.",
-          "The Lean output shows the dependency chain — theorem C depends on theorems A and B.",
+          "The compiler emits THREE theorems, one per @verify. With monogate-forge 0.14.4, #print axioms shows two proved and one not.",
+          "saturated_in_range and safe_output_bounded are proved: no sorryAx.",
+          "pid_bounded is true (the output stays under 10·50 + 1·500 = 1000) but not proved: the tactics Forge tries do not find a proof for a bound that multiplies two bounded inputs, like Kp · error.",
+          "safe_output_bounded does not need pid_bounded. The saturate alone keeps the output in [-100, 100] whatever pid returns, so a clamp at the boundary makes the system property provable while an inner one is still open.",
         ],
       },
       {
         heading: "Reading the Lean output",
-        code: `-- Generated by Monogate Forge
--- Source: safe_control.eml
+        code: `-- safe_control.lean from monogate-forge 0.14.4 (excerpt)
 
-import MachLib.EML
+noncomputable def safe_output (error : Real) (integral : Real) : Real :=
+  (min (max (((2.5 : Real) * error) + ((0.1 : Real) * integral)) (-100.0 : Real)) (100.0 : Real))
 
-def safe_output (error integral : Real) : Real :=
-  let raw := 2.5 * error + 0.1 * integral
-  max (-100.0) (min raw 100.0)
-
-theorem safe_output_bounded
-    (error integral : Real)
-    (h1 : abs error < 50.0)
-    (h2 : abs integral < 500.0) :
-    safe_output error integral >= -100.0 ∧
-    safe_output error integral <= 100.0 := by
+theorem safe_output_bounded (error : Real) (integral : Real)
+    (h1 : ((abs error) < (50.0 : Real)))
+    (h2 : ((abs integral) < (500.0 : Real)))
+    (h_clamp1 : (-100.0 : Real) ≤ (100.0 : Real)) :
+    (((safe_output error integral) >= (-(100.0 : Real)))) ∧ (((safe_output error integral) <= (100.0 : Real))) := by
   unfold safe_output
-  constructor
-  · -- left: result >= -100.0
-    sorry  -- TODO: prove against MachLib
-  · -- right: result <= 100.0
-    sorry  -- TODO: prove against MachLib`,
+  refine ⟨?_, ?_⟩ <;>
+    first
+    | (apply lo_le_clamp <;> (first | assumption | mach_positivity))
+    | apply clamp_le_hi
+    -- ... 13 more tactics, tried in order ...
+    | sorry  -- out of reach; left for the prover`,
         explanation: [
-          "The theorem statement is auto-generated and CORRECT — it exactly matches your contract.",
-          "The sorry means the proof body isn't filled yet. That's normal for auto-generated output.",
-          "The proof structure is already there: constructor splits the ∧ (and) into two goals.",
-          "A human or an RL agent fills the sorry. The STATEMENT is the hard part — Forge does that for you.",
+          "One hypothesis per requires, one conclusion per ensures. Forge adds h_clamp1 itself: a clamp needs lo ≤ hi.",
+          "safe_output's body is pid and saturate inlined. This release proves the composed expression directly, not by citing the first two theorems.",
+          "The tactic list ends in sorry as a last resort, present whether or not an earlier tactic worked. The word itself tells you nothing.",
+          "#print axioms does: no sorryAx for safe_output_bounded, so it is proved. Level 1, Lesson 4 shows the command.",
         ],
       },
       {
@@ -368,30 +355,27 @@ fn pid_f64(error: Real, integral: Real) -> Real {
       },
       {
         heading: "When precision matters",
-        code: `# Chain 0: float32 is identical to float64
+        code: `# Chain 0 · drift: LOW
 @target(fpga, precision = float32)
 fn gravity(m1: Real, m2: Real, r: Real) -> Real {
     6.674e-11 * m1 * m2 / (r * r)
 }
-# drift: NONE — float32 is fine
 
-# Chain 2: float32 diverges from float64 after ~1000 iterations
+# Chain 2 · drift: MEDIUM
 @target(fpga, precision = float32)
 fn oscillator(t: Real, freq: Real) -> Real {
     sin(freq * t)
 }
-# drift: MEDIUM — float32 ok for audio (short), not for navigation (long)
 
-# Chain 4+: float32 is dangerous
+# Chain 3 · drift: HIGH
 @target(fpga, precision = float64)
 fn damped_osc(t: Real, d: Real, f: Real) -> Real {
     exp(-d * t) * sin(f * t)
-}
-# drift: HIGH — use float64, the extra resources are worth it`,
+}`,
         explanation: [
-          "Drift risk isn't about single evaluations — it's about ACCUMULATION over time.",
-          "A game running at 60fps for 1 minute: 3,600 evaluations. float32 chain-2 is fine.",
-          "A flight controller at 1kHz for 8 hours: 28.8M evaluations. float32 chain-2 will drift.",
+          "The drift flag is per evaluation. What matters in a real system is whether error ACCUMULATES over time.",
+          "A game at 60fps for 1 minute makes 3,600 evaluations; a flight controller at 1kHz for 8 hours makes 28.8 million.",
+          "Error only accumulates when an output feeds back into the next step, so check the loop, not just the function.",
           "Match precision to your application's time horizon, not just the function's complexity.",
         ],
       },
@@ -441,9 +425,10 @@ fn autopilot_inner(roll_err: Real, pitch_err: Real) -> (Real, Real) {
 eml-compile controller.eml --target python -o controller.py
 python -c "import controller; print(controller.pid(1.0, 0.0, 2.5, 0.1))"
 
-# Step 2: Emit Lean obligations (then prove separately)
+# Step 2: Emit Lean, then ask Lean which theorems are proved
 eml-compile controller.eml --target lean -o controller.lean
-cd lean-project && lake build  # checks only completed proofs
+echo '#print axioms controller_safe' >> controller.lean
+cd machlib/foundations && lake env lean /path/to/controller.lean  # sorryAx = not proved
 
 # Step 3: Build production in Rust (performance)
 eml-compile controller.eml --target rust -o controller.rs
@@ -453,7 +438,7 @@ cargo build --release
 eml-compile controller.eml --target ada -o controller.ads
 gnatprove -P controller.gpr  # SPARK formal analysis
 
-# Step 5: Emit and synthesize FPGA candidate (hardware review)
+# Step 5: Emit an FPGA candidate (needs @target(fpga) in the source)
 eml-compile controller.eml --target verilog -o controller.v
 vivado -mode batch -source synth.tcl  # synthesis
 
@@ -461,7 +446,7 @@ vivado -mode batch -source synth.tcl  # synthesis
 # Change the .eml file → regenerate the reviewed artifact bundle.`,
         explanation: [
           "Python for prototyping (seconds to test).",
-          "Lean for proof obligations; only completed Lean proofs become proof evidence.",
+          "Lean: one theorem per @verify contract. #print axioms shows which are proved — sorryAx in the list means not proved.",
           "Rust/C for production-oriented code review.",
           "Ada/SPARK for safety-critical analysis paths.",
           "Verilog for hardware candidates after simulation and synthesis.",
@@ -470,39 +455,42 @@ vivado -mode batch -source synth.tcl  # synthesis
       },
       {
         heading: "CI/CD integration",
-        code: `# .github/workflows/verify.yml
-name: EML Verify
+        code: `# .github/workflows/eml.yml
+name: EML
 on: [push]
 jobs:
-  verify:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - run: pip install monogate-forge
 
-      # Emit selected reviewed targets
-      - run: eml-compile src/*.eml --target python -o build/python/
-      - run: eml-compile src/*.eml --target c -o build/c/
-      - run: eml-compile src/*.eml --target lean -o build/lean/
+      # eml-compile takes one source per call, so loop over the files
+      - run: |
+          mkdir -p build/python build/c
+          for f in src/*.eml; do
+            name=$(basename "$f" .eml)
+            eml-compile "$f" --target python -o "build/python/$name.py"
+            eml-compile "$f" --target c -o "build/c/$name.c"
+          done
 
-      # Run Python tests
-      - run: pytest build/test_*.py
-
-      # Check completed Lean proofs; theorem stubs are not proof claims
-      - run: cd build && lake build
-
-      # Check chain-order budget (every fn <= chain 3)
+      # Chain-order budget: fail if any function is chain order 4 or more
       - run: |
           for f in src/*.eml; do
-            eml-compile "$f" --profile-only \\
-              | grep -E "chain_order: [4-9]|chain_order: [1-9][0-9]+" \\
-              && exit 1 || true
+            eml-compile "$f" --profile-only > profile.txt
+            if grep -qE "chain_order: ([4-9]|[1-9][0-9]+)" profile.txt; then
+              echo "$f is over the chain-order budget"
+              exit 1
+            fi
           done`,
         explanation: [
-          "Every push emits the reviewed targets and runs available checks.",
-          "The grep pass enforces a complexity budget in CI — fails on chain ≥ 4.",
-          "If someone adds a chain-4 function, the build fails. Intentional.",
-          "The proof check only supports claims for obligations with completed proofs.",
+          "Every push emits Python and C for every source file.",
+          "One source per eml-compile call, so the workflow loops. A glob passes every file at once and fails.",
+          "The --profile-only pass enforces a complexity budget: a chain-order-4 function fails the build. Intentional.",
+          "Lean is left out on purpose: checking proofs needs a MachLib build (Step 2), which is a job of its own.",
         ],
       },
       {
@@ -512,7 +500,7 @@ jobs:
 # Need speed?         → C or Rust first; FPGA after hardware evidence
 # Need safety cert?   → Ada/SPARK + completed proof evidence
 # Need prototyping?   → Python
-# Need browser?       → JavaScript (WebAssembly Pro)
+# Need browser?       → JavaScript or WebAssembly
 # Need browser GPU?   → WGSL (WebGPU)
 # Need mobile GPU?    → Metal (iOS) or GLSL ES (Android)
 # Need iOS / macOS?   → Swift
@@ -541,86 +529,81 @@ jobs:
     title: "The standard library",
     time: "10 min",
     intro:
-      "EML's standard library gives you building blocks so you don't reinvent "
-      + "common math. Everything in stdlib is chain-order profiled and the "
-      + "stable kernels carry @verify contracts.",
+      "The standard library ships inside the compiler as plain EML files — "
+      + "math, signal, control, linalg, ml and constants — so you can read "
+      + "every function you call. Import the ones you need by name.",
     sections: [
       {
         heading: "stdlib::math",
-        code: `use stdlib::math;
+        code: `module easing;
 
-// Interpolation
-let smoothed = math::lerp(current, target, 0.1);
-let eased = math::smoothstep(0.0, 1.0, t);
+use stdlib::math::{lerp, smoothstep, hypot2};
 
-// Clamping and ranges
-let bounded = math::clamp(value, -1.0, 1.0);
-let mapped = math::remap(sensor, 0.0, 1023.0, 0.0, 5.0);
+fn ease(a: Real, b: Real, t: Real) -> Real {
+    lerp(a, b, smoothstep(t))
+}
 
-// Constants
-let circle = 2.0 * math::PI * radius;
-let natural = math::E;`,
+fn distance(dx: Real, dy: Real) -> Real {
+    hypot2(dx, dy)
+}`,
         explanation: [
-          "lerp: linear interpolation. Chain order 0. The most common operation in gaming and control.",
-          "smoothstep: smooth Hermite interpolation. Chain order 0. Produces S-curves without trig.",
-          "remap: rescale a value from one range to another. Chain order 0.",
-          "All chain order 0 — no transcendentals, pure arithmetic.",
+          "use stdlib::math::{lerp, smoothstep, hypot2}; imports three functions. Call them by their plain names.",
+          "math::lerp(...) does not parse: import the name, then call lerp(...).",
+          "lerp and smoothstep are chain order 0, pure arithmetic. hypot2 uses sqrt.",
+          "smoothstep(t) expects t already scaled to [0, 1].",
         ],
       },
       {
         heading: "stdlib::signal",
-        code: `use stdlib::signal;
+        code: `module tone;
 
-// Digital filters
-let lp = signal::biquad_lowpass(input, cutoff, q, sample_rate);
-let hp = signal::biquad_highpass(input, cutoff, q, sample_rate);
+use stdlib::signal::{wave_sine, biquad_step};
 
-// Windowing
-let w = signal::hann_window(n, length);
-let w2 = signal::blackman_window(n, length);
+fn a440(t: Real) -> Real {
+    wave_sine(t, 440.0, 0.5, 0.0)
+}
 
-// Oscillators
-let sine = signal::sine_osc(phase, freq, sample_rate);
-let saw = signal::saw_osc(phase, freq, sample_rate);`,
+fn filtered(x: Real, x1: Real, x2: Real, y1: Real, y2: Real) -> Real {
+    biquad_step(x, x1, x2, y1, y2, 0.2, 0.4, 0.2, -0.3, 0.1)
+}`,
         explanation: [
-          "biquad filters: proven stable (poles inside unit circle). Chain order 0–1.",
-          "Window functions: proven bounded in [0,1]. Used in FFT and audio.",
-          "Oscillators: phase-accumulator based. No drift over time.",
-          "Every stdlib::signal function has a @verify contract for stability.",
+          "wave_sine(t, frequency, amplitude, phase), wave_cosine and wave_triangle generate test signals.",
+          "biquad_step computes one sample of a Direct-Form-I biquad. You keep the history (x1, x2, y1, y2) and pass it back in.",
+          "Also here: fir3, fir5, linear_to_db, db_to_linear, box_muller.",
         ],
       },
       {
         heading: "stdlib::control",
-        code: `use stdlib::control;
+        code: `module motor;
 
-// PID with anti-windup
-let output = control::pid_aw(
-    error, integral, derivative,
-    Kp, Ki, Kd,
-    integral_limit
-);
+use stdlib::control::{pid_anti_windup, rate_limit};
 
-// State observer
-let estimated = control::luenberger(
-    state, measurement, A, B, C, L
-);
-
-// Trajectory generation
-let pos = control::trapezoid_profile(t, v_max, a_max, distance);`,
+fn command(error: Real, integral: Real, derivative: Real, previous: Real) -> Real {
+    let u = pid_anti_windup(error, integral, derivative, 2.5, 0.1, 0.05, 50.0, 1.0);
+    rate_limit(u, previous, 0.05)
+}`,
         explanation: [
-          "pid_aw: PID with anti-windup. Proven bounded. The version you actually use in production.",
-          "luenberger: state observer for estimating unmeasured states. Chain order 0.",
-          "trapezoid_profile: motion profile with acceleration limits. Chain order 0.",
-          "Control engineers: these are the functions you've written a hundred times. Now they're proven.",
+          "pid_anti_windup(error, integral, derivative, Kp, Ki, Kd, i_limit, u_limit) clamps the integral term and the output.",
+          "rate_limit(target, current, max_step) moves at most max_step per call.",
+          "Also here: pid, lpf1, hpf1, complementary, saturate, dead_zone, slew, kalman1d_update, kalman1d_predict.",
+        ],
+      },
+      {
+        heading: "Compile them, and what they do not promise",
+        code: `eml-compile easing.eml --target c -o easing.c
+eml-compile tone.eml --target c -o tone.c
+eml-compile motor.eml --target c -o motor.c`,
+        explanation: [
+          "The shipped stdlib carries no @verify contracts yet, so importing a function gives you no theorem.",
+          "To get one, wrap the call in your own function with requires and ensures, add @verify, and check it with #print axioms (Level 1, Lesson 4).",
         ],
       },
     ],
     exercise:
-      "Build a complete audio synthesizer using only stdlib functions: "
-      + "sine_osc for the oscillator, biquad_lowpass for the filter, and lerp "
-      + "for the envelope. Compile to C. The output should be a function that "
-      + "takes (time, note_frequency, filter_cutoff, envelope_position) and "
-      + "returns an audio sample.",
+      "Build a small synthesizer from stdlib functions: wave_sine for the "
+      + "oscillator, biquad_step for the filter, and lerp for the envelope. "
+      + "Compile to C. The output should be a function that takes (time, "
+      + "note_frequency, envelope_position) and returns an audio sample.",
   },
 ];
 

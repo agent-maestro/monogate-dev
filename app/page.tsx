@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "monogate.dev — EML math language playground",
   description:
-    "EML — a single-operator math language verified in Lean and running from " +
-    "your browser to ESP32 to FPGA. Explore the language, try the hardware lab, " +
-    "and learn EML.",
+    "EML — a single-operator math language whose contracts compile to Lean " +
+    "theorems, running from your browser to ESP32 to FPGA. Explore the language, " +
+    "try the hardware lab, and learn EML.",
 };
 
 const C = {
@@ -172,11 +172,13 @@ const RESEARCH_STACK = [
 // Ecosystem-status strip — three live-feeling cells under the hero. These
 // signal "this is a real, active project" without requiring the visitor to
 // click anything.
+// The MachLib figure is a floor ("N+") checked against machlib's README by
+// scripts/check_site_figures.mjs; change it there and here together.
 const ECOSYSTEM_STATUS = [
   {
-    label: "EML kernels",
-    value: "108",
-    note: "Lean-verified in MachLib",
+    label: "MachLib theorems",
+    value: "7 600+",
+    note: "machine-checked in Lean 4 · machlib.org",
   },
   {
     label: "Hardware ports",
@@ -209,8 +211,9 @@ export default function LandingPage() {
           <code style={{ color: C.purple, fontSize: 14, fontFamily: "monospace" }}>
             eml(x, y) = exp(x) − ln(y)
           </code>
-          . Every kernel ships with a Lean proof. The same kernel runs in your
-          browser, on an ESP32, and as a synthesizable FPGA block.
+          . A kernel&apos;s contract compiles to a Lean theorem, and Lean
+          reports whether it is proved. The same kernel runs in your browser,
+          on an ESP32, and as a synthesizable FPGA block.
         </p>
         {/* Capability badges — the "where it runs / how it's checked" strip. */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
@@ -218,7 +221,7 @@ export default function LandingPage() {
             { label: "browser", color: C.blue },
             { label: "ESP32", color: C.green },
             { label: "FPGA", color: C.green },
-            { label: "Lean-verified", color: C.purple },
+            { label: "Lean theorems", color: C.purple },
             { label: "evidence-bundled", color: C.orange },
           ].map(({ label, color }) => (
             <span
