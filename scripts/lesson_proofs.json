@@ -8,7 +8,7 @@
         "<Inline>pid_is_bounded</Inline> is proved. The list is what the proof"
       ],
       "source": "safe_pid.eml",
-      "command": "eml-compile safe_pid.eml --target lean -o ./verified.lean",
+      "command": "eml-compile safe_pid.eml --target lean -o ./safe_pid.lean",
       "theorem": "pid_is_bounded",
       "verdict": "proved",
       "quoted": true
@@ -26,7 +26,7 @@
           "replace": "Kp * error + Ki * integral"
         }
       ],
-      "command": "eml-compile safe_pid.eml --target lean -o ./verified.lean",
+      "command": "eml-compile safe_pid.eml --target lean -o ./safe_pid.lean",
       "theorem": "pid_is_bounded",
       "verdict": "not_proved"
     },
@@ -51,7 +51,7 @@
           "replace": "abs(integral) < 400.0"
         }
       ],
-      "command": "eml-compile safe_pid.eml --target lean -o ./verified.lean",
+      "command": "eml-compile safe_pid.eml --target lean -o ./safe_pid.lean",
       "theorem": "pid_is_bounded",
       "verdict": "not_proved"
     },

@@ -758,9 +758,9 @@ ensures (result <= max_output)
   → One conclusion per ensures`}</Code>
 
         <Heading>Compile to Lean</Heading>
-        <Code lang="bash">{`eml-compile safe_pid.eml --target lean -o ./verified.lean`}</Code>
+        <Code lang="bash">{`eml-compile safe_pid.eml --target lean -o ./safe_pid.lean`}</Code>
         <P>
-          Open <Inline>verified.lean</Inline> (imports trimmed):
+          Open <Inline>safe_pid.lean</Inline> (imports trimmed):
         </P>
         <Code lang="lean">{`noncomputable def safe_pid (error : Real) (integral : Real) : Real :=
   (min (max ((Kp * error) + (Ki * integral)) (-max_output)) max_output)
@@ -795,8 +795,8 @@ theorem pid_is_bounded (error : Real) (integral : Real)
         <Code lang="bash">{`git clone https://github.com/agent-maestro/machlib
 cd machlib/foundations
 lake build          # needs elan; about ten minutes the first time
-echo '#print axioms pid_is_bounded' >> /path/to/verified.lean
-lake env lean /path/to/verified.lean`}</Code>
+echo '#print axioms pid_is_bounded' >> /path/to/safe_pid.lean
+lake env lean /path/to/safe_pid.lean`}</Code>
         <Code>{`'pid_is_bounded' depends on axioms: [propext, Classical.choice, Real, Quot.sound,
  addR, leR, le_iff_lt_or_eq, ltR, lt_total, mulR, negR, realOfScientific, zeroR]`}</Code>
         <P>

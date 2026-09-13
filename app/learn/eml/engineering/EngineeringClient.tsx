@@ -74,7 +74,8 @@ fn vpd_safe(temp_c: Real, humidity_pct: Real) -> Real
           "module climate_control; — names this file. Other files can import it.",
           "vpd() calls saturation_vp() — functions compose naturally.",
           "vpd_safe() wraps vpd() with contracts — the safety layer calls the math layer.",
-          "Three levels: constants → core math → verified interface. This pattern scales to any system.",
+          "Three levels: constants → core math → an interface with contracts. This pattern scales to any system.",
+          "vpd_safe has no @verify, so nothing here asks Lean to prove its ensures. Lesson 3 shows how.",
         ],
       },
       {
@@ -317,9 +318,13 @@ fn altitude_hold(
     ],
     exercise:
       "Build a three-function chain: sensor_read (bounded input), filter "
-      + "(smoothing with proven stability), actuator_command (bounded output). "
-      + "Write contracts so that the full chain is proven end-to-end: valid "
-      + "sensor input → valid actuator output, always.",
+      + "(one smoothing step whose output stays within its input bounds), "
+      + "actuator_command (bounded output). Give each an @verify contract, and "
+      + "give one to the function that chains them: valid sensor input → valid "
+      + "actuator output. Compile to Lean and run #print axioms on every "
+      + "theorem. Which reports have no sorryAx? As with pid_bounded, a true "
+      + "bound can stay open; as with safe_output_bounded, a clamp on the "
+      + "output can still close the chain's theorem.",
   },
   {
     id: "l4",

@@ -148,6 +148,22 @@
     {
       "phrase": "Hardware observed: false",
       "why": "Retired 2026-09-12: /electronics served this typed line while SOURCE.json recorded board captures on the FPGA track. The boundary is now built from SOURCE.json by boundaryText() in seo.ts; do not type it."
+    },
+    {
+      "phrase": "verified interface",
+      "why": "Retired 2026-09-13: Level 2 Lesson 1 called vpd_safe a verified interface. vpd_safe carries no @verify, so no theorem is emitted for it, and the only check on that lesson (check_site_commands.mjs) reads the exit status of its C and Python compiles."
+    },
+    {
+      "phrase": "proven stability",
+      "why": "Retired 2026-09-13: Level 2 Lesson 3's exercise asked for a filter 'with proven stability'. An ensures bounds one call's result; it does not state stability, and nothing on the site proves a stability property."
+    },
+    {
+      "phrase": "proven end-to-end",
+      "why": "Retired 2026-09-13: the same exercise asked for a chain 'proven end-to-end'. What check_lesson_proofs.mjs re-derives for that lesson is narrower: safe_output_bounded closes through a final clamp while pid_bounded, a true bound, still depends on sorryAx. The exercise now asks the reader to run #print axioms and see which close."
+    },
+    {
+      "phrase": "verified.lean",
+      "why": "Retired 2026-09-13: Level 1 Lesson 4 wrote its Lean output to ./verified.lean before #print axioms had been asked anything; the file holds stated theorems, closed or not. It is ./safe_pid.lean, named after its source like every other lesson's output. The command is registered in scripts/lesson_proofs.json."
     }
   ]
 }
