@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 // about what went, why, and how to get it back.
 
 export const metadata: Metadata = {
-  title: "Archived research workbenches",
+  title: "Archived pages",
   description:
     "What was retired from monogate.dev on 2026-09-12, why it went, how to restore it from git, and where to go instead.",
 };
@@ -20,27 +20,59 @@ const C = {
   blue: "#6ab0f5",
 };
 
+const RESEARCH_TAG = "attic/research-stack-2026-06";
+const PRODUCT_TAG = "attic/product-wave-2026-09";
+
 const ARCHIVED = [
   {
     group: "Evidence workbenches",
     items: "the evidence browser, the bundle builder and gallery, the rescue suite, proof digestion, the IR bridge, the atlas annex, and the evidence-governed-computation case study",
+    why: "read from fixtures captured in May and June 2026",
+    tag: RESEARCH_TAG,
   },
   {
     group: "Research explorers",
     items: "the advantage lab, the prime residual benchmark, and the template search",
+    why: "read from fixtures captured in May 2026",
+    tag: RESEARCH_TAG,
   },
   {
     group: "Lean practice lanes",
     items: "the PETAL lanes with their certificates and leaderboard",
+    why: "unchanged since May 2026",
+    tag: RESEARCH_TAG,
+  },
+  {
+    group: "Challenge board",
+    items: "the challenge list, the per-challenge submission pages, the leaderboard, the in-browser search, and the how-to-submit guide",
+    why: "the database behind it no longer resolves, so no challenge could be listed and no submission stored",
+    tag: PRODUCT_TAG,
+  },
+  {
+    group: "Explorer",
+    items: "the operator explorer and the EML language page",
+    why: "their tables and status labels came from fixtures captured in May and June 2026 that nothing re-derives",
+    tag: PRODUCT_TAG,
+  },
+  {
+    group: "Math Lab",
+    items: "the optimizer, the cost calculator, the playground and the calculator",
+    why: "hand-typed tables unchanged since April 2026; the games had already moved to 1op.io",
+    tag: PRODUCT_TAG,
+  },
+  {
+    group: "Interactive EML lesson",
+    items: "the in-browser course at /learn/eml/interactive",
+    why: "it showed sample outputs instead of running the compiler, and nothing linked to it",
+    tag: PRODUCT_TAG,
   },
 ];
 
 const INSTEAD = [
-  { href: "/learn/eml", label: "Learn EML", note: "write a kernel, compile it, and check its proof" },
-  { href: "/electronics", label: "Electronics Lab", note: "kernels on ESP32 trainer boards and FPGA bitstreams" },
-  { href: "/explorer", label: "Explorer", note: "the language and its operators" },
+  { href: "/learn/eml", label: "Learn EML", note: "write a kernel, compile it, and ask Lean what is proved" },
+  { href: "/electronics", label: "Electronics Lab", note: "the hardware courses and their simulators" },
   { href: "https://monogate.org", label: "monogate.org", note: "the research record" },
-  { href: "https://machlib.org", label: "machlib.org", note: "the Lean library the proofs rest on" },
+  { href: "https://machlib.org", label: "machlib.org", note: "the Lean library the lessons' theorems build on" },
 ];
 
 function H2({ children }: { children: ReactNode }) {
@@ -57,35 +89,54 @@ export default function ArchivePage() {
   return (
     <main style={{ background: C.bg, minHeight: "100vh", maxWidth: 760, margin: "0 auto", padding: "40px 18px 80px" }}>
       <h1 style={{ fontSize: 30, color: C.orange, fontFamily: "monospace", lineHeight: 1.2, marginBottom: 14 }}>
-        Research workbenches, archived
+        Archived from monogate.dev
       </h1>
       <P>
         The page you followed a link to has been retired from monogate.dev. Nothing was deleted from history, and the
         sections below say how to bring it back.
       </P>
 
-      <H2>What went</H2>
+      <H2>What went, and why</H2>
       <ul style={{ margin: 0, paddingLeft: 20 }}>
-        {ARCHIVED.map(({ group, items }) => (
-          <li key={group} style={{ fontSize: 14, color: C.text, lineHeight: 1.75, marginBottom: 6 }}>
-            <strong style={{ color: C.text }}>{group}:</strong> <span style={{ color: C.muted }}>{items}.</span>
+        {ARCHIVED.map(({ group, items, why, tag }) => (
+          <li key={group} style={{ fontSize: 14, color: C.text, lineHeight: 1.75, marginBottom: 8 }}>
+            <strong style={{ color: C.text }}>{group}:</strong> <span style={{ color: C.muted }}>{items}.</span>{" "}
+            <span style={{ color: C.text }}>Why: {why}.</span>{" "}
+            <span style={{ color: C.muted }}>
+              Tag <code style={code}>{tag}</code>.
+            </span>
           </li>
         ))}
       </ul>
 
-      <H2>Why</H2>
+      <H2>What the site checks instead</H2>
       <P>
-        Each was last changed between April and June 2026 and read from fixtures captured then, not from anything the
-        project measures today. The site now concentrates on what the compiler actually does, and checks every command
-        and figure it shows before each deploy.
+        Three checks run before each deploy. They are not scheduled, so a result can change between deploys without the
+        site noticing.
       </P>
+      <ul style={{ margin: "0 0 12px", paddingLeft: 20 }}>
+        <li style={{ fontSize: 14, color: C.text, lineHeight: 1.75, marginBottom: 6 }}>
+          Every eml-compile command on the site is run against the newest monogate-forge on PyPI, the compiler{" "}
+          <code style={code}>pip install monogate-forge</code> gives you, and must succeed or fail as the page says. Only
+          the exit status is checked, not the printed output.
+        </li>
+        <li style={{ fontSize: 14, color: C.text, lineHeight: 1.75, marginBottom: 6 }}>
+          The figures registered in <code style={code}>scripts/site_figures.json</code> must match what measures them, and
+          phrases retired as false must not come back. A number that is not registered there is not checked.
+        </li>
+        <li style={{ fontSize: 14, color: C.text, lineHeight: 1.75, marginBottom: 6 }}>
+          A page that labels a Lean theorem as checked must name it in <code style={code}>scripts/lean_claims.json</code>,
+          and that theorem must compile at a pinned revision with no <code style={code}>sorryAx</code> in its{" "}
+          <code style={code}>#print axioms</code>.
+        </li>
+      </ul>
 
       <H2>Getting one back</H2>
       <P>
-        The code is in the site&apos;s repository at the git tag <code style={code}>attic/research-stack-2026-06</code>.
-        For example, <code style={code}>git checkout attic/research-stack-2026-06 -- app/evidence</code> restores the
-        evidence browser; the other routes come back the same way, and their redirects live in{" "}
-        <code style={code}>next.config.mjs</code>.
+        Each group&apos;s code is in the site&apos;s repository at the git tag named beside it. For example,{" "}
+        <code style={code}>git checkout {RESEARCH_TAG} -- app/evidence</code> restores the evidence browser, and{" "}
+        <code style={code}>git checkout {PRODUCT_TAG} -- app/explorer lib/explorer</code> restores the Explorer. Every
+        route&apos;s redirect lives in <code style={code}>next.config.mjs</code>; remove it with the restore.
       </P>
       <P>
         If you worked through the Lean practice lanes, your progress is still saved in your own browser. Nothing here

@@ -185,6 +185,10 @@ async function runCanaries() {
 }
 
 function* sourceFiles(dir) {
+  // A scan root that does not exist holds nothing to check: lib/ went with the
+  // 2026-09-12 product-wave archive. It stays in SCAN_DIRS, so a lib/ that comes
+  // back is scanned without anyone having to remember to re-add it.
+  if (!fs.existsSync(dir)) return;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === "node_modules" || entry.name.startsWith(".")) continue;
     const full = path.join(dir, entry.name);

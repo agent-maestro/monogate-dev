@@ -14,8 +14,9 @@ const eslintConfig = defineConfig([
       // next.config.mjs does not enable `reactCompiler`, and these rules flag
       // patterns (refs read during render, setState in effects/useMemo,
       // module-level mutation, Math.random() during render) that are working,
-      // pre-compiler idioms throughout lib/games/* and lib/explorer/*'s
-      // animation/canvas code. Downgraded to warn so they stay visible — worth
+      // pre-compiler idioms. Most were in lib/games/* and lib/explorer/*'s
+      // animation/canvas code, archived 2026-09-12 (git tag
+      // attic/product-wave-2026-09). Downgraded to warn so they stay visible — worth
       // revisiting if/when reactCompiler is turned on — without failing the
       // build today.
       'react-hooks/set-state-in-effect': 'warn',

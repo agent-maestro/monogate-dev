@@ -337,8 +337,7 @@ export default function SuperBESTPage() {
             <li><strong style={{ color: C.text }}>Aggregate genuine F16 savings: ~12%</strong> across all catalogs; ~40% with 23-op extended</li>
           </ul>
           <p style={{ marginTop: 16, fontSize: 12, color: C.muted }}>
-            Research: <a href="https://monogate.org/superbest" style={{ color: C.accent }}>monogate.org/superbest ↗</a> ·
-            Explorer: <a href="/explorer" style={{ color: C.accent }}>monogate.dev/explorer</a>
+            Research: <a href="https://monogate.org/superbest" style={{ color: C.accent }}>monogate.org/superbest ↗</a>
           </p>
         </div>
 

@@ -57,19 +57,7 @@
     },
     {
       "phrase": "Lean-verified",
-      "why": "Retired 2026-09-12: reads as 'every proof closed'. Say 'Lean theorem' and show #print axioms, which is what tells proved from stated. A line that keeps the label must also be a registered site in scripts/lean_claims.json, whose gate re-proves it on every deploy.",
-      "allow": [
-        {
-          "file": "app/theorems/page.tsx",
-          "line": "Strict i-Unconstructibility (Lean-verified)",
-          "reason": "names one theorem (T17), not every kernel. The proof is not vouched for here but gated: this line is a site of claim T19-strict-i-unconstructible in scripts/lean_claims.json. Before every deploy, check_claims.py requires T19_i_unconstructible_strict to be declared in StrictBarrier.lean at the pinned monogate-research sha, compile in monogate-lean, and report no sorryAx. The lean4/i_unconstructibility.lean the page cited never existed; the evidence text now says so. next.config.mjs redirects /theorems to monogate.org, so this page is not served."
-        },
-        {
-          "file": "lib/explorer/ExplorerApp.jsx",
-          "line": "under principal-branch semantics. Lean-verified.",
-          "reason": "names one theorem (T19), not every kernel. The proof is not vouched for here but gated: this line is a site of claim T19-strict-i-unconstructible in scripts/lean_claims.json. Before every deploy, check_claims.py requires T19_i_unconstructible_strict and strict_barrier_T19 to be declared in monogate-research/lean/EML/StrictBarrier.lean at the pinned sha, compile in monogate-lean (toolchain and Mathlib pinned), and report only [propext, Classical.choice, Quot.sound]. It holds because the strict evaluator is typed into the reals."
-        }
-      ]
+      "why": "Retired 2026-09-12: reads as 'every proof closed'. Say 'Lean theorem' and show #print axioms, which is what tells proved from stated. A line that keeps the label must also be a registered site in scripts/lean_claims.json, whose gate re-proves it on every deploy, and get a one-line `allow` here. The last two allowed lines (T19 on the Explorer and on the unserved /theorems page) went with the 2026-09-12 product-wave archive."
     },
     {
       "phrase": "verified in Lean",

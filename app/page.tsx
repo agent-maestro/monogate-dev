@@ -50,18 +50,9 @@ const FLOW_STEPS: { n: string; text: string; sub: string }[] = [
 ];
 
 // Primary spotlights — what a first-time visitor should try.
-// Order matters: Explorer first (what is EML), Electronics (the differentiator),
-// Learn (where to go next).
+// The Explorer card went with the 2026-09-12 product-wave archive (git tag
+// attic/product-wave-2026-09): it rendered May fixtures that nothing re-derives.
 const PRIMARY_SPOTLIGHTS = [
-  {
-    href: "/explorer/eml-language",
-    title: "EML Language Explorer",
-    eyebrow: "start here · what is eml",
-    text:
-      "The single-operator language at the heart of Monogate. Browse syntax, " +
-      "expressions, and worked examples. Start here if you're new.",
-    color: C.blue,
-  },
   {
     href: "/electronics",
     title: "Electronics Lab",
@@ -79,27 +70,6 @@ const PRIMARY_SPOTLIGHTS = [
       "Step-by-step courses in EML and Forge: write a kernel, compile it, " +
       "and check its proof.",
     color: C.purple,
-  },
-];
-
-// Secondary spotlights — interactive surfaces that aren't the "start here" but
-// reward curiosity.
-const EXPLORE_FURTHER = [
-  {
-    href: "/lab",
-    title: "Math Lab",
-    eyebrow: "interactive · playground",
-    text: "Hands-on experiments and experiences built on the EML grammar.",
-    color: C.purple,
-  },
-  {
-    href: "/challenge",
-    title: "Challenge Board",
-    eyebrow: "open problems · credited",
-    text:
-      "Construct sin, cos, π, i from eml(x,y) = exp(x) − ln(y). " +
-      "Submit a construction, get credited permanently.",
-    color: C.orange,
   },
 ];
 
@@ -171,18 +141,18 @@ export default function LandingPage() {
             </span>
           ))}
         </div>
-        {/* Primary CTAs — three doorways: Explorer (what), Electronics (proof
-            of life), Learn (next step). */}
+        {/* Primary CTAs — Level 1 (the first thing to do), Electronics, the
+            Learn hub. "Try the Explorer" went with the 2026-09-12 archive. */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <a
-            href="/explorer/eml-language"
+            href="/learn/eml/intro"
             style={{
               fontSize: 13, color: C.bg, background: C.blue,
               border: `1px solid ${C.blue}`, borderRadius: 5,
               padding: "10px 16px", textDecoration: "none", fontWeight: 700,
             }}
           >
-            Try the Explorer →
+            Start with Level 1 →
           </a>
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- /electronics is a route handler serving the Vite electronics app, not a Next page: it needs a full page load */}
           <a
@@ -273,35 +243,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Explore further — interactive surfaces, medium prominence. */}
-      <section style={{ marginBottom: 48 }}>
-        <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
-          Try something
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
-          {EXPLORE_FURTHER.map(({ href, title, eyebrow, text, color }) => (
-            <a
-              key={href}
-              href={href}
-              style={{
-                display: "block", minHeight: 130,
-                background: C.surface,
-                border: `1px solid ${C.border}`,
-                borderRadius: 6,
-                padding: "14px 16px",
-                textDecoration: "none",
-                color: "inherit",
-              }}
-            >
-              <div style={{ fontSize: 9, color, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "monospace", marginBottom: 8 }}>
-                {eyebrow}
-              </div>
-              <div style={{ fontSize: 14, color, fontWeight: 700, marginBottom: 6 }}>{title}</div>
-              <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.6 }}>{text}</div>
-            </a>
-          ))}
-        </div>
-      </section>
+      {/* The "Try something" section (Math Lab, Challenge Board) went with the
+          2026-09-12 product-wave archive; see /archive. */}
 
       {/* How it works — kept from the original; useful for visitors who want
           to understand the workbench contract before clicking deeper. */}

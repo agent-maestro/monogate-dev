@@ -1,21 +1,6 @@
 {
   "_comment": "Every public claim on monogate.dev that a Lean theorem is proved, pinned to the artifact that proves it. `npm run check:site` runs ../monogate-lean/tools/lean_claims/check_claims.py over it on every deploy: each claimed theorem must be declared in its file at the pinned revision, the file must compile in its environment (toolchain and every package revision below exactly as pinned, imports only from Lean core and those packages), each theorem's own #print axioms must have no sorryAx and nothing outside allowed_axioms, and every label occurrence in app/ and lib/ must be a site below or an exemption with its reason. To make a new claim, add it here in the same change. After `lake update` in an environment, re-pin its packages here.",
   "environments": {
-    "mathlib": {
-      "project": "../monogate-lean",
-      "toolchain": "leanprover/lean4:v4.32.2",
-      "packages": {
-        "mathlib": "905b95818eb32af7874a58b427f50c1711a5e96c",
-        "plausible": "e12c1910fe855cbfc38803cd4e55543906d5fa62",
-        "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
-        "importGraph": "7e9612bf0b9ee66db3cb5b9988a35afc706f5a12",
-        "proofwidgets": "6e311e2a844da9b2cc3971187df2fe0066947b93",
-        "aesop": "a7dbf0c63b694e47f425f3dcddbc0e178bb432d3",
-        "Qq": "38d591e778f100aec9762bb582f9c7f55f50e9dc",
-        "batteries": "023ce7d62a0531e22a5331e20b587817a80d49ff",
-        "Cli": "88679d088c9720c27ebdf2ba4dafe17341747f94"
-      }
-    },
     "machlib": {
       "project": "../machlib/foundations",
       "toolchain": "leanprover/lean4:v4.32.2",
@@ -46,33 +31,6 @@
     ]
   },
   "claims": [
-    {
-      "id": "T19-strict-i-unconstructible",
-      "statement": "i = sqrt(-1) is not constructible from {1} under strict principal-branch semantics (monogate.org lists the same statement as T17)",
-      "sites": [
-        {
-          "file": "lib/explorer/ExplorerApp.jsx",
-          "line": "under principal-branch semantics. Lean-verified."
-        },
-        {
-          "file": "app/theorems/page.tsx",
-          "line": "Strict i-Unconstructibility (Lean-verified)"
-        }
-      ],
-      "repository": "../monogate-research",
-      "revision": "ce5cd70b0ec977be32d16a37fbccb8faf45cad47",
-      "file": "lean/EML/StrictBarrier.lean",
-      "environment": "mathlib",
-      "theorems": [
-        "T19_i_unconstructible_strict",
-        "strict_barrier_T19"
-      ],
-      "allowed_axioms": [
-        "propext",
-        "Classical.choice",
-        "Quot.sound"
-      ]
-    },
     {
       "id": "superbest-cost-theory",
       "statement": "the cost theory's named results on /superbest, badged machine-checked; the page promises only propext and Quot.sound",

@@ -421,6 +421,10 @@ function runCanaries(bin) {
 }
 
 function* sourceFiles(dir) {
+  // A scan root that does not exist holds no command: lib/ went with the
+  // 2026-09-12 product-wave archive. It stays in SCAN_DIRS, so a lib/ that comes
+  // back is scanned; MIN_COMMANDS still catches an extractor that finds nothing.
+  if (!fs.existsSync(dir)) return;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === "node_modules" || entry.name.startsWith(".")) continue;
     const full = path.join(dir, entry.name);
