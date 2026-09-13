@@ -85,7 +85,7 @@ fn stand_in(x: Real) -> Real
 }
 `;
 
-class Unavailable extends Error {}
+export class Unavailable extends Error {}
 
 function scriptKind(file) {
   const ext = path.extname(file);
@@ -99,7 +99,7 @@ function literalText(node) {
 }
 
 /** Sources and `eml-compile` commands in one file's text. */
-function extract(fileName, text) {
+export function extract(fileName, text) {
   const sf = ts.createSourceFile(fileName, text, ts.ScriptTarget.Latest, true, scriptKind(fileName));
   const consts = new Map();
   const literals = [];
@@ -183,7 +183,7 @@ function extract(fileName, text) {
  * redirect. `expanded[i]` is true when word i holds `$`, `*` or a backtick
  * outside single quotes -- its value depends on the reader's shell, not the page.
  */
-function shellWords(line) {
+export function shellWords(line) {
   const words = [];
   const expanded = [];
   let current = "";
@@ -287,7 +287,7 @@ function evaluate(bin, cmd, pageSources) {
   }
 }
 
-async function resolveCompiler() {
+export async function resolveCompiler() {
   const override = process.env.EML_COMPILE;
   if (override) {
     if (!fs.existsSync(override)) throw new Unavailable(`EML_COMPILE=${override} does not exist`);
@@ -493,4 +493,7 @@ async function main() {
   console.log("PASS -- every command shown on the site runs");
 }
 
-await main();
+// Run only as a script. scripts/check_lesson_proofs.mjs imports extract(),
+// shellWords() and resolveCompiler(), so both gates read a page and pick the
+// compiler the same way.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

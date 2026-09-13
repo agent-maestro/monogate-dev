@@ -1,0 +1,143 @@
+{
+  "_comment": "Every lesson line on monogate.dev that says a theorem is proved, or is not, with what re-derives it. scripts/check_lesson_proofs.mjs runs before each deploy: for each verdict it runs the page's own `eml-compile <source> --target lean` command, on the page's own source with `edits` applied, using the monogate-forge a reader installs; appends `#print axioms <theorem>`; runs `lake env lean` in ../machlib/foundations; and requires no sorryAx for \"proved\", sorryAx for \"not_proved\", and, when `quoted`, the report the page quotes. Every `lines` entry must still be on the page, and a \"monogate-forge X.Y.Z\" inside one must be the version the run used. `generic` lists lines that say \"not proved\" or \"shows sorryAx\" without stating a verdict about a theorem. To add a verdict to a lesson, register it here in the same change; if its line carries an \"is proved\" label, exempt it in scripts/lean_claims.json citing check_lesson_proofs.",
+  "verdicts": [
+    {
+      "id": "intro.l4.pid_is_bounded",
+      "file": "app/learn/eml/intro/page.tsx",
+      "lines": [
+        "<Inline>pid_is_bounded</Inline> is proved. The list is what the proof"
+      ],
+      "source": "safe_pid.eml",
+      "command": "eml-compile safe_pid.eml --target lean -o ./verified.lean",
+      "theorem": "pid_is_bounded",
+      "verdict": "proved",
+      "quoted": true
+    },
+    {
+      "id": "intro.l4.without_clamp",
+      "file": "app/learn/eml/intro/page.tsx",
+      "lines": [
+        "<Inline>#print axioms</Inline> shows <Inline>sorryAx</Inline>."
+      ],
+      "source": "safe_pid.eml",
+      "edits": [
+        {
+          "find": "clamp(Kp * error + Ki * integral, -max_output, max_output)",
+          "replace": "Kp * error + Ki * integral"
+        }
+      ],
+      "command": "eml-compile safe_pid.eml --target lean -o ./verified.lean",
+      "theorem": "pid_is_bounded",
+      "verdict": "not_proved"
+    },
+    {
+      "id": "intro.l4.tightened_inputs",
+      "file": "app/learn/eml/intro/page.tsx",
+      "lines": [
+        "so the theorem is true again, and it still shows"
+      ],
+      "source": "safe_pid.eml",
+      "edits": [
+        {
+          "find": "clamp(Kp * error + Ki * integral, -max_output, max_output)",
+          "replace": "Kp * error + Ki * integral"
+        },
+        {
+          "find": "abs(error) < 50.0",
+          "replace": "abs(error) < 20.0"
+        },
+        {
+          "find": "abs(integral) < 500.0",
+          "replace": "abs(integral) < 400.0"
+        }
+      ],
+      "command": "eml-compile safe_pid.eml --target lean -o ./verified.lean",
+      "theorem": "pid_is_bounded",
+      "verdict": "not_proved"
+    },
+    {
+      "id": "intro.l6.force_proportional",
+      "file": "app/learn/eml/intro/page.tsx",
+      "lines": [
+        "Lesson 4. With monogate-forge 0.14.4 it shows",
+        "1000 + 500) but not proved. Can you rewrite the function so it is?"
+      ],
+      "source": "my_project.eml",
+      "command": "eml-compile my_project.eml --target lean -o my_project.lean",
+      "theorem": "force_proportional",
+      "verdict": "not_proved"
+    },
+    {
+      "id": "guard.guard_output_bounded",
+      "file": "app/learn/eml/intro/guard/page.tsx",
+      "lines": [
+        "<Inline>guard_output_bounded</Inline> is proved, resting on Lean&apos;s own axioms and MachLib&apos;s axioms for the real numbers.",
+        "With monogate-forge 0.14.4 and MachLib, guard_output_bounded is proved."
+      ],
+      "source": "threshold_reflex_v0.eml",
+      "command": "eml-compile threshold_reflex_v0.eml --target lean -o threshold_reflex_v0.lean",
+      "theorem": "guard_output_bounded",
+      "verdict": "proved",
+      "quoted": true
+    },
+    {
+      "id": "engineering.l3.saturated_in_range",
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "lines": [
+        "With monogate-forge 0.14.4, #print axioms shows two proved and one not.",
+        "saturated_in_range and safe_output_bounded are proved: no sorryAx."
+      ],
+      "source": "safe_control.eml",
+      "command": "eml-compile safe_control.eml --target lean -o safe_control.lean",
+      "theorem": "saturated_in_range",
+      "verdict": "proved"
+    },
+    {
+      "id": "engineering.l3.safe_output_bounded",
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "lines": [
+        "With monogate-forge 0.14.4, #print axioms shows two proved and one not.",
+        "saturated_in_range and safe_output_bounded are proved: no sorryAx.",
+        "no sorryAx for safe_output_bounded, so it is proved."
+      ],
+      "source": "safe_control.eml",
+      "command": "eml-compile safe_control.eml --target lean -o safe_control.lean",
+      "theorem": "safe_output_bounded",
+      "verdict": "proved"
+    },
+    {
+      "id": "engineering.l3.pid_bounded",
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "lines": [
+        "With monogate-forge 0.14.4, #print axioms shows two proved and one not.",
+        "but not proved: the tactics Forge tries do not find a proof"
+      ],
+      "source": "safe_control.eml",
+      "command": "eml-compile safe_control.eml --target lean -o safe_control.lean",
+      "theorem": "pid_bounded",
+      "verdict": "not_proved"
+    }
+  ],
+  "generic": [
+    {
+      "file": "app/learn/eml/intro/page.tsx",
+      "line": "proof. <Inline>sorryAx</Inline> means not proved.",
+      "reason": "defines the signal (sorryAx in the report means not proved); names no theorem"
+    },
+    {
+      "file": "app/learn/eml/intro/page.tsx",
+      "line": "# sorryAx in the list = not proved",
+      "reason": "a reference-card comment defining the signal; names no theorem"
+    },
+    {
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "line": "# sorryAx = not proved",
+      "reason": "a workflow comment defining the signal; names no theorem"
+    },
+    {
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "line": "sorryAx in the list means not proved.",
+      "reason": "defines the signal in the multi-target lesson; names no theorem"
+    }
+  ]
+}

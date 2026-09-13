@@ -1,5 +1,5 @@
 {
-  "_comment": "Every public claim on monogate.dev that a Lean theorem is proved, pinned to the artifact that proves it. `npm run check:site` runs ../monogate-lean/tools/lean_claims/check_claims.py over it on every deploy: each claimed theorem must be declared in its file at the pinned revision, the file must compile in its environment (toolchain and every package revision below exactly as pinned; imports only from Lean core, those packages, and the local source trees pinned under `sources`, whose build must be current), each theorem's own #print axioms must have no sorryAx and nothing outside allowed_axioms, and every label occurrence in the scanned paths must be a site below or an exemption with its reason. A site may sit outside the scanned paths, as the Electronics Lab bundle in public/ does; it must still appear in its file. To make a new claim, add it here in the same change. After `lake update` in an environment, re-pin its packages here. To move to a newer machlib, move the `sources` pin and every claim's `revision` together.",
+  "_comment": "Every public claim on monogate.dev that a Lean theorem is proved, pinned to the artifact that proves it. `npm run check:site` runs ../monogate-lean/tools/lean_claims/check_claims.py over it on every deploy: each claimed theorem must be declared in its file at the pinned revision, the file must compile in its environment (toolchain and every package revision below exactly as pinned; imports only from Lean core, those packages, and the local source trees pinned under `sources`, whose build must be current), each theorem's own #print axioms must have no sorryAx and nothing outside allowed_axioms, and every label occurrence in the scanned paths must be a site below or an exemption with its reason. A site may sit outside the scanned paths, as the Electronics Lab bundle in public/ does; it must still appear in its file. A lesson line that gives a theorem's verdict quotes compiler output that is in no repository, so it cannot be a claim here: it is exempted with a reason citing check_lesson_proofs, and scripts/check_lesson_proofs.mjs re-derives it and fails if such an exemption names a line it does not register. To make a new claim, add it here in the same change. After `lake update` in an environment, re-pin its packages here. To move to a newer machlib, move the `sources` pin and every claim's `revision` together.",
   "environments": {
     "machlib": {
       "project": "../machlib/foundations",
@@ -33,7 +33,11 @@
       "verified in lean",
       "lean[- ]proven",
       "prove[dn] in lean",
-      "machine[- ]checked"
+      "machine[- ]checked",
+      "is proved",
+      "are proved",
+      "proved theorem",
+      "sorryAx-free"
     ]
   },
   "claims": [
@@ -201,6 +205,101 @@
       "file": "app/electronics/[[...slug]]/seo.ts",
       "line": "up to machine-checked",
       "reason": "a course description (the Foundations track teaches up to machine-checked certificates); it asserts no theorem is proved"
+    },
+    {
+      "file": "app/learn/eml/intro/page.tsx",
+      "line": "<Inline>pid_is_bounded</Inline> is proved. The list is what the proof",
+      "reason": "a lesson verdict on the output of the page's own `eml-compile safe_pid.eml --target lean`; re-derived with #print axioms against MachLib, quoted report included, by check_lesson_proofs (intro.l4.pid_is_bounded)"
+    },
+    {
+      "file": "app/learn/eml/intro/guard/page.tsx",
+      "line": "<Inline>guard_output_bounded</Inline> is proved, resting on Lean&apos;s own axioms and MachLib&apos;s axioms for the real numbers.",
+      "reason": "a lesson verdict on the output of the page's own `eml-compile threshold_reflex_v0.eml --target lean`; re-derived, quoted report included, by check_lesson_proofs (guard.guard_output_bounded)"
+    },
+    {
+      "file": "app/learn/eml/intro/guard/page.tsx",
+      "line": "With monogate-forge 0.14.4 and MachLib, guard_output_bounded is proved.",
+      "reason": "the same verdict in the course footer; re-derived by check_lesson_proofs (guard.guard_output_bounded), which also requires 0.14.4 to be the compiler it ran"
+    },
+    {
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "line": "saturated_in_range and safe_output_bounded are proved: no sorryAx.",
+      "reason": "lesson verdicts on the output of the page's own `eml-compile safe_control.eml --target lean`; re-derived by check_lesson_proofs (engineering.l3.saturated_in_range, engineering.l3.safe_output_bounded)"
+    },
+    {
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "line": "no sorryAx for safe_output_bounded, so it is proved.",
+      "reason": "the same verdict restated under the Lean excerpt; re-derived by check_lesson_proofs (engineering.l3.safe_output_bounded)"
+    },
+    {
+      "file": "app/page.tsx",
+      "line": "Ask Lean what is proved",
+      "reason": "names a step of the method (run #print axioms), not a result; no theorem is named"
+    },
+    {
+      "file": "app/page.tsx",
+      "line": "No sorryAx in the list means the theorem is proved.",
+      "reason": "defines how to read #print axioms; it gives no verdict about any theorem"
+    },
+    {
+      "file": "app/page.tsx",
+      "line": "reports whether it is proved.",
+      "reason": "describes what Lean reports for a kernel's contract; no theorem is named or claimed proved"
+    },
+    {
+      "file": "app/page.tsx",
+      "line": "ask Lean what is proved, then",
+      "reason": "names a step of the method, not a result"
+    },
+    {
+      "file": "app/archive/page.tsx",
+      "line": "and ask Lean what is proved",
+      "reason": "describes what the Learn EML course teaches, not a result"
+    },
+    {
+      "file": "app/learn/LearnHubClient.tsx",
+      "line": "and ask Lean what is proved.",
+      "reason": "describes what the course teaches, not a result"
+    },
+    {
+      "file": "app/learn/page.tsx",
+      "line": "and check what is proved.",
+      "reason": "page metadata describing what the course teaches, not a result"
+    },
+    {
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "line": "# Step 2: Emit Lean, then ask Lean which theorems are proved",
+      "reason": "a workflow step in a script comment, not a result; the controller.eml it refers to is not shown on the page"
+    },
+    {
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "line": "#print axioms shows which are proved",
+      "reason": "defines how to read #print axioms; it gives no verdict about any theorem"
+    },
+    {
+      "file": "app/learn/eml/intro/page.tsx",
+      "line": "#print axioms says whether it is proved.",
+      "reason": "part of a 'why this matters' contrast; it gives no verdict about any theorem"
+    },
+    {
+      "file": "app/learn/eml/intro/page.tsx",
+      "line": "An unproved theorem is visible instead of hidden.",
+      "reason": "\"unproved theorem\" contains the label; the line claims nothing is proved"
+    },
+    {
+      "file": "app/learn/eml/intro/page.tsx",
+      "line": "5. Stated a property with @verify and asked Lean whether it is proved",
+      "reason": "a course recap of a step the reader did, not a result"
+    },
+    {
+      "file": "app/learn/eml/intro/page.tsx",
+      "line": "- Tell a proved theorem from a stated one with #print axioms",
+      "reason": "a skill the course teaches, not a result"
+    },
+    {
+      "file": "app/learn/eml/intro/page.tsx",
+      "line": "whether it is proved.",
+      "reason": "the closing exercise asks the reader to check their own theorem; no theorem is named"
     }
   ]
 }

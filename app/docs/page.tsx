@@ -120,7 +120,7 @@ export default function ReproducePage() {
 
       <H2>4 · The checks behind this site</H2>
       <P>
-        Three checks run before each deploy, from scripts in the public monogate-dev repository. They are not
+        Four checks run before each deploy, from scripts in the public monogate-dev repository. They are not
         scheduled, so a result can change between deploys without the site noticing.
       </P>
       <ul style={{ margin: "0 0 12px", paddingLeft: 20 }}>
@@ -143,6 +143,14 @@ export default function ReproducePage() {
           <code style={mono}>#print axioms</code>. That covers the cost-theory table on /superbest and the
           forward-error theorems the Electronics Lab cites. machlib and monogate-lean are public, so this check needs
           nothing private.
+        </Li>
+        <Li>
+          <strong>Lesson verdicts</strong> (<code style={mono}>scripts/check_lesson_proofs.mjs</code> with{" "}
+          <code style={mono}>scripts/lesson_proofs.json</code>): each lesson line that gives a theorem&apos;s verdict,
+          proved or not, is re-derived. The page&apos;s own Lean command runs on the page&apos;s own source with the same
+          PyPI compiler, the emitted file is compiled against a committed MachLib checkout, and{" "}
+          <code style={mono}>#print axioms</code> must agree with the page, including any report the page quotes.
+          MachLib is public, so this check needs nothing private either.
         </Li>
       </ul>
 

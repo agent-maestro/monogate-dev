@@ -253,7 +253,9 @@ fn safe_output(error: Real, integral: Real) -> Real
       },
       {
         heading: "Reading the Lean output",
-        code: `-- safe_control.lean from monogate-forge 0.14.4 (excerpt)
+        code: `$ eml-compile safe_control.eml --target lean -o safe_control.lean
+
+-- safe_control.lean from monogate-forge 0.14.4 (excerpt)
 
 noncomputable def safe_output (error : Real) (integral : Real) : Real :=
   (min (max (((2.5 : Real) * error) + ((0.1 : Real) * integral)) (-100.0 : Real)) (100.0 : Real))

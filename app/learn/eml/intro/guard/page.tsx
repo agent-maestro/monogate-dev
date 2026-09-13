@@ -73,8 +73,9 @@ void loop() {
     );
 }`;
 
-// Real output of monogate-forge 0.14.4 (excerpt), and the axiom check run
-// against MachLib on 2026-09-12.
+// Real output of monogate-forge 0.14.4 (excerpt). The axiom report below is
+// re-derived before each deploy by scripts/check_lesson_proofs.mjs, which
+// fails when it stops matching what Lean prints.
 const leanOutput = `import MachLib.EML
 import MachLib.Trig
 import MachLib.Forge
@@ -352,7 +353,7 @@ export default function EmlIntroPage() {
 
       <footer style={{ marginTop: 24, border: "1px solid rgba(232,160,32,0.28)", borderRadius: 6, background: "rgba(232,160,32,0.07)", padding: 16 }}>
         <p style={{ margin: 0, color: "#fff2a6", fontSize: 13, lineHeight: 1.6 }}>
-          This course shows the EML -&gt; C -&gt; ESP32 path and a checked proof. With monogate-forge 0.14.4 and MachLib, guard_output_bounded is proved (checked 2026-09-12 with #print axioms). The proof covers the function, not the firmware or the hardware; those need their own evidence.
+          This course shows the EML -&gt; C -&gt; ESP32 path and a checked proof. With monogate-forge 0.14.4 and MachLib, guard_output_bounded is proved. The proof covers the function, not the firmware or the hardware; those need their own evidence.
         </p>
       </footer>
     </Shell>

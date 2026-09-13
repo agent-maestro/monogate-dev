@@ -111,7 +111,7 @@ export default function ArchivePage() {
 
       <H2>What the site checks instead</H2>
       <P>
-        Three checks run before each deploy. They are not scheduled, so a result can change between deploys without the
+        Four checks run before each deploy. They are not scheduled, so a result can change between deploys without the
         site noticing.
       </P>
       <ul style={{ margin: "0 0 12px", paddingLeft: 20 }}>
@@ -129,6 +129,11 @@ export default function ArchivePage() {
           A page that labels a Lean theorem as checked must name it in <code style={code}>scripts/lean_claims.json</code>,
           and that theorem must compile at a pinned revision with no <code style={code}>sorryAx</code> in its{" "}
           <code style={code}>#print axioms</code>.
+        </li>
+        <li style={{ fontSize: 14, color: C.text, lineHeight: 1.75, marginBottom: 6 }}>
+          A lesson line that gives a theorem&apos;s verdict, proved or not, is re-derived: the page&apos;s own Lean command
+          runs on the page&apos;s own source, the emitted file is compiled against MachLib, and its{" "}
+          <code style={code}>#print axioms</code> must agree with the page (<code style={code}>scripts/lesson_proofs.json</code>).
         </li>
       </ul>
 
