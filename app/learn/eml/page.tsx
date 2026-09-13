@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PAGE_ROUTES } from "../../sitemap-pages";
 
 export const metadata: Metadata = {
   title: "Learn EML — monogate.dev/learn/eml",
@@ -23,7 +24,6 @@ type Level = {
   number: string;
   title: string;
   href: string;
-  status: "live" | "draft";
   time: string;
   prereq: string | null;
   blurb: string;
@@ -35,7 +35,6 @@ const LEVELS: Level[] = [
     number: "00",
     title: "Play EML",
     href: "/learn/eml/play",
-    status: "live",
     time: "10 min - 5 puzzles",
     prereq: null,
     blurb:
@@ -48,7 +47,6 @@ const LEVELS: Level[] = [
     number: "01",
     title: "EML in 30 Minutes",
     href: "/learn/eml/intro",
-    status: "live",
     time: "30 min · 6 lessons",
     prereq: null,
     blurb:
@@ -61,7 +59,6 @@ const LEVELS: Level[] = [
     number: "02",
     title: "Engineering with EML",
     href: "/learn/eml/engineering",
-    status: "live",
     time: "60 min · 6 lessons",
     prereq: "Level 1",
     blurb:
@@ -77,7 +74,6 @@ type Track = {
   slug: string;
   label: string;
   blurb: string;
-  status: "live" | "draft";
 };
 
 const TRACKS: Track[] = [
@@ -85,37 +81,31 @@ const TRACKS: Track[] = [
     slug: "aerospace",
     label: "Aerospace",
     blurb: "Flight controllers, autopilots, IMUs, INS alignment.",
-    status: "draft",
   },
   {
     slug: "gaming",
     label: "Gaming",
     blurb: "Physics, animation, shaders (HLSL/GLSL/WGSL/Metal), audio.",
-    status: "draft",
   },
   {
     slug: "robotics",
     label: "Robotics",
     blurb: "Kinematics, motion planning, control, sensor fusion.",
-    status: "draft",
   },
   {
     slug: "audio",
     label: "Audio DSP",
     blurb: "Synthesizers, filters, reverbs, real-time effects.",
-    status: "draft",
   },
   {
     slug: "medical",
     label: "Medical Devices",
     blurb: "Defibrillator energy, infusion pumps, patient monitors.",
-    status: "draft",
   },
   {
     slug: "defi",
     label: "DeFi",
     blurb: "AMMs, oracles, risk models. Solidity-first.",
-    status: "draft",
   },
 ];
 
@@ -123,7 +113,6 @@ const FORGE: Level = {
   number: "04",
   title: "Forge Internals",
   href: "/learn/eml/forge",
-  status: "draft",
   time: "deep dive",
   prereq: "Level 2 + one Level 3 track",
   blurb:
@@ -151,8 +140,17 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-function StatusPill({ status }: { status: "live" | "draft" }) {
-  const live = status === "live";
+// A pill says only whether this site has a page at the card's URL. PAGE_ROUTES
+// is app/sitemap-pages.ts, which check_sitemap_pages.mjs derives from the app/
+// tree and fails check:site on when it drifts, so no pill can call a route
+// with no page published. Until 2026-09-13 each status was a typed field that
+// no check read, and the green pill on every level with a page claimed more
+// than that.
+function isPublished(href: string): boolean {
+  return PAGE_ROUTES.includes(href);
+}
+
+function StatusPill({ published }: { published: boolean }) {
   return (
     <span
       style={{
@@ -163,19 +161,18 @@ function StatusPill({ status }: { status: "live" | "draft" }) {
         textTransform: "uppercase",
         padding: "3px 8px",
         borderRadius: 3,
-        color: live ? ACCENT_GREEN : MUTED,
-        background: live ? "rgba(74, 222, 128, 0.08)" : "rgba(255,255,255,0.04)",
-        border: `1px solid ${live ? "rgba(74, 222, 128, 0.25)" : BORDER}`,
+        color: published ? ACCENT_GREEN : MUTED,
+        background: published ? "rgba(74, 222, 128, 0.08)" : "rgba(255,255,255,0.04)",
+        border: `1px solid ${published ? "rgba(74, 222, 128, 0.25)" : BORDER}`,
       }}
     >
-      {live ? "live" : "draft"}
+      {published ? "published" : "not published"}
     </span>
   );
 }
 
 function LevelCard({ level }: { level: Level }) {
-  const live = level.status === "live";
-  const Tag = live ? "a" : "div";
+  const published = isPublished(level.href);
   const content = (
     <>
       <div
@@ -210,7 +207,7 @@ function LevelCard({ level }: { level: Level }) {
             {level.title}
           </h2>
         </div>
-        <StatusPill status={level.status} />
+        <StatusPill published={published} />
       </div>
       <div
         style={{
@@ -236,7 +233,7 @@ function LevelCard({ level }: { level: Level }) {
     </>
   );
 
-  if (live) {
+  if (published) {
     return (
       <a
         href={level.href}
@@ -271,8 +268,8 @@ function LevelCard({ level }: { level: Level }) {
 }
 
 function TrackTile({ track }: { track: Track }) {
-  const live = track.status === "live";
-  const Tag: "a" | "div" = live ? "a" : "div";
+  const href = `/learn/eml/${track.slug}`;
+  const published = isPublished(href);
   const inner = (
     <>
       <div
@@ -291,19 +288,19 @@ function TrackTile({ track }: { track: Track }) {
           }}
         >
           {track.label}
-          {live ? " →" : ""}
+          {published ? " →" : ""}
         </div>
-        <StatusPill status={track.status} />
+        <StatusPill published={published} />
       </div>
       <div style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.55 }}>
         {track.blurb}
       </div>
     </>
   );
-  if (live) {
+  if (published) {
     return (
       <a
-        href={`/learn/eml/${track.slug}`}
+        href={href}
         style={{
           display: "block",
           padding: "16px 18px",

@@ -164,6 +164,27 @@
     {
       "phrase": "verified.lean",
       "why": "Retired 2026-09-13: Level 1 Lesson 4 wrote its Lean output to ./verified.lean before #print axioms had been asked anything; the file holds stated theorems, closed or not. It is ./safe_pid.lean, named after its source like every other lesson's output. The command is registered in scripts/lesson_proofs.json."
+    },
+    {
+      "phrase": "live",
+      "why": "Retired 2026-09-13: /learn/eml gave every level that had a page a green 'live' pill, from a typed status field that no check read. The pill now reads published or not published, derived from PAGE_ROUTES in app/sitemap-pages.ts, which check_sitemap_pages.mjs keeps equal to the app/ tree. A status word needs a check behind it. Matched as a whole word, so 'lives' and 'live-reload' pass; any other use needs a one-line allowance saying why it claims no status.",
+      "allow": [
+        {
+          "file": "app/learn/forge/page.tsx",
+          "line": "which is what the live URL returns",
+          "reason": "a code comment, not rendered: https://monogate.dev/learn/forge answered 307 to /learn/eml when curled on 2026-09-13. No gate re-checks it; verify_deploy.mjs does not probe /learn/forge."
+        },
+        {
+          "file": "app/electronics/[[...slug]]/route.ts",
+          "line": "(those live in the ASSETS binding)",
+          "reason": "the verb, in a code comment: static files are served from the Worker's ASSETS binding. No status is claimed."
+        },
+        {
+          "file": "app/electronics/[[...slug]]/seo.ts",
+          "line": "transcribed from the live rendered DOM (headless Chromium,",
+          "reason": "a dated provenance note in a code comment (the deployed page's DOM, read 2026-07-25). Not rendered, and it claims no status today."
+        }
+      ]
     }
   ]
 }
