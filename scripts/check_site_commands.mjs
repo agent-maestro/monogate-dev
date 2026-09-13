@@ -241,7 +241,6 @@ function evaluate(bin, cmd, pageSources) {
   const argv = parsed.words.slice(1);
   const expanded = parsed.expanded.slice(1);
   const work = fs.mkdtempSync(path.join(os.tmpdir(), "site-command-"));
-  let shown = 0;
   let unseen = 0;
   try {
     // Every source the page shows sits beside the command, as it would for a
@@ -268,7 +267,6 @@ function evaluate(bin, cmd, pageSources) {
       fs.mkdirSync(path.dirname(path.join(work, name)), { recursive: true });
       fs.writeFileSync(path.join(work, name), body ?? STAND_IN);
       if (body === undefined) unseen++;
-      else shown++;
     }
     const r = spawnSync(bin, argv, { cwd: work, encoding: "utf8", timeout: RUN_TIMEOUT_MS });
     const output = `${r.stdout ?? ""}${r.stderr ?? ""}`.trim();

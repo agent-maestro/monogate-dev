@@ -37,6 +37,9 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     // Project-specific build/output directories:
     '.open-next/**',
+    // wrangler's local bundle of the Worker, written by `wrangler dev` and deploys.
+    // Linting it reported 27 errors and 5 493 warnings on 2026-09-13, none in source.
+    '.wrangler/**',
     'node_modules/**',
     // public/electronics-lab/assets holds committed Vite-built bundles
     // (hashed filenames, __vite__mapDeps) — vendored build output, not

@@ -5,7 +5,6 @@ const ACCENT_GOLD = "#E8A020";
 const ACCENT_GREEN = "#4ADE80";
 const ACCENT_BLUE = "#6AB0F5";
 const ACCENT_PURPLE = "#A78BFA";
-const SURFACE = "#0d0f18";
 const SURFACE_2 = "#0a0b12";
 const BORDER = "#1c1f2e";
 const TEXT = "#d4d4d4";

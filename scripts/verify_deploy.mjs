@@ -19,7 +19,6 @@
  * cached older deploy, because the older deploy never had that filename.
  */
 import { readdirSync, existsSync } from "node:fs";
-import { join } from "node:path";
 
 const SITE = process.env.DEPLOY_VERIFY_URL ?? "https://monogate.dev";
 const CHUNKS = ".open-next/assets/_next/static/chunks";
