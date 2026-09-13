@@ -17,8 +17,10 @@
 //   claims  -- a file, a regex whose first group is the figure as written, a
 //              source, and a relation: `equal`, or `floor` for a figure written
 //              "N+" (the source must be at least N).
-//   sources -- `url` fetches text and extracts a number with a regex; `count`
-//              counts regex matches in a repo file.
+//   sources -- `url` fetches text and extracts a number with a regex or, with
+//              `entries`, counts that regex's matches inside the first group
+//              (the items of a tuple). Each URL is fetched once per run.
+//              `count` counts regex matches in a repo file.
 //   retired -- phrases that were false on the site, each with why. Matched as
 //              whole words, case-insensitively, one line at a time, in app/
 //              and lib/; a phrase split across two source lines is not seen.
@@ -32,7 +34,8 @@
 // register it in the same change, or it is unchecked.
 //
 // Canaries run first: drift, a broken floor, an unmatched pattern, a retired
-// phrase and an unreachable source must each be caught, or no verdict is given.
+// phrase, a counted region that is empty or gone, and an unreachable source
+// must each be caught, or no verdict is given.
 //
 // Exit: 0 pass | 1 drift, unmatched claim, retired phrase, or canary failure |
 //       2 a source could not be evaluated -- never a pass.
@@ -75,18 +78,51 @@ async function measure(source) {
   if (source.kind === "url") {
     let text;
     try {
-      const res = await fetch(source.url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      text = await res.text();
+      text = await fetchText(source.url);
     } catch (err) {
       throw new Unavailable(`cannot fetch ${source.url}: ${err.message}`);
     }
-    const match = new RegExp(source.extract, source.flags ?? "").exec(text);
-    const value = match ? parseFigure(match[1]) : null;
-    if (value === null) throw new Unavailable(`${source.url} no longer has a figure matching /${source.extract}/`);
-    return value;
+    return figureFromText(source, text);
   }
   throw new Error(`unknown source kind ${JSON.stringify(source.kind)}`);
+}
+
+// Several sources read the same file (superbest.py, monogate.org's
+// superbest.json), so each URL is fetched once per run.
+const fetched = new Map();
+
+function fetchText(url) {
+  if (!fetched.has(url)) {
+    fetched.set(
+      url,
+      fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }).then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      }),
+    );
+  }
+  return fetched.get(url);
+}
+
+/**
+ * The figure a `url` source reads from its text: the whole number in the first
+ * group of `extract` or, when `entries` is set, how many times `entries` matches
+ * inside that group (the items of a tuple, say). A region with no entry is a
+ * pattern that stopped matching, not a count of zero, so it is UNAVAILABLE.
+ */
+function figureFromText(source, text) {
+  const match = new RegExp(source.extract, source.flags ?? "").exec(text);
+  if (!match || match[1] === undefined) {
+    throw new Unavailable(`${source.url} no longer has a match for /${source.extract}/`);
+  }
+  if (source.entries !== undefined) {
+    const found = [...match[1].matchAll(new RegExp(source.entries, "g"))].length;
+    if (found === 0) throw new Unavailable(`${source.url}: /${source.entries}/ matches nothing inside /${source.extract}/`);
+    return found;
+  }
+  const value = parseFigure(match[1]);
+  if (value === null) throw new Unavailable(`${source.url} no longer has a figure matching /${source.extract}/`);
+  return value;
 }
 
 /** Problems with one claim against one file's text; empty when it holds. */
@@ -175,6 +211,23 @@ async function runCanaries() {
     "a different line in an allowed file is still a hit",
     retiredHits("a.tsx", "T19 (Lean-verified)\nAll 108 kernels are Lean-verified.", allowT19).hits.length === 1,
   );
+  // Added 2026-09-13 with the first counted sources: "8-op basket" on /superbest
+  // is the length of a tuple in superbest.py, not a number written there.
+  const counted = { url: "u", extract: "^POS = \\(([^)]*)\\)", flags: "m", entries: '"\\w+"' };
+  expect(
+    "a counted source reads the entries inside its region, not the file's",
+    figureFromText(counted, 'POS = (\n    "exp", "ln", "neg",\n)\nGEN = ("exp", "abs")\n') === 3,
+  );
+  const unavailableFrom = (text) => {
+    try {
+      figureFromText(counted, text);
+      return false;
+    } catch (err) {
+      return err instanceof Unavailable;
+    }
+  };
+  expect("a counted region that holds no entry is UNAVAILABLE, not zero", unavailableFrom("POS = ()\n"));
+  expect("a counted region that is gone is UNAVAILABLE", unavailableFrom('GEN = ("exp")\n'));
   try {
     await measure({ kind: "url", url: "http://127.0.0.1:9/", extract: "(\\d+)" });
     failures.push("an unreachable source is UNAVAILABLE, not a value");

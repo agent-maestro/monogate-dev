@@ -1,5 +1,5 @@
 {
-  "_comment": "Figures on monogate.dev and the claims retired from it, checked by scripts/check_site_figures.mjs. A claim names a repo file, a regex whose FIRST capture group is the figure as written, a source, and a relation: `equal`, or `floor` for a figure written N+ (the source must be at least N). A `url` source fetches text and extracts a number; a `count` source counts regex matches in a repo file. An unevaluable source is UNAVAILABLE (exit 2), never a pass. A claim whose pattern stops matching FAILS. To put a number on a page, add its claim here in the same change.",
+  "_comment": "Figures on monogate.dev and the claims retired from it, checked by scripts/check_site_figures.mjs. A claim names a repo file, a regex whose FIRST capture group is the figure as written, a source, and a relation: `equal`, or `floor` for a figure written N+ (the source must be at least N). A `url` source fetches text and extracts a number, or, with `entries`, counts that regex's matches inside the extracted group (a tuple's items); a `count` source counts regex matches in a repo file. A source that reads another site's copy of a figure only keeps the two sites in step: its `_note` says so, and the figure stays unmeasured. An unevaluable source is UNAVAILABLE (exit 2), never a pass. A claim whose pattern stops matching FAILS. To put a number on a page, add its claim here in the same change.",
   "sources": {
     "machlib_core_theorems": {
       "kind": "url",
@@ -42,6 +42,84 @@
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
       "extract": "^SUPERBEST_V52_GEN_NAIVE = (\\d+)$",
       "flags": "m"
+    },
+    "superbest_lib_positive_ops": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
+      "extract": "^SUPERBEST_V52_POS_OPS = \\(([^)]*)\\)",
+      "flags": "m",
+      "entries": "\"[a-z]+\"",
+      "_note": "The operators the positive-domain headline sums: 10 names on 2026-09-13 (exp, ln, neg, add, sub, mul, div, recip, pow, sqrt)."
+    },
+    "superbest_lib_general_ops": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
+      "extract": "^SUPERBEST_V52_GEN_OPS = \\(([^)]*)\\)",
+      "flags": "m",
+      "entries": "\"[a-z]+\"",
+      "_note": "The general-domain basket SUPERBEST_V52_GEN_TOTAL/NAIVE (16/62) sum over: 8 names on 2026-09-13 (exp, ln, mul, div, neg, add, sub, abs). Until then \"8-op basket\" on /superbest was typed and unregistered."
+    },
+    "monogate_org_qcc_equations": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/theorems.json",
+      "extract": "\"id\": \"QCC\",[^}]*\"evidence\": \"Verified on (\\d+)\\+ equations",
+      "_note": "monogate.org's theorem catalog; https://monogate.org/theorems/ renders this entry as 'Evidence: Verified on 187+ equations' (read 2026-09-13). It is a figure typed in that data, not a count of a dataset. The cost-theory paper (python/paper/cost_theory/Cost_Theory_Complete.tex, 'Cumulative validation') states 187+ after naming a 100-equation validation corpus and a 157-equation extended corpus, without showing how they combine, and the monogate repository holds no list of the 187. This keeps /superbest in step with monogate.org; it does not measure the corpus."
+    },
+    "monogate_org_catalog_ml_items": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"ML functions \\((\\d+) items\\)\"",
+      "_note": "monogate.org's savings_summary, which https://monogate.org/superbest/ renders (read 2026-09-13). Its ML, quantum, physics and aggregate rows copy the Honest Savings Summary of python/paper/exploration/SuperBEST_Final_Taxonomy_Lock.tex, committed 2026-04-21 (3ba4b2d4): rounded estimates over that paper's own catalogs, which nothing re-derives. That paper's high-impact table lists 5 ML, 8 quantum and 5 physics expressions; its ML row says 6 items. The eleven monogate_org_catalog_* sources keep /superbest showing what monogate.org shows; they do not make the estimates measurements."
+    },
+    "monogate_org_catalog_ml_layer1": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\""
+    },
+    "monogate_org_catalog_ml_layer2": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\""
+    },
+    "monogate_org_catalog_quantum_items": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"Quantum \\((\\d+) items\\)\""
+    },
+    "monogate_org_catalog_quantum_layer1": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\""
+    },
+    "monogate_org_catalog_quantum_layer2": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\""
+    },
+    "monogate_org_catalog_physics_items": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"Physics \\((\\d+) items\\)\""
+    },
+    "monogate_org_catalog_physics_layer1": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\""
+    },
+    "monogate_org_catalog_physics_layer2": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\""
+    },
+    "monogate_org_catalog_aggregate_layer1": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"~(\\d+)%\""
+    },
+    "monogate_org_catalog_aggregate_layer2": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
+      "extract": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\""
     }
   },
   "claims": [
@@ -101,6 +179,120 @@
       "file": "data/superbest_v5_table.json",
       "pattern": "\"savings_general\": \\{\\s*\"naive_total\": (\\d+),",
       "source": "superbest_lib_general_naive",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.headline_general_ops",
+      "file": "app/superbest/page.tsx",
+      "pattern": "general domain, (\\d+)-op basket vs",
+      "source": "superbest_lib_general_ops",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.core_catalog_ops",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Core arithmetic \\((\\d+) ops, positive domain\\)\"",
+      "source": "superbest_lib_positive_ops",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.qcc_equations",
+      "file": "app/superbest/page.tsx",
+      "pattern": "empirical over (\\d+) equations",
+      "source": "monogate_org_qcc_equations",
+      "relation": "equal",
+      "_note": "Repeats monogate.org's figure; see the source's note for what that figure is and is not."
+    },
+    {
+      "id": "superbest.catalog_ml_items",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"ML functions \\((\\d+) items\\)\"",
+      "source": "monogate_org_catalog_ml_items",
+      "relation": "equal",
+      "_note": "This and the next ten catalog claims are the dated estimates /superbest captions as not re-derived. They are compared with monogate.org's copy only."
+    },
+    {
+      "id": "superbest.catalog_ml_layer1",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\"",
+      "source": "monogate_org_catalog_ml_layer1",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_ml_layer2",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\"",
+      "source": "monogate_org_catalog_ml_layer2",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_quantum_items",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Quantum \\((\\d+) items\\)\"",
+      "source": "monogate_org_catalog_quantum_items",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_quantum_layer1",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\"",
+      "source": "monogate_org_catalog_quantum_layer1",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_quantum_layer2",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\"",
+      "source": "monogate_org_catalog_quantum_layer2",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_physics_items",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Physics \\((\\d+) items\\)\"",
+      "source": "monogate_org_catalog_physics_items",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_physics_layer1",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\"",
+      "source": "monogate_org_catalog_physics_layer1",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_physics_layer2",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\"",
+      "source": "monogate_org_catalog_physics_layer2",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_aggregate_layer1",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"~(\\d+)%\"",
+      "source": "monogate_org_catalog_aggregate_layer1",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.catalog_aggregate_layer2",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\"",
+      "source": "monogate_org_catalog_aggregate_layer2",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.key_results_aggregate_layer1",
+      "file": "app/superbest/page.tsx",
+      "pattern": "Aggregate genuine F16 savings: ~(\\d+)%",
+      "source": "monogate_org_catalog_aggregate_layer1",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.key_results_aggregate_layer2",
+      "file": "app/superbest/page.tsx",
+      "pattern": "; ~(\\d+)% with 23-op extended",
+      "source": "monogate_org_catalog_aggregate_layer2",
       "relation": "equal"
     }
   ],

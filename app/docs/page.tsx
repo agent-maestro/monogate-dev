@@ -133,8 +133,10 @@ export default function ReproducePage() {
         <Li>
           <strong>Figures</strong> (<code style={mono}>scripts/check_site_figures.mjs</code> with{" "}
           <code style={mono}>scripts/site_figures.json</code>): each registered number against what measures it
-          (machlib&apos;s README count, the lesson counts, the SuperBEST totals in the monogate library), and phrases
-          retired as false. A number that is not registered is not checked.
+          (machlib&apos;s README count, the lesson counts, the SuperBEST totals and operator lists in the monogate
+          library). Figures this site only repeats (the /superbest savings estimates and T42-QCC&apos;s equation
+          count) are compared with monogate.org&apos;s data, which does not make them measurements. Phrases retired
+          as false must not come back. A number that is not registered is not checked.
         </Li>
         <Li>
           <strong>Lean claims</strong> (monogate-lean&apos;s <code style={mono}>tools/lean_claims/check_claims.py</code>{" "}

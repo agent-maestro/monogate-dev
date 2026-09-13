@@ -73,7 +73,7 @@ const LEAN_THEOREMS: LeanResult[] = [
   { id: "T38-NNP", name: "No-Nesting Penalty — composing operators is additive, no adapter/depth overhead", lean: "no_nesting_penalty", status: "proven" },
   { id: "T38", name: "Cost = Naive − Pattern − Sharing — the two savings account for exactly the naive/actual gap", lean: "t38_decomposition", status: "proven" },
   { id: "T40", name: "Additive Cost Law — independent branches sum exactly; sums are association-independent", lean: "additive_cost_law · sum_assoc_invariant", status: "proven" },
-  { id: "T41-ISO", name: "Cross-domain cost invariance — isomorphic DAG topologies cost the same (the 10 confirmed tower families' principle)", lean: "iso_cost", status: "proven" },
+  { id: "T41-ISO", name: "Cross-domain cost invariance — isomorphic DAG topologies cost the same", lean: "iso_cost", status: "proven" },
   { id: "T42", name: "O(N) single-sum law — N equal-cost terms cost (α₀+3)·N − 3", lean: "cost_flatSum", status: "proven" },
   { id: "T42²", name: "O(N²) double-sum law — a nested N×N sum is an exact quadratic", lean: "cost_doubleSum", status: "proven" },
   { id: "P1–P3", name: "Basic properties — non-negativity, terminal characterisation, subadditivity", lean: "p1_nonneg · p2_*_cost_ge · p3_subadditive_*", status: "proven" },
@@ -312,8 +312,10 @@ export default function SuperBESTPage() {
         </div>
         <p style={{ fontSize: 12, color: C.muted, marginTop: 10, lineHeight: 1.7 }}>
           The core-arithmetic row is the positive-domain headline, computed from totals that are checked against the
-          monogate.superbest library before each deploy. The other rows are rounded estimates from the v5 study;
-          nothing on this site re-derives them.
+          monogate.superbest library before each deploy. The ML, quantum, physics and aggregate rows are rounded
+          estimates dated 2026-04-21, over the SuperBEST taxonomy lock&apos;s own item catalogs rather than the tables
+          above. Nothing re-derives them. Before each deploy they are compared with the copy monogate.org shows, so a
+          change there fails the next deploy until this table matches.
         </p>
 
         {/* Machine-checked theorems */}
@@ -356,7 +358,7 @@ export default function SuperBESTPage() {
             <li><strong style={{ color: C.text }}>LSE corrected:</strong> ln(e^x+e^y) = 4n in F16 (was 5n); 2n in 23-op via EEA+ln</li>
             <li><strong style={{ color: C.text }}>Taxonomy:</strong> {lock.total_operators} operators catalogued. CONJ_NO_OP_24 (no 24th operator) is a conjecture, argued on paper; no Lean proof exists</li>
             <li><strong style={{ color: C.text }}>softplus = 2n</strong> in both layers via EML(x,1/e)+ln (Category B: genuine F16)</li>
-            <li><strong style={{ color: C.text }}>Aggregate genuine F16 savings: ~12%</strong> across all catalogs; ~40% with 23-op extended (rounded estimates from the v5 study, not re-derived here)</li>
+            <li><strong style={{ color: C.text }}>Aggregate genuine F16 savings: ~12%</strong> across the taxonomy lock&apos;s catalogs; ~40% with 23-op extended (rounded estimates dated 2026-04-21, not re-derived; compared with monogate.org&apos;s copy before each deploy)</li>
           </ul>
           <p style={{ marginTop: 16, fontSize: 12, color: C.muted }}>
             Research: <a href="https://monogate.org/superbest" style={{ color: C.accent }}>monogate.org/superbest ↗</a>
