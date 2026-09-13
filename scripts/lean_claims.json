@@ -1,0 +1,132 @@
+{
+  "_comment": "Every public claim on monogate.dev that a Lean theorem is proved, pinned to the artifact that proves it. `npm run check:site` runs ../monogate-lean/tools/lean_claims/check_claims.py over it on every deploy: each claimed theorem must be declared in its file at the pinned revision, the file must compile in its environment (toolchain and every package revision below exactly as pinned, imports only from Lean core and those packages), each theorem's own #print axioms must have no sorryAx and nothing outside allowed_axioms, and every label occurrence in app/ and lib/ must be a site below or an exemption with its reason. To make a new claim, add it here in the same change. After `lake update` in an environment, re-pin its packages here.",
+  "environments": {
+    "mathlib": {
+      "project": "../monogate-lean",
+      "toolchain": "leanprover/lean4:v4.32.2",
+      "packages": {
+        "mathlib": "905b95818eb32af7874a58b427f50c1711a5e96c",
+        "plausible": "e12c1910fe855cbfc38803cd4e55543906d5fa62",
+        "LeanSearchClient": "c5d5b8fe6e5158def25cd28eb94e4141ad97c843",
+        "importGraph": "7e9612bf0b9ee66db3cb5b9988a35afc706f5a12",
+        "proofwidgets": "6e311e2a844da9b2cc3971187df2fe0066947b93",
+        "aesop": "a7dbf0c63b694e47f425f3dcddbc0e178bb432d3",
+        "Qq": "38d591e778f100aec9762bb582f9c7f55f50e9dc",
+        "batteries": "023ce7d62a0531e22a5331e20b587817a80d49ff",
+        "Cli": "88679d088c9720c27ebdf2ba4dafe17341747f94"
+      }
+    },
+    "machlib": {
+      "project": "../machlib/foundations",
+      "toolchain": "leanprover/lean4:v4.32.2",
+      "packages": {}
+    }
+  },
+  "scan": {
+    "paths": [
+      "app",
+      "lib"
+    ],
+    "extensions": [
+      ".ts",
+      ".tsx",
+      ".js",
+      ".jsx",
+      ".mjs",
+      ".json",
+      ".md",
+      ".mdx"
+    ],
+    "labels": [
+      "lean[- ]verified",
+      "verified in lean",
+      "lean[- ]proven",
+      "prove[dn] in lean",
+      "machine[- ]checked"
+    ]
+  },
+  "claims": [
+    {
+      "id": "T19-strict-i-unconstructible",
+      "statement": "i = sqrt(-1) is not constructible from {1} under strict principal-branch semantics (monogate.org lists the same statement as T17)",
+      "sites": [
+        {
+          "file": "lib/explorer/ExplorerApp.jsx",
+          "line": "under principal-branch semantics. Lean-verified."
+        },
+        {
+          "file": "app/theorems/page.tsx",
+          "line": "Strict i-Unconstructibility (Lean-verified)"
+        }
+      ],
+      "repository": "../monogate-research",
+      "revision": "ce5cd70b0ec977be32d16a37fbccb8faf45cad47",
+      "file": "lean/EML/StrictBarrier.lean",
+      "environment": "mathlib",
+      "theorems": [
+        "T19_i_unconstructible_strict",
+        "strict_barrier_T19"
+      ],
+      "allowed_axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "id": "superbest-cost-theory",
+      "statement": "the cost theory's named results on /superbest, badged machine-checked; the page promises only propext and Quot.sound",
+      "sites": [
+        {
+          "file": "app/superbest/page.tsx",
+          "line": "label: \"machine-checked\""
+        },
+        {
+          "file": "app/superbest/page.tsx",
+          "line": "{/* Machine-checked theorems */}"
+        },
+        {
+          "file": "app/superbest/page.tsx",
+          "line": "<SectionHead>Machine-Checked Theorems (Lean 4)</SectionHead>"
+        }
+      ],
+      "repository": "../machlib",
+      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "file": "foundations/MachLib/CostTheory.lean",
+      "environment": "machlib",
+      "theorems": [
+        "MachLib.CostTheory.no_nesting_penalty",
+        "MachLib.CostTheory.T38.t38_decomposition",
+        "MachLib.CostTheory.additive_cost_law",
+        "MachLib.CostTheory.sum_assoc_invariant",
+        "MachLib.CostTheory.iso_cost",
+        "MachLib.CostTheory.cost_flatSum",
+        "MachLib.CostTheory.cost_doubleSum",
+        "MachLib.CostTheory.p1_nonneg",
+        "MachLib.CostTheory.p2_un_cost_ge",
+        "MachLib.CostTheory.p2_bin_cost_ge",
+        "MachLib.CostTheory.p3_subadditive_un",
+        "MachLib.CostTheory.p3_subadditive_bin",
+        "MachLib.CostTheory.T41.classify",
+        "MachLib.CostTheory.T41.rational_floor",
+        "MachLib.CostTheory.T41.mixed_ceiling"
+      ],
+      "allowed_axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "exempt": [
+    {
+      "file": "app/page.tsx",
+      "line": "machine-checked in Lean 4 · machlib.org",
+      "reason": "a COUNT of MachLib theorems, not a claim about one: the figure beside it is checked against machlib's README by check_site_figures.mjs, and machlib's own prose gate ties that README row to tools/count_theorems.py"
+    },
+    {
+      "file": "app/electronics/[[...slug]]/seo.ts",
+      "line": "up to machine-checked",
+      "reason": "a course description (the Foundations track teaches up to machine-checked certificates); it asserts no theorem is proved"
+    }
+  ]
+}

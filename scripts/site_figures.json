@@ -57,17 +57,17 @@
     },
     {
       "phrase": "Lean-verified",
-      "why": "Retired 2026-09-12: reads as 'every proof closed'. Say 'Lean theorem' and show #print axioms, which is what tells proved from stated.",
+      "why": "Retired 2026-09-12: reads as 'every proof closed'. Say 'Lean theorem' and show #print axioms, which is what tells proved from stated. A line that keeps the label must also be a registered site in scripts/lean_claims.json, whose gate re-proves it on every deploy.",
       "allow": [
         {
           "file": "app/theorems/page.tsx",
           "line": "Strict i-Unconstructibility (Lean-verified)",
-          "reason": "names one theorem (T17), not every kernel. Re-checked 2026-09-12: T17's statement is T19_i_unconstructible_strict (private monogate-research StrictBarrier.lean), which compiles against Mathlib with no sorryAx. The lean4/i_unconstructibility.lean the page cited never existed; the evidence text now says so. next.config.mjs redirects /theorems to monogate.org, so this page is not served."
+          "reason": "names one theorem (T17), not every kernel. The proof is not vouched for here but gated: this line is a site of claim T19-strict-i-unconstructible in scripts/lean_claims.json. Before every deploy, check_claims.py requires T19_i_unconstructible_strict to be declared in StrictBarrier.lean at the pinned monogate-research sha, compile in monogate-lean, and report no sorryAx. The lean4/i_unconstructibility.lean the page cited never existed; the evidence text now says so. next.config.mjs redirects /theorems to monogate.org, so this page is not served."
         },
         {
           "file": "lib/explorer/ExplorerApp.jsx",
           "line": "under principal-branch semantics. Lean-verified.",
-          "reason": "names one theorem (T19), not every kernel. Re-checked 2026-09-12: T19_i_unconstructible_strict in monogate-research/lean/EML/StrictBarrier.lean compiles against Mathlib (monogate-lean, Lean v4.32.2) with axioms [propext, Classical.choice, Quot.sound] and no sorryAx. It holds because the strict evaluator is typed into the reals. The whole file compiles since monogate-research ce5cd70b, which replaced its last two lines (a #check after a doc comment)."
+          "reason": "names one theorem (T19), not every kernel. The proof is not vouched for here but gated: this line is a site of claim T19-strict-i-unconstructible in scripts/lean_claims.json. Before every deploy, check_claims.py requires T19_i_unconstructible_strict and strict_barrier_T19 to be declared in monogate-research/lean/EML/StrictBarrier.lean at the pinned sha, compile in monogate-lean (toolchain and Mathlib pinned), and report only [propext, Classical.choice, Quot.sound]. It holds because the strict evaluator is typed into the reals."
         }
       ]
     },
