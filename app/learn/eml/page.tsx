@@ -1,15 +1,6 @@
 import type { Metadata } from "next";
 import { PAGE_ROUTES } from "../../sitemap-pages";
 
-export const metadata: Metadata = {
-  title: "Learn EML — monogate.dev/learn/eml",
-  description:
-    "The EML curriculum: a four-level ladder from 30-minute intro to "
-    + "production engineering, six domain tracks (aerospace, gaming, "
-    + "robotics, audio DSP, medical devices, DeFi), and the Forge "
-    + "compiler internals. Self-paced, written for engineers.",
-};
-
 const ACCENT_GOLD = "#E8A020";
 const ACCENT_GREEN = "#4ADE80";
 const ACCENT_BLUE = "#6AB0F5";
@@ -62,8 +53,8 @@ const LEVELS: Level[] = [
     time: "60 min · 6 lessons",
     prereq: "Level 1",
     blurb:
-      "Multi-module systems, the chain-order cost model, compositional "
-      + "verification contracts, hardware budgets, multi-target CI workflows, "
+      "Multi-module systems, the chain-order cost model, contracts on "
+      + "composed functions, hardware budgets, multi-target CI workflows, "
       + "and the standard library. The lessons that turn a Level 1 user into "
       + "an EML engineer.",
     accent: ACCENT_GOLD,
@@ -116,10 +107,45 @@ const FORGE: Level = {
   time: "deep dive",
   prereq: "Level 2 + one Level 3 track",
   blurb:
-    "How Forge actually works: the parser, the Pfaffian profiler, the "
-    + "optimizer pipeline (inline / CSE / SuperBEST / shake-imports), the "
-    + "target registry, the FPGA allocator, and the Lean theorem-shape generator.",
+    "Topics: the parser, the Pfaffian profiler, the optimizer passes "
+    + "(inlining, CSE, SuperBEST routing, import shaking), the target "
+    + "registry, the FPGA allocator, and the Lean backend.",
   accent: ACCENT_PURPLE,
+};
+
+const trackHref = (track: Track): string => `/learn/eml/${track.slug}`;
+
+// Everything this page says about which levels and tracks exist is built from
+// the same PAGE_ROUTES test as the pills (isPublished, below), so the prose and
+// the pills cannot disagree. Until 2026-09-13 the metadata, the tracks
+// paragraph and "Where to start" described all six tracks and Level 04 in the
+// present tense while none of them had a page.
+const PUBLISHED_LEVELS = LEVELS.filter((level) => isPublished(level.href));
+const PUBLISHED_TRACKS = TRACKS.filter((track) => isPublished(trackHref(track)));
+const FORGE_PUBLISHED = isPublished(FORGE.href);
+
+function curriculumDescription(): string {
+  const parts = PUBLISHED_LEVELS.map((level) => `Level ${Number(level.number)}, ${level.title}`);
+  if (PUBLISHED_TRACKS.length > 0) {
+    parts.push(`domain tracks for ${PUBLISHED_TRACKS.map((track) => track.label).join(", ")}`);
+  }
+  if (FORGE_PUBLISHED) parts.push(`Level ${Number(FORGE.number)}, ${FORGE.title}`);
+  return `The EML curriculum on monogate.dev: ${parts.join("; ")}. Self-paced, written for engineers.`;
+}
+
+function tracksSummary(): string {
+  const total = TRACKS.length;
+  const n = PUBLISHED_TRACKS.length;
+  if (n === 0) {
+    return `None of these ${total} domain tracks has a page on this site. Each card names an industry vertical and the kind of kernel a track for it would cover.`;
+  }
+  const labels = PUBLISHED_TRACKS.map((track) => track.label).join(", ");
+  return `${n} of ${total} domain tracks ${n === 1 ? "has" : "have"} a page on this site: ${labels}.`;
+}
+
+export const metadata: Metadata = {
+  title: "Learn EML — monogate.dev/learn/eml",
+  description: curriculumDescription(),
 };
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -209,17 +235,19 @@ function LevelCard({ level }: { level: Level }) {
         </div>
         <StatusPill published={published} />
       </div>
-      <div
-        style={{
-          fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-          fontSize: 12,
-          color: MUTED,
-          marginBottom: 12,
-        }}
-      >
-        {level.time}
-        {level.prereq ? <> &nbsp;·&nbsp; prereq: {level.prereq}</> : null}
-      </div>
+      {published ? (
+        <div
+          style={{
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+            fontSize: 12,
+            color: MUTED,
+            marginBottom: 12,
+          }}
+        >
+          {level.time}
+          {level.prereq ? <> &nbsp;·&nbsp; prereq: {level.prereq}</> : null}
+        </div>
+      ) : null}
       <p
         style={{
           fontSize: 14.5,
@@ -268,7 +296,7 @@ function LevelCard({ level }: { level: Level }) {
 }
 
 function TrackTile({ track }: { track: Track }) {
-  const href = `/learn/eml/${track.slug}`;
+  const href = trackHref(track);
   const published = isPublished(href);
   const inner = (
     <>
@@ -381,8 +409,8 @@ export default function LearnEMLHub() {
         >
           A playable ladder into mathematical programming. Start with tiny
           control puzzles, continue into Level 1 with no prerequisites, and
-          finish Level 2 ready to reason about multi-module systems on real
-          hardware. The electronics path turns EML into starter kernels for
+          finish Level 2 ready to reason about multi-module systems and their
+          hardware budgets. The electronics path turns EML into starter kernels for
           sensors, guards, outputs, traces, and evidence packets.
         </p>
         <p
@@ -460,7 +488,8 @@ export default function LearnEMLHub() {
                 color: MUTED,
               }}
             >
-              prereq: Level 2 &nbsp;·&nbsp; pick any
+              prereq: Level 2
+              {PUBLISHED_TRACKS.length > 0 ? <> &nbsp;·&nbsp; pick any</> : null}
             </span>
           </div>
           <p
@@ -471,12 +500,7 @@ export default function LearnEMLHub() {
               marginBottom: 20,
             }}
           >
-            Six tracks, one per industry vertical. Each track walks through
-            the kinds of equations the vertical lives on — what the math is,
-            why chain order matters there, what proofs ship, and which
-            targets the kernel lands on. The pre-built kernels themselves
-            are the proprietary product; tracks describe the surface without
-            shipping the source. The compiler itself is free —{" "}
+            {tracksSummary()} The compiler itself is free —{" "}
             <a
               href="https://monogateforge.com/get-started"
               style={{ color: ACCENT_GOLD, textDecoration: "underline" }}
@@ -563,20 +587,26 @@ export default function LearnEMLHub() {
               to turn EML-style kernels into LED, sensor, display, and matrix
               projects.
             </li>
-            <li>
-              <strong style={{ color: "#fff" }}>
-                Looking for your domain?
-              </strong>{" "}
-              The Level 3 tracks pair the engineering foundations with the
-              kernels you'd actually ship.
-            </li>
-            <li>
-              <strong style={{ color: "#fff" }}>
-                Want to extend the compiler?
-              </strong>{" "}
-              Level 4 is the Forge internals — parser, profiler, optimizer,
-              backends.
-            </li>
+            {PUBLISHED_TRACKS.length > 0 ? (
+              <li>
+                <strong style={{ color: "#fff" }}>
+                  Looking for your domain?
+                </strong>{" "}
+                Pick a Level 3 track:{" "}
+                {PUBLISHED_TRACKS.map((track) => track.label).join(", ")}.
+              </li>
+            ) : null}
+            {FORGE_PUBLISHED ? (
+              <li>
+                <strong style={{ color: "#fff" }}>
+                  Want to extend the compiler?
+                </strong>{" "}
+                <a href={FORGE.href} style={{ color: ACCENT_GOLD }}>
+                  Level {Number(FORGE.number)}
+                </a>{" "}
+                covers the Forge internals.
+              </li>
+            ) : null}
           </ul>
         </section>
 

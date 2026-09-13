@@ -377,6 +377,38 @@
           "reason": "a dated provenance note in a code comment (the deployed page's DOM, read 2026-07-25). Not rendered, and it claims no status today."
         }
       ]
+    },
+    {
+      "phrase": "Each track walks through",
+      "why": "Retired 2026-09-13: /learn/eml described what each of the six domain tracks covers while none had a page. The tracks paragraph is now tracksSummary(), built from PAGE_ROUTES like the pills. Write track copy once a track page exists."
+    },
+    {
+      "phrase": "Level 4 is the Forge internals",
+      "why": "Retired 2026-09-13: /learn/eml's 'Where to start' sent readers to a Level 4 with no page. That item now renders only when /learn/eml/forge is in PAGE_ROUTES."
+    },
+    {
+      "phrase": "How Forge actually works",
+      "why": "Retired 2026-09-13: the Level 04 card described an unpublished level as if it were written. Its blurb is a topic list, and a card shows time and prerequisites only when its page exists."
+    },
+    {
+      "phrase": "six domain tracks",
+      "why": "Retired 2026-09-13: /learn/eml's metadata listed six domain tracks and the Forge internals as part of the curriculum. curriculumDescription() now names only levels and tracks in PAGE_ROUTES."
+    },
+    {
+      "phrase": "DO-178C",
+      "why": "Retired 2026-09-13: Level 2 Lesson 3 said 'This IS what DO-178C calls high-level requirements verification.' Nothing on the site checks a certification claim. A line that names a certification standard needs an allowance saying what it claims and which check backs it."
+    },
+    {
+      "phrase": "system-level guarantees",
+      "why": "Retired 2026-09-13: Lesson 3's intro said small proofs combine into system-level guarantees. The lesson shows Forge inlining the calls and Lean closing the composed expression directly (safe_output_bounded, re-derived by check_lesson_proofs.mjs), not citing the smaller theorems."
+    },
+    {
+      "phrase": "verification is compositional",
+      "why": "Retired 2026-09-13: the same Lesson 3 intro; see 'system-level guarantees'."
+    },
+    {
+      "phrase": "compositional verification",
+      "why": "Retired 2026-09-13: the Level 2 card on /learn/eml said 'compositional verification contracts'; see 'system-level guarantees'. The card now says 'contracts on composed functions'."
     }
   ]
 }

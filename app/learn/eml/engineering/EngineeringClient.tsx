@@ -207,9 +207,11 @@ fn nested(x: Real) -> Real { exp(sin(x)) }`,
     title: "Verification contracts in depth",
     time: "10 min",
     intro:
-      "Level 1 showed you @verify with simple requires/ensures. Real "
-      + "verification is compositional — you prove small properties about "
-      + "small functions, then combine them into system-level guarantees.",
+      "Level 1 showed you @verify with simple requires/ensures. Here each "
+      + "function in a small system gets its own contract, and so does the "
+      + "function that composes them. Forge emits one theorem per @verify and "
+      + "inlines the calls, so the system's theorem is about the composed "
+      + "expression itself: Lean does not cite the smaller theorems to close it.",
     sections: [
       {
         heading: "Compositional contracts",
@@ -305,13 +307,12 @@ fn altitude_hold(
     let p_term = 0.001 * error;
     let i_term = 0.0001 * integral;
     let d_term = -0.01 * rate;
-    clamp(p_term + i_term + d_term, -0.8, 0.8)
+    clamp(p_term + i_term + d_term, -0.75, 0.75)
 }`,
         explanation: [
           "Multiple requires define the valid operating envelope.",
-          "Multiple ensures define what the function GUARANTEES within that envelope.",
-          "This IS what DO-178C calls 'high-level requirements verification.'",
-          "The Lean theorem has one hypothesis per requires and one conclusion per ensures.",
+          "Multiple ensures state what the function must guarantee within that envelope, and each must be true. The clamp to ±0.75 keeps abs(result) < 0.8; clamp to ±0.8 instead and that ensures is false whenever the output saturates, because the clamp can return exactly 0.8.",
+          "The Lean theorem has one hypothesis per requires and one conclusion per ensures. As in Level 1, Lesson 4, #print axioms tells you whether Lean closed it.",
           "If you can't state the property, you can't prove it. Writing contracts IS the engineering.",
         ],
       },
@@ -777,8 +778,9 @@ export default function EngineeringClient() {
         >
           Six lessons, ten minutes each. By the end you'll know how to
           structure multi-module systems, think in chain-order cost, write
-          compositional verification contracts, target real hardware, and
-          build CI pipelines that prove your math on every push.
+          contracts on composed functions, read hardware budgets, and
+          build CI pipelines that compile every source and enforce a
+          chain-order budget on every push.
         </p>
 
         <p style={{ fontSize: 14, color: TEXT_DIM, marginBottom: 32 }}>
