@@ -422,18 +422,18 @@
       },
       {
         "catalog": "ML functions (5 items)",
-        "layer1": "~35%",
-        "layer2": "~55%"
+        "layer1": "35%",
+        "layer2": "62%"
       },
       {
         "catalog": "Quantum (8 items)",
-        "layer1": "~15%",
-        "layer2": "~35%"
+        "layer1": "19%",
+        "layer2": "44%"
       },
       {
         "catalog": "Physics (5 items)",
-        "layer1": "~30%",
-        "layer2": "~45%"
+        "layer1": "29%",
+        "layer2": "40%"
       },
       {
         "catalog": "Special functions",

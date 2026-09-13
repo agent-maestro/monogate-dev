@@ -90,12 +90,12 @@
     "monogate_org_catalog_ml_layer1": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
-      "extract": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\""
+      "extract": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"~?(\\d+)%\""
     },
     "monogate_org_catalog_ml_layer2": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
-      "extract": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\""
+      "extract": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~?(\\d+)%\""
     },
     "monogate_org_catalog_quantum_items": {
       "kind": "url",
@@ -105,12 +105,12 @@
     "monogate_org_catalog_quantum_layer1": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
-      "extract": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\""
+      "extract": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"~?(\\d+)%\""
     },
     "monogate_org_catalog_quantum_layer2": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
-      "extract": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\""
+      "extract": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~?(\\d+)%\""
     },
     "monogate_org_catalog_physics_items": {
       "kind": "url",
@@ -120,22 +120,22 @@
     "monogate_org_catalog_physics_layer1": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
-      "extract": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\""
+      "extract": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"~?(\\d+)%\""
     },
     "monogate_org_catalog_physics_layer2": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
-      "extract": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\""
+      "extract": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~?(\\d+)%\""
     },
     "monogate_org_catalog_aggregate_layer1": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
-      "extract": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"~(\\d+)%\""
+      "extract": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"~?(\\d+)%\""
     },
     "monogate_org_catalog_aggregate_layer2": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
-      "extract": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\""
+      "extract": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~?(\\d+)%\""
     }
   },
   "claims": [
@@ -230,14 +230,14 @@
     {
       "id": "superbest.catalog_ml_layer1",
       "file": "data/superbest_v5_table.json",
-      "pattern": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\"",
+      "pattern": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"~?(\\d+)%\"",
       "source": "monogate_org_catalog_ml_layer1",
       "relation": "equal"
     },
     {
       "id": "superbest.catalog_ml_layer2",
       "file": "data/superbest_v5_table.json",
-      "pattern": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\"",
+      "pattern": "\"catalog\": \"ML functions \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~?(\\d+)%\"",
       "source": "monogate_org_catalog_ml_layer2",
       "relation": "equal"
     },
@@ -251,14 +251,14 @@
     {
       "id": "superbest.catalog_quantum_layer1",
       "file": "data/superbest_v5_table.json",
-      "pattern": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\"",
+      "pattern": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"~?(\\d+)%\"",
       "source": "monogate_org_catalog_quantum_layer1",
       "relation": "equal"
     },
     {
       "id": "superbest.catalog_quantum_layer2",
       "file": "data/superbest_v5_table.json",
-      "pattern": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\"",
+      "pattern": "\"catalog\": \"Quantum \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~?(\\d+)%\"",
       "source": "monogate_org_catalog_quantum_layer2",
       "relation": "equal"
     },
@@ -272,42 +272,42 @@
     {
       "id": "superbest.catalog_physics_layer1",
       "file": "data/superbest_v5_table.json",
-      "pattern": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"~(\\d+)%\"",
+      "pattern": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"~?(\\d+)%\"",
       "source": "monogate_org_catalog_physics_layer1",
       "relation": "equal"
     },
     {
       "id": "superbest.catalog_physics_layer2",
       "file": "data/superbest_v5_table.json",
-      "pattern": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\"",
+      "pattern": "\"catalog\": \"Physics \\(\\d+ items\\)\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~?(\\d+)%\"",
       "source": "monogate_org_catalog_physics_layer2",
       "relation": "equal"
     },
     {
       "id": "superbest.catalog_aggregate_layer1",
       "file": "data/superbest_v5_table.json",
-      "pattern": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"~(\\d+)%\"",
+      "pattern": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"~?(\\d+)%\"",
       "source": "monogate_org_catalog_aggregate_layer1",
       "relation": "equal"
     },
     {
       "id": "superbest.catalog_aggregate_layer2",
       "file": "data/superbest_v5_table.json",
-      "pattern": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~(\\d+)%\"",
+      "pattern": "\"catalog\": \"Aggregate\",\\s*\"layer1\": \"[^\"]*\",\\s*\"layer2\": \"~?(\\d+)%\"",
       "source": "monogate_org_catalog_aggregate_layer2",
       "relation": "equal"
     },
     {
       "id": "superbest.key_results_aggregate_layer1",
       "file": "app/superbest/page.tsx",
-      "pattern": "Aggregate genuine F16 savings: ~(\\d+)%",
+      "pattern": "Aggregate genuine F16 savings: ~?(\\d+)%",
       "source": "monogate_org_catalog_aggregate_layer1",
       "relation": "equal"
     },
     {
       "id": "superbest.key_results_aggregate_layer2",
       "file": "app/superbest/page.tsx",
-      "pattern": "; ~(\\d+)% with 23-op extended",
+      "pattern": "; ~?(\\d+)% with 23-op extended",
       "source": "monogate_org_catalog_aggregate_layer2",
       "relation": "equal"
     },

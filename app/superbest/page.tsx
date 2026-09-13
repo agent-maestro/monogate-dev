@@ -335,10 +335,11 @@ export default function SuperBESTPage() {
         </div>
         <p style={{ fontSize: 12, color: C.muted, marginTop: 10, lineHeight: 1.7 }}>
           The core-arithmetic row is the positive-domain headline, computed from totals that are checked against the
-          monogate.superbest library before each deploy. The ML, quantum, physics and aggregate rows are rounded
-          estimates dated 2026-04-21, over the SuperBEST taxonomy lock&apos;s own item catalogs rather than the tables
-          above. Nothing re-derives them. Before each deploy they are compared with the copy monogate.org shows, so a
-          change there fails the next deploy until this table matches.
+          monogate.superbest library before each deploy. The ML, quantum and physics rows are pooled over the SuperBEST
+          taxonomy lock&apos;s own item rows, as monogate.org recomputed them on 2026-09-13 (they were rounded estimates
+          before); the aggregate row is still the paper&apos;s rounded estimate, dated 2026-04-21. Nothing on this site
+          re-derives them. Before each deploy they are compared with the copy monogate.org shows, so a change there
+          fails the next deploy until this table matches.
         </p>
 
         {/* Machine-checked theorems */}
