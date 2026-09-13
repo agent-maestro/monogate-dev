@@ -19,8 +19,14 @@
 //              "N+" (the source must be at least N).
 //   sources -- `url` fetches text and extracts a number with a regex or, with
 //              `entries`, counts that regex's matches inside the first group
-//              (the items of a tuple). Each URL is fetched once per run.
-//              `count` counts regex matches in a repo file.
+//              (the items of a tuple). With `json` it parses the text first and
+//              reads the value at a dotted path (with `where`, an array element),
+//              so wording and key order around a number do not matter.
+//              `if_unavailable` is added to its UNAVAILABLE message. Each URL is
+//              fetched once per run. `count` counts regex matches in a repo file.
+//   tables  -- a JSON array in a repo file (`file`, `path`) that repeats one at
+//              `url` (`source_path`): rows matched by `key`, every listed field
+//              equal, and a row on only one side fails.
 //   retired -- phrases that were false on the site, each with why. Matched as
 //              whole words, case-insensitively, one line at a time, in app/
 //              and lib/; a phrase split across two source lines is not seen.
@@ -34,8 +40,9 @@
 // register it in the same change, or it is unchecked.
 //
 // Canaries run first: drift, a broken floor, an unmatched pattern, a retired
-// phrase, a counted region that is empty or gone, and an unreachable source
-// must each be caught, or no verdict is given.
+// phrase, a counted region that is empty or gone, a JSON entry that no longer
+// states its number, a changed or one-sided table row, and an unreachable
+// source must each be caught, or no verdict is given.
 //
 // Exit: 0 pass | 1 drift, unmatched claim, retired phrase, or canary failure |
 //       2 a source could not be evaluated -- never a pass.
@@ -105,24 +112,132 @@ function fetchText(url) {
 }
 
 /**
- * The figure a `url` source reads from its text: the whole number in the first
- * group of `extract` or, when `entries` is set, how many times `entries` matches
- * inside that group (the items of a tuple, say). A region with no entry is a
- * pattern that stopped matching, not a count of zero, so it is UNAVAILABLE.
+ * The figure a `url` source reads from its text.
+ *   json     -- parse the text and take the value at this dotted path; with
+ *               `where`, the array element whose fields equal it. With no
+ *               `extract`, that value must be a whole number. With one,
+ *               `extract` runs over the value's JSON text, so the number is
+ *               found whatever the wording around it or the key order.
+ *   extract  -- the whole number in the regex's first group or, with
+ *               `entries`, how many times `entries` matches inside that group
+ *               (the items of a tuple, say).
+ * Anything that finds nothing is UNAVAILABLE, never a pass: a region with no
+ * entry is a pattern that stopped matching, not a count of zero. The message
+ * ends with the source's `if_unavailable`, which says what to do.
  */
 function figureFromText(source, text) {
-  const match = new RegExp(source.extract, source.flags ?? "").exec(text);
+  const unavailable = (message) =>
+    new Unavailable(source.if_unavailable ? `${message}. ${source.if_unavailable}` : message);
+  let scope = text;
+  if (source.json !== undefined) {
+    const selected = selectJson(source, text, unavailable);
+    if (source.extract === undefined) {
+      if (!Number.isInteger(selected)) throw unavailable(`${source.url} has no whole number at ${source.json}`);
+      return selected;
+    }
+    scope = JSON.stringify(selected);
+  }
+  const match = new RegExp(source.extract, source.flags ?? "").exec(scope);
   if (!match || match[1] === undefined) {
-    throw new Unavailable(`${source.url} no longer has a match for /${source.extract}/`);
+    throw unavailable(`${source.url} no longer has a match for /${source.extract}/`);
   }
   if (source.entries !== undefined) {
     const found = [...match[1].matchAll(new RegExp(source.entries, "g"))].length;
-    if (found === 0) throw new Unavailable(`${source.url}: /${source.entries}/ matches nothing inside /${source.extract}/`);
+    if (found === 0) throw unavailable(`${source.url}: /${source.entries}/ matches nothing inside /${source.extract}/`);
     return found;
   }
   const value = parseFigure(match[1]);
-  if (value === null) throw new Unavailable(`${source.url} no longer has a figure matching /${source.extract}/`);
+  if (value === null) throw unavailable(`${source.url} no longer has a figure matching /${source.extract}/`);
   return value;
+}
+
+function atPath(value, dotted) {
+  return dotted.split(".").reduce((node, key) => (node === null || node === undefined ? undefined : node[key]), value);
+}
+
+function selectJson(source, text, unavailable) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (err) {
+    throw unavailable(`${source.url} is not JSON (${err.message})`);
+  }
+  let selected = atPath(data, source.json);
+  if (selected !== undefined && source.where) {
+    selected = Array.isArray(selected)
+      ? selected.find((item) => Object.entries(source.where).every(([k, v]) => item?.[k] === v))
+      : undefined;
+  }
+  if (selected === undefined) {
+    const where = source.where ? ` where ${JSON.stringify(source.where)}` : "";
+    throw unavailable(`${source.url} has nothing at ${source.json}${where}`);
+  }
+  return selected;
+}
+
+/**
+ * Problems when a table on the site differs from the table it repeats. Rows are
+ * matched by `key`; every listed field must be equal (numbers, strings and
+ * "inf" alike); a row on only one side is a problem, in both directions.
+ */
+function compareTable(table, siteRows, sourceRows) {
+  const problems = [];
+  const index = (rows, side) => {
+    const byKey = new Map();
+    for (const row of rows) {
+      const id = row?.[table.key];
+      if (byKey.has(id)) problems.push(`${table.id}: ${side} has two rows keyed ${JSON.stringify(id)}`);
+      byKey.set(id, row);
+    }
+    return byKey;
+  };
+  const site = index(siteRows, table.file);
+  const source = index(sourceRows, "the source");
+  for (const [id, row] of site) {
+    const theirs = source.get(id);
+    if (!theirs) {
+      problems.push(`${table.id}: row ${JSON.stringify(id)} is in ${table.file} but not in the source`);
+      continue;
+    }
+    for (const field of table.fields) {
+      if (JSON.stringify(row[field]) !== JSON.stringify(theirs[field])) {
+        problems.push(
+          `${table.id}: ${JSON.stringify(id)}.${field} is ${JSON.stringify(row[field])} in ${table.file}; the source has ${JSON.stringify(theirs[field])}`,
+        );
+      }
+    }
+  }
+  for (const id of source.keys()) {
+    if (!site.has(id)) problems.push(`${table.id}: the source has row ${JSON.stringify(id)}, which ${table.file} lacks`);
+  }
+  return problems;
+}
+
+/** One registered table against its source: { problems, rows } or { unavailable }. */
+async function checkTable(table) {
+  let siteRows;
+  try {
+    siteRows = atPath(JSON.parse(fs.readFileSync(path.join(ROOT, table.file), "utf8")), table.path);
+  } catch (err) {
+    return { problems: [`${table.id}: cannot read ${table.file}: ${err.message}`] };
+  }
+  if (!Array.isArray(siteRows)) return { problems: [`${table.id}: ${table.file} has no table at ${table.path}`] };
+  let text;
+  try {
+    text = await fetchText(table.url);
+  } catch (err) {
+    return { unavailable: `${table.id}: cannot fetch ${table.url}: ${err.message}` };
+  }
+  let sourceRows;
+  try {
+    sourceRows = atPath(JSON.parse(text), table.source_path ?? table.path);
+  } catch (err) {
+    return { unavailable: `${table.id}: ${table.url} is not JSON (${err.message})` };
+  }
+  if (!Array.isArray(sourceRows)) {
+    return { unavailable: `${table.id}: ${table.url} has no table at ${table.source_path ?? table.path}` };
+  }
+  return { problems: compareTable(table, siteRows, sourceRows), rows: siteRows.length };
 }
 
 /** Problems with one claim against one file's text; empty when it holds. */
@@ -228,6 +343,32 @@ async function runCanaries() {
   };
   expect("a counted region that holds no entry is UNAVAILABLE, not zero", unavailableFrom("POS = ()\n"));
   expect("a counted region that is gone is UNAVAILABLE", unavailableFrom('GEN = ("exp")\n'));
+  // Added 2026-09-13 with the first JSON-selected sources and the first tables.
+  const qcc = { url: "u", json: "results", where: { id: "QCC" }, extract: "(\\d+)\\+? equations", if_unavailable: "HINT" };
+  expect(
+    "a JSON-selected source reads its number from the chosen entry, whatever the wording or key order",
+    figureFromText(qcc, JSON.stringify({ results: [{ id: "T39", evidence: "on 90 equations" }, { evidence: "Consistent with 187+ equations", id: "QCC" }] })) === 187,
+  );
+  const unavailableWithHint = (source, text) => {
+    try {
+      figureFromText(source, text);
+      return false;
+    } catch (err) {
+      return err instanceof Unavailable && err.message.endsWith("HINT");
+    }
+  };
+  expect(
+    "a JSON-selected entry that no longer states the number is UNAVAILABLE and says what to do",
+    unavailableWithHint(qcc, JSON.stringify({ results: [{ id: "QCC", evidence: "No known counterexample." }] })),
+  );
+  expect("a JSON-selected entry that is gone is UNAVAILABLE and says what to do", unavailableWithHint(qcc, '{"results":[{"id":"T39"}]}'));
+  expect("a JSON path to a whole number reads it", figureFromText({ url: "u", json: "lock.total" }, '{"lock":{"total":23}}') === 23);
+  const costTable = { id: "t", file: "f", key: "op", fields: ["cost"] };
+  const costRows = [{ op: "a", cost: 1 }, { op: "b", cost: "inf" }];
+  expect("a table equal to its source has no problem", compareTable(costTable, costRows, structuredClone(costRows)).length === 0);
+  expect("a changed cell is a problem", compareTable(costTable, costRows, [{ op: "a", cost: 2 }, costRows[1]]).length === 1);
+  expect("a row only on the site is a problem", compareTable(costTable, costRows, [costRows[0]]).length === 1);
+  expect("a row only in the source is a problem", compareTable(costTable, [costRows[0]], costRows).length === 1);
   try {
     await measure({ kind: "url", url: "http://127.0.0.1:9/", extract: "(\\d+)" });
     failures.push("an unreachable source is UNAVAILABLE, not a value");
@@ -290,6 +431,22 @@ async function main() {
     console.log(`${verdict} ${claim.id.padEnd(34)} source ${claim.source} = ${measured.get(claim.source)} (${claim.relation ?? "equal"})`);
   }
 
+  // A table the site repeats is checked cell by cell, so a changed node count
+  // needs no claim of its own and a row added on either side is caught.
+  let cells = 0;
+  for (const table of registry.tables ?? []) {
+    const result = await checkTable(table);
+    if (result.unavailable) {
+      unavailable.push(result.unavailable);
+      console.log(`UNAVAILABLE table ${table.id}`);
+      continue;
+    }
+    problems.push(...result.problems);
+    cells += (result.rows ?? 0) * table.fields.length;
+    const verdict = result.problems.length ? "DRIFT" : "OK   ";
+    console.log(`${verdict} table ${table.id.padEnd(28)} ${result.rows ?? "?"} rows x ${table.fields.length} fields against ${table.url}#${table.source_path ?? table.path}`);
+  }
+
   const retired = registry.retired ?? [];
   const allowedHits = [];
   for (const dir of SCAN_DIRS) {
@@ -323,7 +480,10 @@ async function main() {
   }
   if (problems.length) process.exit(1);
   if (unavailable.length) process.exit(2);
-  console.log(`PASS -- ${registry.claims.length} figures match their sources; ${(registry.retired ?? []).length} retired claims stay retired`);
+  console.log(
+    `PASS -- ${registry.claims.length} figures match their sources; ${(registry.tables ?? []).length} tables (${cells} cells) match the tables they repeat; ` +
+      `${(registry.retired ?? []).length} retired claims stay retired`,
+  );
 }
 
 await main();

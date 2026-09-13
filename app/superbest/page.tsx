@@ -82,6 +82,10 @@ const LEAN_THEOREMS: LeanResult[] = [
   { id: "T42-QCC", name: "Quadratic Ceiling Conjecture — no closed form exceeds O(N²); empirical over 187 equations", lean: "—", status: "conjecture" },
 ];
 
+function nodes(value: number | string): string {
+  return value === "inf" ? "∞" : `${value}n`;
+}
+
 function savings(total: number, naive: number) {
   return { total, naive, pct: (((naive - total) / naive) * 100).toFixed(1) };
 }
@@ -94,6 +98,18 @@ export default function SuperBESTPage() {
   const hi = superbest.high_impact;
   const summary = superbest.savings_summary;
   const lock = superbest.taxonomy_lock;
+  // The Key-results figures for LSE and softplus, and the 23-op unit cost, are
+  // read from the tables below, which check_site_figures.mjs compares cell by
+  // cell with monogate.org's copy before each deploy. Until 2026-09-13 they
+  // were typed here.
+  const mlRow = (prefix: string) => {
+    const row = hi.ml.find((r) => r.expr.startsWith(prefix));
+    if (!row) throw new Error(`/superbest: no high-impact ML row starts with ${prefix}`);
+    return row;
+  };
+  const lse = mlRow("LSE");
+  const softplus = mlRow("softplus");
+  const layer2Costs = [...new Set(extOps.map((row) => row.cost_23op))];
 
   // Headline figures are computed from the totals block, never typed as prose.
   // Its four integers are checked against python/monogate/superbest.py, the
@@ -158,7 +174,7 @@ export default function SuperBESTPage() {
           <span style={{ background: "rgba(79,172,254,0.12)", color: C.accent, padding: "1px 7px", borderRadius: 3, fontWeight: 700, margin: "0 4px" }}>Layer 1 (F16)</span>
           formal theorems, arXiv paper; only F16 orbit nodes counted.
           <span style={{ background: "rgba(94,196,122,0.12)", color: C.green, padding: "1px 7px", borderRadius: 3, fontWeight: 700, margin: "0 4px" }}>Layer 2 (23-op)</span>
-          library/ML/physics use; extended operators count as 1n. Must be labeled.
+          library/ML/physics use; extended operators count as {layer2Costs.length === 1 ? `${layer2Costs[0]}n` : "their listed cost"}. Must be labeled.
         </div>
 
         {/* Domain toggle */}
@@ -185,7 +201,7 @@ export default function SuperBESTPage() {
               <tr>
                 <Th>Operation</Th>
                 <Th color={C.accent}>{domain === "positive" ? "Nodes (x>0)" : "Nodes (all ℝ)"}</Th>
-                <Th>Naive</Th>
+                <Th>v4 cost</Th>
                 <Th>Construction</Th>
                 <Th>Notes</Th>
               </tr>
@@ -213,7 +229,10 @@ export default function SuperBESTPage() {
         <SectionHead>Extended Operators (23-op Beyond F16)</SectionHead>
         <p style={{ fontSize: 12, color: C.muted, marginBottom: 14 }}>
           Cat A: genuine F16 algebraic shortcut. Cat B: genuine via EML sign-variant.
-          Cat C: notation-only (23-op=1n; F16=3–4n; no F16 shortcut).
+          Cat C: notation-only; with no F16 shortcut, the saving exists only in the 23-op count.
+          Node counts here and in the high-impact tables are from the SuperBEST taxonomy lock of
+          2026-04-21. Nothing on this site re-derives them; before each deploy they are compared cell
+          by cell with the copy monogate.org shows.
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -270,7 +289,11 @@ export default function SuperBESTPage() {
           </table>
         </div>
 
-        <SubHead>Special Functions (all require infinite F16 depth)</SubHead>
+        <SubHead>
+          {hi.special_functions.every((row) => row.f16 === "inf")
+            ? "Special Functions (all require infinite F16 depth)"
+            : "Special Functions"}
+        </SubHead>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
@@ -280,7 +303,7 @@ export default function SuperBESTPage() {
               {hi.special_functions.map((row, i) => (
                 <tr key={i}>
                   <Td><code style={{ fontSize: 11, color: C.muted }}>{row.expr}</code></Td>
-                  <Td bold color={C.muted}>∞</Td>
+                  <Td bold color={C.muted}>{row.f16 === row.op23 ? nodes(row.f16) : `${nodes(row.f16)} / ${nodes(row.op23)}`}</Td>
                   <Td small color={C.muted}>{row.reason}</Td>
                 </tr>
               ))}
@@ -355,9 +378,9 @@ export default function SuperBESTPage() {
           <h2 style={{ fontSize: "1rem", fontWeight: 600, color: C.text, marginBottom: 12 }}>Key results</h2>
           <ul style={{ paddingLeft: 20, color: C.muted, fontSize: 13, lineHeight: 1.9 }}>
             <li><strong style={{ color: C.text }}>Core table:</strong> {pos.total}n / {pos.pct}% savings vs {pos.naive}n naive (positive domain) — totals checked against the monogate.superbest library before each deploy; unaffected by extended operators</li>
-            <li><strong style={{ color: C.text }}>LSE corrected:</strong> ln(e^x+e^y) = 4n in F16 (was 5n); 2n in 23-op via EEA+ln</li>
+            <li><strong style={{ color: C.text }}>LSE corrected:</strong> ln(e^x+e^y) = {lse.f16}n in F16 (was 5n); {lse.op23}n in 23-op via EEA+ln</li>
             <li><strong style={{ color: C.text }}>Taxonomy:</strong> {lock.total_operators} operators catalogued. CONJ_NO_OP_24 (no 24th operator) is a conjecture, argued on paper; no Lean proof exists</li>
-            <li><strong style={{ color: C.text }}>softplus = 2n</strong> in both layers via EML(x,1/e)+ln (Category B: genuine F16)</li>
+            <li><strong style={{ color: C.text }}>softplus = {softplus.f16}n</strong> {softplus.f16 === softplus.op23 ? "in both layers" : `in F16 (${softplus.op23}n in 23-op)`} via EML(x,1/e)+ln (Category B: genuine F16)</li>
             <li><strong style={{ color: C.text }}>Aggregate genuine F16 savings: ~12%</strong> across the taxonomy lock&apos;s catalogs; ~40% with 23-op extended (rounded estimates dated 2026-04-21, not re-derived; compared with monogate.org&apos;s copy before each deploy)</li>
           </ul>
           <p style={{ marginTop: 16, fontSize: 12, color: C.muted }}>
