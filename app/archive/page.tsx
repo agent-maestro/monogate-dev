@@ -117,8 +117,9 @@ export default function ArchivePage() {
       <ul style={{ margin: "0 0 12px", paddingLeft: 20 }}>
         <li style={{ fontSize: 14, color: C.text, lineHeight: 1.75, marginBottom: 6 }}>
           Every eml-compile command on the site is run against the newest monogate-forge on PyPI, the compiler{" "}
-          <code style={code}>pip install monogate-forge</code> gives you, and must succeed or fail as the page says. Only
-          the exit status is checked, not the printed output.
+          <code style={code}>pip install monogate-forge</code> gives you, in a directory holding the source its page
+          shows, and must succeed or fail as the page says. A command whose source the page does not show is checked
+          for argument errors only, and printed output is not compared.
         </li>
         <li style={{ fontSize: 14, color: C.text, lineHeight: 1.75, marginBottom: 6 }}>
           The figures registered in <code style={code}>scripts/site_figures.json</code> must match what measures them, and

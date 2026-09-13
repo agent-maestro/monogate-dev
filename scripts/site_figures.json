@@ -17,6 +17,31 @@
       "file": "app/learn/eml/engineering/EngineeringClient.tsx",
       "pattern": "^\\s+id: \"l\\d+\",$",
       "flags": "m"
+    },
+    "superbest_lib_positive_total": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
+      "extract": "^SUPERBEST_V53_POS_TOTAL = (\\d+)$",
+      "flags": "m",
+      "_note": "python/monogate/superbest.py is the canonical SuperBEST library; /superbest's table was reconciled to it in d9a5b6c. monogate-lean's ModelAudit.lean proves superbest_v53_positive_total, 1+1+1+1+1+2+2+2+2+1 = 14: the arithmetic of the per-op sum, not that each per-op cost is minimal."
+    },
+    "superbest_lib_positive_naive": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
+      "extract": "^SUPERBEST_V53_POS_NAIVE = (\\d+)$",
+      "flags": "m"
+    },
+    "superbest_lib_general_total": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
+      "extract": "^SUPERBEST_V52_GEN_TOTAL = (\\d+)$",
+      "flags": "m"
+    },
+    "superbest_lib_general_naive": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
+      "extract": "^SUPERBEST_V52_GEN_NAIVE = (\\d+)$",
+      "flags": "m"
     }
   },
   "claims": [
@@ -47,6 +72,35 @@
       "file": "app/learn/LearnHubClient.tsx",
       "pattern": "badge=\"(\\d+) lessons · 30 minutes · beginner\"",
       "source": "level1_lessons",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.positive_total",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"superbest_positive_total\": (\\d+),",
+      "source": "superbest_lib_positive_total",
+      "relation": "equal",
+      "_note": "app/superbest/page.tsx computes its headlines and the core savings row from these four integers, so the 80.8% and 74.2% it shows follow from checked figures. Until 2026-09-12 both headlines were hand-typed strings in this JSON that no gate read."
+    },
+    {
+      "id": "superbest.positive_naive",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"savings_positive\": \\{\\s*\"naive_total\": (\\d+),",
+      "source": "superbest_lib_positive_naive",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.general_total",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"superbest_general_total\": (\\d+),",
+      "source": "superbest_lib_general_total",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.general_naive",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"savings_general\": \\{\\s*\"naive_total\": (\\d+),",
+      "source": "superbest_lib_general_naive",
       "relation": "equal"
     }
   ],
@@ -86,6 +140,14 @@
     {
       "phrase": "--target python,c",
       "why": "argparse rejects a comma list. One target per command, or --target all."
+    },
+    {
+      "phrase": "No 24th exists",
+      "why": "Retired 2026-09-12: CONJ_NO_OP_24 has no Lean proof in machlib, monogate-lean or monogate-research. It rests on a paper case analysis and a PGC+AIT filter pass in the monogate repo's exploration notes, so it is a conjecture."
+    },
+    {
+      "phrase": "Hardware observed: false",
+      "why": "Retired 2026-09-12: /electronics served this typed line while SOURCE.json recorded board captures on the FPGA track. The boundary is now built from SOURCE.json by boundaryText() in seo.ts; do not type it."
     }
   ]
 }

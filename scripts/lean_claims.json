@@ -1,10 +1,16 @@
 {
-  "_comment": "Every public claim on monogate.dev that a Lean theorem is proved, pinned to the artifact that proves it. `npm run check:site` runs ../monogate-lean/tools/lean_claims/check_claims.py over it on every deploy: each claimed theorem must be declared in its file at the pinned revision, the file must compile in its environment (toolchain and every package revision below exactly as pinned, imports only from Lean core and those packages), each theorem's own #print axioms must have no sorryAx and nothing outside allowed_axioms, and every label occurrence in app/ and lib/ must be a site below or an exemption with its reason. To make a new claim, add it here in the same change. After `lake update` in an environment, re-pin its packages here.",
+  "_comment": "Every public claim on monogate.dev that a Lean theorem is proved, pinned to the artifact that proves it. `npm run check:site` runs ../monogate-lean/tools/lean_claims/check_claims.py over it on every deploy: each claimed theorem must be declared in its file at the pinned revision, the file must compile in its environment (toolchain and every package revision below exactly as pinned; imports only from Lean core, those packages, and the local source trees pinned under `sources`, whose build must be current), each theorem's own #print axioms must have no sorryAx and nothing outside allowed_axioms, and every label occurrence in the scanned paths must be a site below or an exemption with its reason. A site may sit outside the scanned paths, as the Electronics Lab bundle in public/ does; it must still appear in its file. To make a new claim, add it here in the same change. After `lake update` in an environment, re-pin its packages here. To move to a newer machlib, move the `sources` pin and every claim's `revision` together.",
   "environments": {
     "machlib": {
       "project": "../machlib/foundations",
       "toolchain": "leanprover/lean4:v4.32.2",
-      "packages": {}
+      "packages": {},
+      "sources": {
+        "../machlib/foundations": {
+          "repository": "../machlib",
+          "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1"
+        }
+      }
     }
   },
   "scan": {
@@ -72,6 +78,116 @@
       "allowed_axioms": [
         "propext",
         "Quot.sound"
+      ]
+    },
+    {
+      "id": "electronics-acos-forward-error",
+      "statement": "The Electronics Lab labels the theorem behind its FPGA arccos certificate \"sorryAx-free, lake build clean\". That label lives only in the vendored bundle: public/electronics-lab is a Vite build synced by scripts/sync_electronics_lab_public.py from the private monogate-electronics repo, whose build_evidence_packet.py types the string and never runs lake. Editing the bundle here would break SOURCE.json's sha256 manifest and be undone by the next sync, so the label is gated instead: the theorem must compile at the pinned machlib with no sorryAx. A re-sync renames the hashed bundle file, which fails this site as STALE_SITE until it is re-pinned.",
+      "sites": [
+        {
+          "file": "public/electronics-lab/assets/index-C5dDI1g9.js",
+          "line": "\"theorem\":\"MachLib.Real.eml_acos_full_fwd_error\",\"theorem_file\":\"foundations/MachLib/AcosHardwareForwardError.lean\""
+        }
+      ],
+      "repository": "../machlib",
+      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "file": "foundations/MachLib/AcosHardwareForwardError.lean",
+      "environment": "machlib",
+      "theorems": [
+        "MachLib.Real.eml_acos_full_fwd_error"
+      ]
+    },
+    {
+      "id": "electronics-asin-forward-error",
+      "statement": "As electronics-acos-forward-error, for the FPGA arcsin certificate.",
+      "sites": [
+        {
+          "file": "public/electronics-lab/assets/index-C5dDI1g9.js",
+          "line": "\"theorem\":\"MachLib.Real.eml_asin_full_fwd_error\",\"theorem_file\":\"foundations/MachLib/AsinHardwareForwardError.lean\""
+        }
+      ],
+      "repository": "../machlib",
+      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "file": "foundations/MachLib/AsinHardwareForwardError.lean",
+      "environment": "machlib",
+      "theorems": [
+        "MachLib.Real.eml_asin_full_fwd_error"
+      ]
+    },
+    {
+      "id": "electronics-sin-forward-error",
+      "statement": "As electronics-acos-forward-error, for the FPGA sine certificate; the bundle also cites this theorem, labelled \"sorryAx-free\", for a simulation-and-build packet with no theorem_file.",
+      "sites": [
+        {
+          "file": "public/electronics-lab/assets/index-C5dDI1g9.js",
+          "line": "\"theorem\":\"MachLib.Real.eml_sin_full_fwd_error\",\"theorem_file\":\"foundations/MachLib/SinHardwareForwardError.lean\""
+        },
+        {
+          "file": "public/electronics-lab/assets/index-C5dDI1g9.js",
+          "line": "\"theorem\":\"MachLib.Real.eml_sin_full_fwd_error\",\"theorem_file\":null"
+        }
+      ],
+      "repository": "../machlib",
+      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "file": "foundations/MachLib/SinHardwareForwardError.lean",
+      "environment": "machlib",
+      "theorems": [
+        "MachLib.Real.eml_sin_full_fwd_error"
+      ]
+    },
+    {
+      "id": "electronics-tan-forward-error",
+      "statement": "As electronics-acos-forward-error, for the FPGA tangent certificate.",
+      "sites": [
+        {
+          "file": "public/electronics-lab/assets/index-C5dDI1g9.js",
+          "line": "\"theorem\":\"MachLib.Real.eml_tan_full_fwd_error\",\"theorem_file\":\"foundations/MachLib/TanHardwareForwardError.lean\""
+        }
+      ],
+      "repository": "../machlib",
+      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "file": "foundations/MachLib/TanHardwareForwardError.lean",
+      "environment": "machlib",
+      "theorems": [
+        "MachLib.Real.eml_tan_full_fwd_error"
+      ]
+    },
+    {
+      "id": "electronics-tanh-forward-error",
+      "statement": "As electronics-acos-forward-error, for the FPGA tanh certificate.",
+      "sites": [
+        {
+          "file": "public/electronics-lab/assets/index-C5dDI1g9.js",
+          "line": "\"theorem\":\"MachLib.Real.eml_tanh_full_fwd_error\",\"theorem_file\":\"foundations/MachLib/TanhHardwareForwardError.lean\""
+        }
+      ],
+      "repository": "../machlib",
+      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "file": "foundations/MachLib/TanhHardwareForwardError.lean",
+      "environment": "machlib",
+      "theorems": [
+        "MachLib.Real.eml_tanh_full_fwd_error"
+      ]
+    },
+    {
+      "id": "electronics-reflex-fixed-point-soundness",
+      "statement": "The Electronics Lab's Reflex contract lab says #print axioms ran against the built MachLib and shows \"sorryAx-free\" for MachLib.Real.fx_sound. Same vendored-bundle situation as electronics-acos-forward-error.",
+      "sites": [
+        {
+          "file": "public/electronics-lab/assets/ReflexContractLab-Di7ySCoU.js",
+          "line": "name:\"MachLib.Real.fx_sound\""
+        },
+        {
+          "file": "public/electronics-lab/assets/ReflexContractLab-Di7ySCoU.js",
+          "line": "\" ran against the built MachLib:\",\" \",e.jsx(\"strong\",{children:\"sorryAx-free\"})"
+        }
+      ],
+      "repository": "../machlib",
+      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "file": "foundations/MachLib/FixedPointCertifier.lean",
+      "environment": "machlib",
+      "theorems": [
+        "MachLib.Real.fx_sound"
       ]
     }
   ],

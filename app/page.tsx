@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import labSource from "../public/electronics-lab/SOURCE.json";
 
 export const metadata: Metadata = {
   title: "monogate.dev — EML math language playground",
   description:
     "EML — a single-operator math language whose contracts compile to Lean " +
-    "theorems, running from your browser to ESP32 to FPGA. Explore the language, " +
-    "try the hardware lab, and learn EML.",
+    "theorems and whose kernels compile to C, Python and Verilog. Learn EML, " +
+    "try the Electronics Lab, and reproduce what the site checks.",
 };
 
 const C = {
@@ -20,6 +21,20 @@ const C = {
   green: "#4ade80",
   purple: "#a78bfa",
 };
+
+// Hardware is read from the Electronics Lab's SOURCE.json at build time, never
+// typed here. monogate-electronics derives that file's hardware_evidence block
+// from its evidence packets: a track reads hardware_observed only where a
+// packet records a capture from a real board. Until 2026-09-12 this page said
+// "browser · ESP32 · FPGA — running today" while the same file recorded
+// hardware_observed: false for ESP32.
+const HARDWARE = labSource.hardware_evidence;
+const TRACKS = Object.values(HARDWARE.tracks);
+const OBSERVED = TRACKS.filter((t) => t.hardware_observed);
+const OBSERVED_LABELS = OBSERVED.map((t) => t.label).join(", ") || "none";
+const NOT_OBSERVED_LABELS = TRACKS.filter((t) => !t.hardware_observed).map((t) => t.label).join(", ");
+const CAPTURE_PACKETS = OBSERVED.reduce((n, t) => n + t.live_capture_packets, 0);
+const EVIDENCE_DATE = HARDWARE.generated_at.slice(0, 10);
 
 const FLOW_STEPS: { n: string; text: string; sub: string }[] = [
   {
@@ -39,13 +54,15 @@ const FLOW_STEPS: { n: string; text: string; sub: string }[] = [
   },
   {
     n: "04",
-    text: "Run it on hardware",
-    sub: "The Electronics Lab takes kernels onto ESP32 trainer boards and FPGA bitstreams.",
+    text: "Take it to hardware",
+    sub:
+      "The Electronics Lab's courses start in a simulator. Board captures on record: " +
+      `${OBSERVED_LABELS}; none for ${NOT_OBSERVED_LABELS}.`,
   },
   {
     n: "05",
     text: "Go deeper",
-    sub: "The research record lives on monogate.org, and the Lean library behind the proofs on machlib.org.",
+    sub: "The research record lives on monogate.org, and the Lean library the lessons' theorems import on machlib.org.",
   },
 ];
 
@@ -56,10 +73,10 @@ const PRIMARY_SPOTLIGHTS = [
   {
     href: "/electronics",
     title: "Electronics Lab",
-    eyebrow: "differentiator · esp32 / fpga",
+    eyebrow: "courses · esp32 / fpga / robotics",
     text:
-      "EML kernels running on real hardware: ESP32 trainer boards, FPGA bitstreams, " +
-      "and physical-evidence-ready packets. The thing other AI projects don't have.",
+      "Hands-on hardware courses that start in a simulator, each with its " +
+      `evidence boundary stated. Board captures on record: ${OBSERVED_LABELS}.`,
     color: C.green,
   },
   {
@@ -68,16 +85,24 @@ const PRIMARY_SPOTLIGHTS = [
     eyebrow: "tutorials · quick start",
     text:
       "Step-by-step courses in EML and Forge: write a kernel, compile it, " +
-      "and check its proof.",
+      "and read Lean's verdict on its contract.",
     color: C.purple,
+  },
+  {
+    href: "/docs",
+    title: "Reproduce",
+    eyebrow: "what you can re-run",
+    text:
+      "Install the compiler you get from PyPI, run the commands this site checks, " +
+      "and see which checks run on private repositories.",
+    color: C.blue,
   },
 ];
 
-// Ecosystem-status strip — three live-feeling cells under the hero. These
-// signal "this is a real, active project" without requiring the visitor to
-// click anything.
+// Status strip — each cell comes from a source, not from memory.
 // The MachLib figure is a floor ("N+") checked against machlib's README by
-// scripts/check_site_figures.mjs; change it there and here together.
+// scripts/check_site_figures.mjs; change it there and here together. The
+// hardware cell is read from SOURCE.json (above).
 const ECOSYSTEM_STATUS = [
   {
     label: "MachLib theorems",
@@ -85,14 +110,14 @@ const ECOSYSTEM_STATUS = [
     note: "machine-checked in Lean 4 · machlib.org",
   },
   {
-    label: "Hardware ports",
-    value: "browser · ESP32 · FPGA",
-    note: "running today",
+    label: "Board captures",
+    value: OBSERVED_LABELS,
+    note: `${CAPTURE_PACKETS} capture packets · none for ${NOT_OBSERVED_LABELS} · lab SOURCE.json, ${EVIDENCE_DATE}`,
   },
   {
     label: "Status feed",
     value: "monogate.net",
-    note: "CI-emitted dashboard",
+    note: "renders machlib's CI status file",
   },
 ];
 
@@ -100,14 +125,16 @@ export default function LandingPage() {
   return (
     <div style={{ background: C.bg, minHeight: "100vh", maxWidth: 920, margin: "0 auto", padding: "0 18px 80px" }}>
 
-      {/* Hero — lead with what EML is, not what the tools are. */}
+      {/* Hero — lead with what EML is, not what the tools are. Until
+          2026-09-12 the heading was "Math you can verify. Hardware that
+          confirms it."; nothing checked the second half. */}
       <section style={{ marginBottom: 36 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>
           monogate.dev — eml math language workbench
         </div>
         <h1 style={{ fontSize: 38, fontWeight: 700, color: C.orange, fontFamily: "monospace", marginBottom: 14, letterSpacing: "-0.02em", lineHeight: 1.12 }}>
-          Math you can verify.<br />
-          <span style={{ color: C.green }}>Hardware that confirms it.</span>
+          Math you can check.<br />
+          <span style={{ color: C.green }}>Compiled to C, Verilog and Lean.</span>
         </h1>
         <p style={{ fontSize: 16, color: C.text, lineHeight: 1.7, maxWidth: 660, marginBottom: 24 }}>
           <strong style={{ color: C.text }}>EML</strong> is a single-operator math
@@ -116,17 +143,22 @@ export default function LandingPage() {
             eml(x, y) = exp(x) − ln(y)
           </code>
           . A kernel&apos;s contract compiles to a Lean theorem, and Lean
-          reports whether it is proved. The same kernel runs in your browser,
-          on an ESP32, and as a synthesizable FPGA block.
+          reports whether it is proved. The same source compiles to C, Python
+          and Verilog with the compiler{" "}
+          <code style={{ color: C.purple, fontSize: 14, fontFamily: "monospace" }}>
+            pip install monogate-forge
+          </code>{" "}
+          gives you, and every compile command on this site is run against
+          that release before each deploy.
         </p>
-        {/* Capability badges — the "where it runs / how it's checked" strip. */}
+        {/* Target badges — the targets the lessons compile to. Every command
+            that emits one is run by scripts/check_site_commands.mjs. */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
           {[
-            { label: "browser", color: C.blue },
-            { label: "ESP32", color: C.green },
-            { label: "FPGA", color: C.green },
-            { label: "Lean theorems", color: C.purple },
-            { label: "evidence-bundled", color: C.orange },
+            { label: "C", color: C.blue },
+            { label: "Python", color: C.blue },
+            { label: "Verilog", color: C.green },
+            { label: "Lean", color: C.purple },
           ].map(({ label, color }) => (
             <span
               key={label}
@@ -180,7 +212,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Ecosystem-status strip — three cells showing this is alive. */}
+      {/* Status strip — three cells, each read from a source. */}
       <section
         aria-label="Ecosystem status"
         style={{
@@ -213,7 +245,7 @@ export default function LandingPage() {
         ))}
       </section>
 
-      {/* Primary spotlights — the three cards a first-time visitor should try. */}
+      {/* Primary spotlights — the cards a first-time visitor should try. */}
       <section style={{ marginBottom: 48 }}>
         <div style={{ fontSize: 11, color: C.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14 }}>
           Start here
@@ -253,11 +285,11 @@ export default function LandingPage() {
           How it works
         </div>
         <h2 style={{ fontSize: 20, fontWeight: 700, color: C.text, marginBottom: 6, lineHeight: 1.3 }}>
-          From a formula to a checked proof and a running board.
+          From a formula to generated code and a Lean verdict.
         </h2>
         <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.7, marginBottom: 24 }}>
-          The loop is always the same: write the kernel, compile it, ask Lean
-          what is proved, then measure it on hardware.
+          The loop: write the kernel, compile it, ask Lean what is proved, then
+          measure it on a board if you have one wired up.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {FLOW_STEPS.map((step, i) => (
@@ -286,8 +318,8 @@ export default function LandingPage() {
         <div style={{ marginTop: 24, padding: "16px 20px", background: "rgba(232,160,32,0.08)", border: `1px solid rgba(232,160,32,0.18)`, borderRadius: 6, fontFamily: "monospace", fontSize: 12, color: C.text, lineHeight: 1.6 }}>
           Surface split: <strong style={{ color: C.orange }}>monogate.dev</strong> is the workbench,{" "}
           <a href="https://monogate.org" style={{ color: C.orange, fontWeight: 700 }}>monogate.org</a> is the research record,{" "}
-          <a href="https://machlib.org" style={{ color: C.orange, fontWeight: 700 }}>machlib.org</a> is the Lean library the proofs rest on,{" "}
-          <a href="https://monogate.net" style={{ color: C.orange, fontWeight: 700 }}>monogate.net</a> is the CI-emitted verification dashboard, and{" "}
+          <a href="https://machlib.org" style={{ color: C.orange, fontWeight: 700 }}>machlib.org</a> is the Lean library the lessons&apos; theorems import,{" "}
+          <a href="https://monogate.net" style={{ color: C.orange, fontWeight: 700 }}>monogate.net</a> renders machlib&apos;s CI status file, and{" "}
           <a href="https://1op.io" style={{ color: C.orange, fontWeight: 700 }}>1op.io</a> is games and visualization.
         </div>
       </section>

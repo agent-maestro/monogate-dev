@@ -395,16 +395,19 @@ export default function LearnEMLHub() {
             margin: "0 0 40px",
           }}
         >
-          Self-paced. Written for engineers. Every code sample is a real{" "}
+          Self-paced. Written for engineers. Before each deploy, every command
+          in Levels 1 and 2 that calls the compiler is run against the release{" "}
           <code
             style={{
               fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
               color: ACCENT_GOLD,
             }}
           >
-            .eml
+            pip install monogate-forge
           </code>{" "}
-          file you can copy out and compile.
+          gives you, beside the source its page shows. A command whose source
+          the page does not show is checked for argument errors only, and the
+          Level 0 puzzles are not compiled by that check.
         </p>
 
         {/* Levels 1 & 2 */}

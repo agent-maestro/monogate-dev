@@ -1,4 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import labSource from "../../../public/electronics-lab/SOURCE.json";
 import { injectSeo } from "./seo";
 
 /**
@@ -19,7 +20,8 @@ import { injectSeo } from "./seo";
  * reader (crawlers, link unfurlers, agents) saw a blank page. Since this
  * handler already materializes the HTML as a string server-side, it is also
  * where per-route <title>/meta/OG tags and a <noscript> summary get injected —
- * see ./seo.ts.
+ * see ./seo.ts. The landing page's boundary line is built from SOURCE.json,
+ * imported here at build time, so it describes the bundle it ships beside.
  */
 
 export const runtime = "nodejs";
@@ -46,7 +48,7 @@ async function readShell(request: Request): Promise<string> {
 
 export async function GET(request: Request): Promise<Response> {
   const shell = await readShell(request);
-  const html = injectSeo(shell, new URL(request.url).pathname);
+  const html = injectSeo(shell, new URL(request.url).pathname, labSource);
   return new Response(html, {
     status: 200,
     headers: {

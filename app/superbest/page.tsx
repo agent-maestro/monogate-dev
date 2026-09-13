@@ -82,6 +82,10 @@ const LEAN_THEOREMS: LeanResult[] = [
   { id: "T42-QCC", name: "Quadratic Ceiling Conjecture — no closed form exceeds O(N²); empirical over 187 equations", lean: "—", status: "conjecture" },
 ];
 
+function savings(total: number, naive: number) {
+  return { total, naive, pct: (((naive - total) / naive) * 100).toFixed(1) };
+}
+
 export default function SuperBESTPage() {
   const [domain, setDomain] = useState<"positive" | "general">("positive");
   const ops: Op[] = superbest.table;
@@ -91,7 +95,17 @@ export default function SuperBESTPage() {
   const summary = superbest.savings_summary;
   const lock = superbest.taxonomy_lock;
 
-  const headline = domain === "positive" ? totals.positive_headline : totals.general_headline;
+  // Headline figures are computed from the totals block, never typed as prose.
+  // Its four integers are checked against python/monogate/superbest.py, the
+  // canonical library, by scripts/check_site_figures.mjs before each deploy.
+  // Until 2026-09-12 both headlines were hand-typed strings no gate read.
+  const pos = savings(totals.savings_positive.superbest_positive_total, totals.savings_positive.naive_total);
+  const gen = savings(totals.savings_general.superbest_general_total, totals.savings_general.naive_total);
+  const headline = domain === "positive"
+    ? `${pos.total}n / ${pos.pct}% savings (positive domain, ${ops.length}-op headline vs ${pos.naive}n naive)`
+    : `${gen.total}n / ${gen.pct}% savings (general domain, 8-op basket vs ${gen.naive}n naive)`;
+  // The core-arithmetic row of the savings summary is the positive headline.
+  const cell = (v: string) => (v === "=headline" ? `${pos.pct}%` : v);
 
   const hiCols = (
     <tr>
@@ -125,14 +139,17 @@ export default function SuperBESTPage() {
           <span>{superbest.date}</span>
           <span>arXiv:2603.21852</span>
           <span style={{ background: "rgba(79,172,254,0.1)", border: `1px solid ${C.accent}`, color: C.accent, padding: "2px 8px", borderRadius: 3, fontSize: 10 }}>
-            Taxonomy Locked — {lock.total_operators} ops · No 24th exists
+            {lock.total_operators} operators catalogued · no 24th found (conjecture)
           </span>
         </div>
 
         <h1 style={{ fontSize: "1.8rem", fontWeight: 700, color: C.text, marginBottom: 8 }}>SuperBEST Routing Table</h1>
+        {/* Until 2026-09-12 this read "Taxonomy definitively closed: PROVED", and
+            the badge said a 24th operator does not exist. No Lean proof of
+            CONJ_NO_OP_24 exists in machlib, monogate-lean or monogate-research. */}
         <p style={{ color: C.muted, marginBottom: 24, fontSize: 13 }}>
           Minimum F16-node constructions for every elementary arithmetic primitive.
-          Taxonomy definitively closed: {lock.conj_no_op_24}.
+          Taxonomy: {lock.total_operators} operators. {lock.conj_no_op_24}.
         </p>
 
         {/* Two-layer policy */}
@@ -286,13 +303,18 @@ export default function SuperBESTPage() {
               {summary.catalogs.map((row, i) => (
                 <tr key={i}>
                   <Td>{row.catalog}</Td>
-                  <Td bold color={C.accent}>{row.layer1}</Td>
-                  <Td bold color={C.green}>{row.layer2}</Td>
+                  <Td bold color={C.accent}>{cell(row.layer1)}</Td>
+                  <Td bold color={C.green}>{cell(row.layer2)}</Td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <p style={{ fontSize: 12, color: C.muted, marginTop: 10, lineHeight: 1.7 }}>
+          The core-arithmetic row is the positive-domain headline, computed from totals that are checked against the
+          monogate.superbest library before each deploy. The other rows are rounded estimates from the v5 study;
+          nothing on this site re-derives them.
+        </p>
 
         {/* Machine-checked theorems */}
         <SectionHead>Machine-Checked Theorems (Lean 4)</SectionHead>
@@ -330,11 +352,11 @@ export default function SuperBESTPage() {
         <div style={{ marginTop: 48, padding: 24, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8 }}>
           <h2 style={{ fontSize: "1rem", fontWeight: 600, color: C.text, marginBottom: 12 }}>Key results</h2>
           <ul style={{ paddingLeft: 20, color: C.muted, fontSize: 13, lineHeight: 1.9 }}>
-            <li><strong style={{ color: C.text }}>Core table locked:</strong> 14n / 80.8% savings — canonical, unaffected by extended operators</li>
+            <li><strong style={{ color: C.text }}>Core table:</strong> {pos.total}n / {pos.pct}% savings vs {pos.naive}n naive (positive domain) — totals checked against the monogate.superbest library before each deploy; unaffected by extended operators</li>
             <li><strong style={{ color: C.text }}>LSE corrected:</strong> ln(e^x+e^y) = 4n in F16 (was 5n); 2n in 23-op via EEA+ln</li>
-            <li><strong style={{ color: C.text }}>Taxonomy closed:</strong> exactly 23 operators exist; CONJ_NO_OP_24 is a proved theorem</li>
+            <li><strong style={{ color: C.text }}>Taxonomy:</strong> {lock.total_operators} operators catalogued. CONJ_NO_OP_24 (no 24th operator) is a conjecture, argued on paper; no Lean proof exists</li>
             <li><strong style={{ color: C.text }}>softplus = 2n</strong> in both layers via EML(x,1/e)+ln (Category B: genuine F16)</li>
-            <li><strong style={{ color: C.text }}>Aggregate genuine F16 savings: ~12%</strong> across all catalogs; ~40% with 23-op extended</li>
+            <li><strong style={{ color: C.text }}>Aggregate genuine F16 savings: ~12%</strong> across all catalogs; ~40% with 23-op extended (rounded estimates from the v5 study, not re-derived here)</li>
           </ul>
           <p style={{ marginTop: 16, fontSize: 12, color: C.muted }}>
             Research: <a href="https://monogate.org/superbest" style={{ color: C.accent }}>monogate.org/superbest ↗</a>

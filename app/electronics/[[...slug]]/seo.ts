@@ -15,9 +15,13 @@
  *
  * Copy below is transcribed from the live rendered DOM (headless Chromium,
  * 2026-07-25), not written fresh, so the no-JS text matches what a JS visitor
- * actually reads. Descriptions deliberately avoid hardware claims: SOURCE.json
- * carries `hardware_observed: false` / `simulated: true`, and the lab renders
- * "MODE simulated courseware" in its own header. Keep it that way.
+ * actually reads. Descriptions deliberately avoid hardware claims. The one
+ * hardware statement in the no-JS view, the landing page's boundary line, is
+ * built by boundaryText() from SOURCE.json, which route.ts imports at build
+ * time; monogate-electronics derives that file's hardware_evidence block from
+ * its evidence packets. Until 2026-09-12 the line was typed here, with hardware
+ * observation and serial capture both stated as false, while SOURCE.json
+ * recorded board captures on the FPGA track. Keep it read from the file.
  */
 
 const SITE = "https://monogate.dev";
@@ -28,15 +32,36 @@ export interface RouteSeo {
   readonly description: string;
 }
 
+/** One track of SOURCE.json's hardware_evidence block. */
+export interface LabTrack {
+  readonly label: string;
+  readonly hardware_observed: boolean;
+  readonly live_capture_packets: number;
+  readonly total_captured_frames: number;
+  readonly devices: readonly string[];
+  readonly first_capture: string | null;
+  readonly latest_capture: string | null;
+}
+
+/** The part of public/electronics-lab/SOURCE.json the no-JS boundary is read from. */
+export interface LabSource {
+  readonly boundary_flags: { readonly simulated: boolean };
+  readonly hardware_evidence: {
+    readonly generated_at: string;
+    readonly tracks: Readonly<Record<string, LabTrack>>;
+  };
+}
+
 /**
  * Keys are normalized paths (lowercased, trailing slash stripped) — matching
  * how the SPA's own viewFromLocation() lowercases before matching, so the
- * mixed-case /electronics/other/OptimizationBoundary in the sitemap resolves.
+ * mixed-case /electronics/other/OptimizationBoundary resolves.
  *
- * This covers the landing page, the four track hubs, and every path listed in
- * the sitemap. The SPA has ~60 routes; the rest fall through to DEFAULT_SEO
- * rather than being enumerated here, because a stale hand-maintained mirror of
- * a route table in another repo is worse than an honest generic description.
+ * This covers the landing page, the four track hubs, and the pages the
+ * sitemap lists (app/sitemap.ts lists exactly these keys). The SPA has ~60
+ * routes; the rest fall through to DEFAULT_SEO rather than being enumerated
+ * here, because a stale hand-maintained mirror of a route table in another
+ * repo is worse than an honest generic description.
  */
 export const ROUTE_SEO: Readonly<Record<string, RouteSeo>> = {
   "/electronics": {
@@ -139,6 +164,27 @@ export function seoForPath(pathname: string): RouteSeo {
   return ROUTE_SEO[normalizePath(pathname)] ?? DEFAULT_SEO;
 }
 
+/** The landing page's boundary sentence, read from SOURCE.json rather than typed. */
+export function boundaryText(source: LabSource): string {
+  const tracks = Object.values(source.hardware_evidence.tracks);
+  const observed = tracks.filter((t) => t.hardware_observed);
+  const unobserved = tracks.filter((t) => !t.hardware_observed).map((t) => t.label);
+  const sentences: string[] = [];
+  if (source.boundary_flags.simulated) sentences.push("The courseware runs as a simulation.");
+  for (const t of observed) {
+    sentences.push(
+      `Hardware observed on ${t.label}: ${t.live_capture_packets} capture packets, ` +
+        `${t.total_captured_frames} frames, ${t.devices.join(", ")}, ${t.first_capture} to ${t.latest_capture}.`
+    );
+  }
+  if (observed.length === 0) sentences.push("No track has a hardware capture recorded.");
+  if (observed.length > 0 && unobserved.length > 0) {
+    sentences.push(`No hardware capture recorded for ${unobserved.join(" or ")}.`);
+  }
+  sentences.push(`(SOURCE.json evidence summary, ${source.hardware_evidence.generated_at.slice(0, 10)}.)`);
+  return `Boundary: ${sentences.join(" ")}`;
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -171,7 +217,7 @@ function renderHeadTags(seo: RouteSeo, canonical: string): string {
   ].join("\n    ");
 }
 
-function renderNoscript(seo: RouteSeo, normalized: string): string {
+function renderNoscript(seo: RouteSeo, normalized: string, labSource: LabSource): string {
   const isLanding = normalized === "/electronics";
 
   const links = NAV_LINKS
@@ -189,10 +235,10 @@ function renderNoscript(seo: RouteSeo, normalized: string): string {
       </ol>`
     : "";
 
-  // The lab states its own boundary in-page ("MODE simulated courseware"); the
-  // no-JS view must not quietly drop that caveat.
+  // The lab states its own boundary in-page; the no-JS view must not quietly
+  // drop that caveat, and must not state it from memory either.
   const boundary = isLanding
-    ? `<p><em>Boundary: this courseware is simulated. Hardware observed: false. Live serial capture: false.</em></p>`
+    ? `<p><em>${escapeHtml(boundaryText(labSource))}</em></p>`
     : "";
 
   return `<noscript>
@@ -211,7 +257,8 @@ function renderNoscript(seo: RouteSeo, normalized: string): string {
 
 /**
  * Returns a new shell with a per-route <title>, meta/OG tags in <head>, and a
- * no-JS summary before </body>.
+ * no-JS summary before </body>. `labSource` is the parsed SOURCE.json shipped
+ * beside the shell; route.ts imports it at build time.
  *
  * The shell ships one hardcoded `<title>MGElectronics Lab</title>` for all ~60
  * SPA routes, so it is rewritten here too — otherwise every deep link shares a
@@ -223,7 +270,7 @@ function renderNoscript(seo: RouteSeo, normalized: string): string {
  * is still served. Degraded SEO beats a 500. Marker drift is caught at build
  * time by scripts/check_electronics_seo.mjs.
  */
-export function injectSeo(shellHtml: string, pathname: string): string {
+export function injectSeo(shellHtml: string, pathname: string, labSource: LabSource): string {
   const normalized = normalizePath(pathname);
   const seo = seoForPath(normalized);
   const canonical = `${SITE}${normalized}`;
@@ -238,6 +285,6 @@ export function injectSeo(shellHtml: string, pathname: string): string {
     : withTitle;
 
   return withHead.includes("</body>")
-    ? withHead.replace("</body>", `    ${renderNoscript(seo, normalized)}\n  </body>`)
+    ? withHead.replace("</body>", `    ${renderNoscript(seo, normalized, labSource)}\n  </body>`)
     : withHead;
 }

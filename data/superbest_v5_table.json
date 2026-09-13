@@ -160,8 +160,6 @@
         "sqrt"
       ]
     },
-    "positive_headline": "14n / 80.8% savings (positive domain, 10-op headline vs 73n naive)",
-    "general_headline": "16n / 74.2% savings (general domain, 8-op basket vs 62n naive)",
     "savings_positive": {
       "naive_total": 73,
       "superbest_positive_total": 14,
@@ -217,7 +215,7 @@
     "total_operators": 23,
     "f16_orbit": 16,
     "extended_operators": 7,
-    "conj_no_op_24": "PROVED — no 24th operator passes PGC+AIT filter on open domain",
+    "conj_no_op_24": "CONJ_NO_OP_24, that no 24th operator passes the PGC+AIT filter on an open domain, is a conjecture: the monogate repository's exploration notes argue it by case analysis and a filter pass over the remaining candidate operators, and no Lean proof exists",
     "lse_correction": "LSE corrected from 5n to 4n in F16 (direct: exp+exp+add+ln)",
     "two_layer_policy": {
       "layer_1": "F16 ground-truth — formal theorems, arXiv paper",
@@ -411,16 +409,16 @@
         "expr": "sin(x), cos(x)",
         "f16": "inf",
         "op23": "inf",
-        "reason": "T01/AIL: proved"
+        "reason": "T01/AIL"
       }
     ]
   },
   "savings_summary": {
     "catalogs": [
       {
-        "catalog": "Core arithmetic (9 ops)",
-        "layer1": "80.8%",
-        "layer2": "80.8%"
+        "catalog": "Core arithmetic (10 ops, positive domain)",
+        "layer1": "=headline",
+        "layer2": "=headline"
       },
       {
         "catalog": "ML functions (6 items)",

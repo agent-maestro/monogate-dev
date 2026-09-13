@@ -10,13 +10,16 @@
 // at priority 0.7-0.9. app/electronics/[[...slug]]/seo.ts now injects a
 // per-route <title>, meta/OG tags, and a <noscript> summary.
 //
-// Two ways that regresses silently, both checked here:
+// Three ways that regresses silently, all checked here:
 //   1. The shell is synced in from the monogate-electronics repo by
 //      scripts/sync_electronics_lab_public.py. injectSeo() fails open on
 //      missing markers, so a shell reformat would quietly stop injection
 //      without breaking the page.
 //   2. A new path added to app/sitemap.ts with no ROUTE_SEO entry falls back
 //      to the generic description — indexable, but duplicated across routes.
+//   3. The landing page's boundary line drifts from SOURCE.json. Until
+//      2026-09-12 it was typed as "Hardware observed: false" while SOURCE.json
+//      recorded board captures on the FPGA track.
 //
 // Implementation: transpiles seo.ts with the repo's own `typescript` dep (Node
 // 18 has no type stripping) and exercises injectSeo() directly. No network, no
@@ -32,6 +35,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const SEO_TS = path.join(ROOT, "app", "electronics", "[[...slug]]", "seo.ts");
 const SHELL = path.join(ROOT, "public", "electronics-lab", "index.html");
+const SOURCE_JSON = path.join(ROOT, "public", "electronics-lab", "SOURCE.json");
 const SITEMAP_TS = path.join(ROOT, "app", "sitemap.ts");
 
 const MAX_DESCRIPTION = 160; // Google truncates around here.
@@ -54,12 +58,22 @@ async function loadSeoModule() {
   return import(tmp);
 }
 
-function sitemapElectronicsPaths() {
-  const source = fs.readFileSync(SITEMAP_TS, "utf8");
-  return [...source.matchAll(/path:\s*"(\/electronics[^"]*)"/g)].map((m) => m[1]);
+// Since 2026-09-12 app/sitemap.ts lists the Electronics Lab as
+// Object.keys(ROUTE_SEO), so every sitemap path has its own entry by
+// construction. What can still drift is the sitemap no longer doing that: then
+// this returns nothing and section 2 fails.
+function sitemapElectronicsPaths(routeSeo) {
+  return fs.readFileSync(SITEMAP_TS, "utf8").includes("Object.keys(ROUTE_SEO)") ? Object.keys(routeSeo) : [];
 }
 
-const { injectSeo, seoForPath, normalizePath, ROUTE_SEO } = await loadSeoModule();
+function escapeHtml(value) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+const { injectSeo, seoForPath, normalizePath, ROUTE_SEO, boundaryText } = await loadSeoModule();
+// The landing page's no-JS boundary is built from SOURCE.json, which route.ts
+// imports at build time. The same file is passed here.
+const LAB_SOURCE = JSON.parse(fs.readFileSync(SOURCE_JSON, "utf8"));
 
 // --- 1. The synced shell still has the markers injectSeo() keys off of ------
 const shell = fs.readFileSync(SHELL, "utf8");
@@ -71,7 +85,7 @@ for (const marker of ["</head>", "</body>", "<title>"]) {
 
 // --- 2. Every sitemap path resolves to its own entry, not the fallback -----
 const fallback = seoForPath("/electronics/definitely-not-a-real-route");
-const sitemapPaths = sitemapElectronicsPaths();
+const sitemapPaths = sitemapElectronicsPaths(ROUTE_SEO);
 if (sitemapPaths.length === 0) {
   fail("Found no /electronics paths in app/sitemap.ts — did the sitemap format change?");
 }
@@ -85,9 +99,8 @@ for (const p of sitemapPaths) {
 // --- 3. Injected output is well-formed for every checked route -------------
 // Every mapped route, not just the sitemap ones — an entry that is only
 // reachable by in-app navigation still gets shared and unfurled. Deduped by
-// normalized path so the sitemap's mixed-case /electronics/other/
-// OptimizationBoundary isn't compared against its own lowercase key and
-// reported as a duplicate title.
+// normalized path so a mixed-case path is not compared against its own
+// lowercase key and reported as a duplicate title.
 const checked = [...
   new Map(
     [...Object.keys(ROUTE_SEO), ...sitemapPaths, "/electronics"].map((p) => [normalizePath(p), p])
@@ -97,7 +110,7 @@ const seenTitles = new Map();
 const seenDescriptions = new Map();
 
 for (const p of checked) {
-  const html = injectSeo(shell, p);
+  const html = injectSeo(shell, p, LAB_SOURCE);
   const seo = seoForPath(p);
   const canonical = `https://monogate.dev${normalizePath(p)}`;
 
@@ -147,10 +160,23 @@ for (const p of checked) {
 }
 
 // --- 4. Unknown routes still degrade gracefully ----------------------------
-const unknown = injectSeo(shell, "/electronics/esp32/courses/some-future-course");
+const unknown = injectSeo(shell, "/electronics/esp32/courses/some-future-course", LAB_SOURCE);
 if (!unknown.includes("<noscript>") || !unknown.includes('<meta name="description"')) {
   fail("An unmapped /electronics/* route produced no noscript/description — the fallback path is broken.");
 }
+
+// --- 5. The landing boundary says what SOURCE.json records -----------------
+const boundary = boundaryText(LAB_SOURCE);
+if (!injectSeo(shell, "/electronics", LAB_SOURCE).includes(escapeHtml(boundary))) {
+  fail("/electronics: the no-JS page does not carry the boundary line boundaryText() builds from SOURCE.json.");
+}
+for (const track of Object.values(LAB_SOURCE.hardware_evidence.tracks)) {
+  const saysObserved = boundary.includes(`Hardware observed on ${track.label}:`);
+  if (saysObserved !== Boolean(track.hardware_observed)) {
+    fail(`/electronics: SOURCE.json records ${track.label} hardware_observed=${track.hardware_observed}; the boundary line disagrees.`);
+  }
+}
+notes.push(`  boundary: ${boundary}`);
 
 // --- report ---------------------------------------------------------------
 console.log(`Checked ${checked.length} electronics routes:`);

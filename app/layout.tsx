@@ -4,30 +4,35 @@ import Nav from "./components/Nav";
 
 const siteUrl = "https://monogate.dev";
 
+// Site-wide copy: every page's share card and footer come from here, so a
+// claim in this file is on all of them. Until 2026-09-12 the share title was
+// "Math you can verify. Hardware that confirms it.", the description said
+// kernels run "on browser, ESP32, and FPGA" (the Electronics Lab's SOURCE.json
+// records no ESP32 hardware capture), and the footer advertised the archived
+// explorers.
+const DESCRIPTION =
+  "EML — a single-operator math language whose contracts compile to Lean " +
+  "theorems and whose kernels compile to C, Python and Verilog. Learn EML, " +
+  "try the Electronics Lab, and reproduce what the site checks.";
+const SHARE_TITLE = "monogate.dev — Math you can check. Compiled to C, Verilog and Lean.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: "monogate.dev — EML math language playground",
     template: "%s — monogate.dev",
   },
-  description:
-    "EML — a single-operator math language whose contracts compile to Lean " +
-    "theorems, running from your browser to ESP32 to FPGA. Explore the language, " +
-    "try the hardware lab, and learn EML.",
+  description: DESCRIPTION,
   keywords: [
     "EML operator", "elementary functions", "exp minus log", "arXiv:2603.21852",
-    "math language", "Lean 4", "ESP32", "FPGA", "monogate",
-    "hardware-validated math", "evidence bundles", "reproducible claims",
+    "math language", "Lean 4", "ESP32", "FPGA", "monogate", "monogate-forge",
   ],
   authors: [{ name: "monogate.dev" }],
   openGraph: {
     type: "website",
     siteName: "monogate.dev",
-    title: "monogate.dev — Math you can verify. Hardware that confirms it.",
-    description:
-      "EML is a single-operator math language. A kernel's contract compiles to a " +
-      "Lean theorem, and the kernel runs from your browser to ESP32 to FPGA. Try " +
-      "the Explorer, open the Electronics Lab, or learn EML.",
+    title: SHARE_TITLE,
+    description: DESCRIPTION,
     url: siteUrl,
     images: [
       {
@@ -40,10 +45,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "monogate.dev — Math you can verify. Hardware that confirms it.",
-    description:
-      "EML — a single-operator math language whose contracts compile to Lean " +
-      "theorems, running on browser, ESP32, and FPGA. Try the Explorer or Electronics Lab.",
+    title: SHARE_TITLE,
+    description: DESCRIPTION,
     images: ["/og-image.jpg"],
   },
   icons: {
@@ -64,11 +67,11 @@ function Footer() {
     }}>
       Monogate Dev Playground ·{" "}
       <a href="https://arxiv.org/abs/2603.21852" style={{ color: "#4facfe" }}>arXiv:2603.21852</a>
-      {" "}· Workbench surfaces · Evidence bundles · EML explorers ·{" "}
+      {" "}· Lessons · Electronics Lab · Reproduce ·{" "}
       <a href="https://monogate.org" style={{ color: "#4facfe" }}>monogate.org</a> ·{" "}
       <a href="https://monogate.dev" style={{ color: "#4facfe" }}>monogate.dev</a> ·{" "}
       <a href="https://github.com/agent-maestro/monogate" style={{ color: "#4facfe" }}>GitHub</a> ·{" "}
-      <a href="https://pypi.org/project/monogate/" style={{ color: "#4facfe" }}>PyPI</a>
+      <a href="https://pypi.org/project/monogate-forge/" style={{ color: "#4facfe" }}>PyPI monogate-forge</a>
     </footer>
   );
 }
@@ -79,7 +82,7 @@ const projectLd = {
   name: "Monogate",
   alternateName: "monogate.dev — Developer Playground",
   description:
-    "Developer playground for Monogate artifacts: EML explorers, evidence packets, rescue traces, packet builders, simulators, and bounded demos.",
+    "Lessons and an electronics lab for EML, the single-operator math language: compile kernels with monogate-forge and read Lean's verdict on their contracts with #print axioms.",
   url: siteUrl,
   applicationCategory: "DeveloperApplication",
   sameAs: [

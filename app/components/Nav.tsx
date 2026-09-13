@@ -4,13 +4,14 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 // Nav order is deliberately the first impression: what a visitor can do cold
-// (Learn, Electronics), then the reference page. The research-stack items
-// (Evidence, Builder, Digestion) and the product-wave items (Explorer, Lab,
-// Challenge) were archived on 2026-09-12; their URLs redirect to /archive.
+// (Learn, Electronics), then how to reproduce what the site checks. /docs kept
+// its URL when it became the Reproduce page on 2026-09-12. The research-stack
+// items (Evidence, Builder, Digestion) and the product-wave items (Explorer,
+// Lab, Challenge) were archived on 2026-09-12; their URLs redirect to /archive.
 const LINKS = [
   { href: "/learn",             label: "Learn" },
   { href: "/electronics",       label: "Electronics" },
-  { href: "/docs",              label: "Docs" },
+  { href: "/docs",              label: "Reproduce" },
   { href: "https://monogate.org", label: "Research ↗", external: true },
 ];
 
