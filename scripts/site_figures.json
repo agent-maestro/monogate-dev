@@ -21,11 +21,24 @@
     "superbest_lib_positive_total": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
-      "extract": "^SUPERBEST_V53_POS_TOTAL = (\\d+)$",
+      "extract": "^SUPERBEST_F16_POS_TOTAL = (\\d+)$",
       "flags": "m",
-      "_note": "python/monogate/superbest.py is the canonical SuperBEST library; /superbest's table was reconciled to it in d9a5b6c. monogate-lean's ModelAudit.lean proves superbest_v53_positive_total, 1+1+1+1+1+2+2+2+2+1 = 14: the arithmetic of the per-op sum, not that each per-op cost is minimal."
+      "_note": "python/monogate/superbest.py is the canonical SuperBEST library; /superbest's table was reconciled to it in d9a5b6c. Since monogate 6890c967 (2026-09-13) its headline is SUPERBEST_F16_POS_TOTAL, the ten positive-domain ops counted in the sixteen operators on monogate.org/framework: 15 on that date, a literal in the library. Each construction is evaluated numerically in that repository (python/tests/test_superbest_f16_constructions.py, which this gate does not run); the total is an upper bound, and no Lean theorem this site gates states it. Until 2026-09-13 this source read SUPERBEST_V53_POS_TOTAL, the count with ln x = EXL(0, x) as one node, which is now superbest_lib_positive_total_with_exl."
     },
     "superbest_lib_positive_naive": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
+      "extract": "^SUPERBEST_F16_POS_NAIVE = (\\d+)$",
+      "flags": "m"
+    },
+    "superbest_lib_positive_total_with_exl": {
+      "kind": "url",
+      "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
+      "extract": "^SUPERBEST_V53_POS_TOTAL = (\\d+)$",
+      "flags": "m",
+      "_note": "The same ten ops with ln x = EXL(0, x) as one node: 14 on 2026-09-13. EXL, exp(x)·ln y, is a census operator outside F16. monogate-lean's ModelAudit.lean states this sum as superbest_v53_positive_total, 1+1+1+1+1+2+2+2+2+1 = 14, with ln taken through EXL: the arithmetic of the per-op sum, not that each per-op cost is minimal. This site does not gate that theorem, and /superbest shows the count only beside words saying it counts ln through EXL."
+    },
+    "superbest_lib_positive_naive_with_exl": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
       "extract": "^SUPERBEST_V53_POS_NAIVE = (\\d+)$",
@@ -34,30 +47,31 @@
     "superbest_lib_general_total": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
-      "extract": "^SUPERBEST_V52_GEN_TOTAL = (\\d+)$",
-      "flags": "m"
+      "extract": "^SUPERBEST_F16_GEN_TOTAL = (\\d+)$",
+      "flags": "m",
+      "_note": "18 on 2026-09-13, over the basket superbest_lib_general_ops counts. Until then this source read SUPERBEST_V52_GEN_TOTAL (16); monogate 6890c967 made that name an alias of SUPERBEST_F16_GEN_TOTAL, so a regex expecting digits after it stopped matching."
     },
     "superbest_lib_general_naive": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
-      "extract": "^SUPERBEST_V52_GEN_NAIVE = (\\d+)$",
+      "extract": "^SUPERBEST_F16_GEN_NAIVE = (\\d+)$",
       "flags": "m"
     },
     "superbest_lib_positive_ops": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
-      "extract": "^SUPERBEST_V52_POS_OPS = \\(([^)]*)\\)",
+      "extract": "^SUPERBEST_F16_POS_OPS = \\(([^)]*)\\)",
       "flags": "m",
       "entries": "\"[a-z]+\"",
-      "_note": "The operators the positive-domain headline sums: 10 names on 2026-09-13 (exp, ln, neg, add, sub, mul, div, recip, pow, sqrt)."
+      "_note": "The operators the positive-domain F16 headline sums: 10 names on 2026-09-13 (exp, ln, neg, add, sub, mul, div, recip, pow, sqrt). SUPERBEST_V52_POS_OPS, which this source read until then, lists the same names."
     },
     "superbest_lib_general_ops": {
       "kind": "url",
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/python/monogate/superbest.py",
-      "extract": "^SUPERBEST_V52_GEN_OPS = \\(([^)]*)\\)",
+      "extract": "^SUPERBEST_F16_GEN_OPS = \\(([^)]*)\\)",
       "flags": "m",
       "entries": "\"[a-z]+\"",
-      "_note": "The general-domain basket SUPERBEST_V52_GEN_TOTAL/NAIVE (16/62) sum over: 8 names on 2026-09-13 (exp, ln, mul, div, neg, add, sub, abs). Until then \"8-op basket\" on /superbest was typed and unregistered."
+      "_note": "The general-domain basket SUPERBEST_F16_GEN_TOTAL/NAIVE sum over: 6 names after monogate 6890c967 (exp, mul, div, neg, add, sub). Earlier on 2026-09-13 this source read SUPERBEST_V52_GEN_OPS, 8 names with ln and abs, which that commit made an alias: abs has no real F16 tree, and ln no real value for x <= 0. Before that date the basket's op count on /superbest was typed and unregistered."
     },
     "monogate_org_qcc_equations": {
       "kind": "url",
@@ -174,13 +188,28 @@
       "pattern": "\"superbest_positive_total\": (\\d+),",
       "source": "superbest_lib_positive_total",
       "relation": "equal",
-      "_note": "app/superbest/page.tsx computes its headlines and the core savings row from these four integers, so the 80.8% and 74.2% it shows follow from checked figures. Until 2026-09-12 both headlines were hand-typed strings in this JSON that no gate read."
+      "_note": "app/superbest/page.tsx computes its headlines, the Which F16 note, Key results and the core savings row from six integers (this total, the general total, their two naive totals, and the total and naive with EXL), so every total and percentage it shows follows from checked figures: 15n / 79.5%, 18n / 66.7% and, with EXL, 14n / 80.8% on 2026-09-13. Until 2026-09-12 both headlines were hand-typed strings in this JSON that no gate read."
     },
     {
       "id": "superbest.positive_naive",
       "file": "data/superbest_v5_table.json",
       "pattern": "\"savings_positive\": \\{\\s*\"naive_total\": (\\d+),",
       "source": "superbest_lib_positive_naive",
+      "relation": "equal"
+    },
+    {
+      "id": "superbest.positive_total_with_exl",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"superbest_positive_total_with_exl\": (\\d+),",
+      "source": "superbest_lib_positive_total_with_exl",
+      "relation": "equal",
+      "_note": "The count with ln x = EXL(0, x) as one node. /superbest renders it only where the words say so (the Which F16 note and Key results) and in the Layer 2 cell of the core savings row, as monogate.org does."
+    },
+    {
+      "id": "superbest.positive_naive_with_exl",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "\"savings_positive_with_exl\": \\{\\s*\"naive_total\": (\\d+),",
+      "source": "superbest_lib_positive_naive_with_exl",
       "relation": "equal"
     },
     {
@@ -198,11 +227,12 @@
       "relation": "equal"
     },
     {
-      "id": "superbest.headline_general_ops",
+      "id": "superbest.general_basket_ops",
       "file": "app/superbest/page.tsx",
-      "pattern": "general domain, (\\d+)-op basket vs",
+      "pattern": "(\\d+)-op (?:general )?basket\\b",
       "source": "superbest_lib_general_ops",
-      "relation": "equal"
+      "relation": "equal",
+      "_note": "Every 'N-op basket' and 'N-op general basket' in the page source: the general headline and Key results, 2 matches on 2026-09-13. Until then this claim, superbest.headline_general_ops, read only the headline."
     },
     {
       "id": "superbest.core_catalog_ops",
@@ -210,6 +240,14 @@
       "pattern": "\"catalog\": \"Core arithmetic \\((\\d+) ops, positive domain\\)\"",
       "source": "superbest_lib_positive_ops",
       "relation": "equal"
+    },
+    {
+      "id": "superbest.positive_headline_ops_data",
+      "file": "data/superbest_v5_table.json",
+      "pattern": "(\\d+)-op headline",
+      "source": "superbest_lib_positive_ops",
+      "relation": "equal",
+      "_note": "totals.total_positive.note names the headline's op count. It is not rendered; the page computes its own from the table's row count."
     },
     {
       "id": "superbest.qcc_equations",
@@ -322,10 +360,10 @@
     {
       "id": "superbest.layer2_labels_page",
       "file": "app/superbest/page.tsx",
-      "pattern": "(\\d+)-op\\b(?! basket)",
+      "pattern": "(\\d+)-op\\b(?! (?:general )?basket)",
       "source": "monogate_org_total_operators",
       "relation": "equal",
-      "_note": "Every 'N-op' label in the page source except the general 8-op basket (claim superbest.headline_general_ops): the Layer 2 name, table headers, captions, Key results and one comment. 11 matches on 2026-09-13."
+      "_note": "Every 'N-op' label in the page source except the general basket (claim superbest.general_basket_ops): the Layer 2 name, table headers, captions, Key results and one comment. 11 matches on 2026-09-13."
     },
     {
       "id": "superbest.layer2_labels_data",
@@ -333,7 +371,7 @@
       "pattern": "(\\d+)-op\\b(?! basket| headline)",
       "source": "monogate_org_total_operators",
       "relation": "equal",
-      "_note": "The same label in the data the page renders (the high-impact note, the two-layer policy, EEA's description). '8-op basket' and '10-op headline' are other figures, registered elsewhere."
+      "_note": "The same label in the data the page renders (the high-impact note, the two-layer policy, EEA's description). 'N-op headline' is the positive headline's op count (claim superbest.positive_headline_ops_data), and 'N-op basket' would be the general basket's; the data names no basket count since 2026-09-13."
     },
     {
       "id": "superbest.lse_was",
@@ -351,7 +389,7 @@
       "url": "https://raw.githubusercontent.com/agent-maestro/monogate/master/blog/src/data/superbest.json",
       "key": "op",
       "fields": ["cost_positive", "cost_general", "v4_cost", "v4_cost_add_pos", "v4_cost_add_gen"],
-      "_note": "The per-operation node counts in /superbest's core table. Construction and note text is not compared: monogate.org's div row words them differently. The same counts equal python/monogate/superbest.py's SUPERBEST_COSTS_POS and SUPERBEST_COSTS_GEN (read by hand 2026-09-13, not gated). The column over v4_cost was headed 'Naive', which it is not (the library's naive costs are NAIVE_COSTS, mul 13 against v4_cost 2); it now reads 'v4 cost'."
+      "_note": "The per-operation node counts in /superbest's core table. Construction and note text is not compared: monogate.org's rows word them differently, and this copy leaves out the Lean labels this site does not gate and the counts monogate.org types in prose. After monogate 6890c967's F16 recount the same counts equal python/monogate/superbest.py's SUPERBEST_COSTS_POS and SUPERBEST_COSTS_GEN (ln 2 on the positive domain; mul 3, div 8 and recip 7 over all reals), and the cells that are null (ln, sqrt and pow over all reals, rendered as a dash) are the library's GENERAL_DOMAIN_GAPS, which also holds abs (read by hand 2026-09-13 after that commit, not gated). The column over v4_cost was headed 'Naive', which it is not (the library's naive costs are NAIVE_COSTS, mul 13 against v4_cost 2); it now reads 'v4 cost'."
     },
     {
       "id": "superbest.extended_operators",
@@ -510,6 +548,10 @@
     {
       "phrase": "compositional verification",
       "why": "Retired 2026-09-13: the Level 2 card on /learn/eml said 'compositional verification contracts'; see 'system-level guarantees'. The card now says 'contracts on composed functions'."
+    },
+    {
+      "phrase": "Minimum F16-node",
+      "why": "Retired 2026-09-13: /superbest opened with 'Minimum F16-node constructions for every elementary arithmetic primitive.' Nothing shows any count minimal. The counts are best-known upper bounds, each construction evaluated numerically in the monogate repository, and monogate.org says 'Best known'."
     }
   ]
 }

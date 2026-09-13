@@ -326,8 +326,9 @@ async function runCanaries() {
     "a different line in an allowed file is still a hit",
     retiredHits("a.tsx", "T19 (Lean-verified)\nAll 108 kernels are Lean-verified.", allowT19).hits.length === 1,
   );
-  // Added 2026-09-13 with the first counted sources: "8-op basket" on /superbest
-  // is the length of a tuple in superbest.py, not a number written there.
+  // Added 2026-09-13 with the first counted sources: the general basket's op
+  // count on /superbest ("N-op basket") is the length of a tuple in
+  // superbest.py, not a number written there.
   const counted = { url: "u", extract: "^POS = \\(([^)]*)\\)", flags: "m", entries: '"\\w+"' };
   expect(
     "a counted source reads the entries inside its region, not the file's",

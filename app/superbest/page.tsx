@@ -111,17 +111,35 @@ export default function SuperBESTPage() {
   const softplus = mlRow("softplus");
   const layer2Costs = [...new Set(extOps.map((row) => row.cost_23op))];
 
+  // The notes under the headline quote three core-table cells. They are read
+  // from the table, which check_site_figures.mjs compares cell by cell with
+  // monogate.org's copy, so a recount there cannot leave a stale count in a
+  // sentence here. A cell with no count fails the build instead of rendering.
+  const coreCount = (prefix: string, field: "cost_positive" | "cost_general") => {
+    const row = ops.find((r) => r.op.startsWith(prefix));
+    const value = row?.[field];
+    if (typeof value !== "number") throw new Error(`/superbest: core row ${prefix} has no ${field}`);
+    return value;
+  };
+  const lnPositive = coreCount("ln(", "cost_positive");
+  const mulGeneral = coreCount("mul(", "cost_general");
+  const divGeneral = coreCount("div(", "cost_general");
+
   // Headline figures are computed from the totals block, never typed as prose.
-  // Its four integers are checked against python/monogate/superbest.py, the
-  // canonical library, by scripts/check_site_figures.mjs before each deploy.
+  // Its six integers are checked against python/monogate/superbest.py, the
+  // canonical library, by scripts/check_site_figures.mjs before each deploy:
+  // the F16 totals against SUPERBEST_F16_POS_* and SUPERBEST_F16_GEN_*, and the
+  // count with ln x = EXL(0, x) as one node against SUPERBEST_V53_POS_*.
   // Until 2026-09-12 both headlines were hand-typed strings no gate read.
   const pos = savings(totals.savings_positive.superbest_positive_total, totals.savings_positive.naive_total);
   const gen = savings(totals.savings_general.superbest_general_total, totals.savings_general.naive_total);
+  const exl = savings(totals.savings_positive_with_exl.superbest_positive_total_with_exl, totals.savings_positive_with_exl.naive_total);
   const headline = domain === "positive"
-    ? `${pos.total}n / ${pos.pct}% savings (positive domain, ${ops.length}-op headline vs ${pos.naive}n naive)`
-    : `${gen.total}n / ${gen.pct}% savings (general domain, 8-op basket vs ${gen.naive}n naive)`;
-  // The core-arithmetic row of the savings summary is the positive headline.
-  const cell = (v: string) => (v === "=headline" ? `${pos.pct}%` : v);
+    ? `${pos.total}n / ${pos.pct}% savings (positive domain, ${ops.length}-op headline vs ${pos.naive}n naive, F16)`
+    : `${gen.total}n / ${gen.pct}% savings (general domain, 6-op basket vs ${gen.naive}n naive, F16)`;
+  // The core-arithmetic row of the savings summary: Layer 1 is the positive F16
+  // headline; Layer 2 counts ln x = EXL(0, x) as one node, as monogate.org's does.
+  const cell = (v: string) => (v === "=headline" ? `${pos.pct}%` : v === "=with_exl" ? `${exl.pct}%` : v);
 
   const hiCols = (
     <tr>
@@ -162,17 +180,19 @@ export default function SuperBESTPage() {
         <h1 style={{ fontSize: "1.8rem", fontWeight: 700, color: C.text, marginBottom: 8 }}>SuperBEST Routing Table</h1>
         {/* Until 2026-09-12 this read "Taxonomy definitively closed: PROVED", and
             the badge said a 24th operator does not exist. No Lean proof of
-            CONJ_NO_OP_24 exists in machlib, monogate-lean or monogate-research. */}
+            CONJ_NO_OP_24 exists in machlib, monogate-lean or monogate-research.
+            Until 2026-09-13 it called the constructions minimum; nothing shows
+            any count minimal, and monogate.org says "Best known". */}
         <p style={{ color: C.muted, marginBottom: 24, fontSize: 13 }}>
-          Minimum F16-node constructions for every elementary arithmetic primitive.
-          Taxonomy: {lock.total_operators} operators. {lock.conj_no_op_24}.
+          Best known F16-node constructions for every elementary arithmetic primitive. Every count is an upper bound;
+          none is shown to be minimal. Taxonomy: {lock.total_operators} operators. {lock.conj_no_op_24}.
         </p>
 
         {/* Two-layer policy */}
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 6, padding: "12px 18px", marginBottom: 28, fontSize: 12, color: C.muted, lineHeight: 1.8 }}>
           <strong style={{ color: C.text }}>Two-layer accounting policy — </strong>
           <span style={{ background: "rgba(79,172,254,0.12)", color: C.accent, padding: "1px 7px", borderRadius: 3, fontWeight: 700, margin: "0 4px" }}>Layer 1 (F16)</span>
-          formal theorems, arXiv paper; only F16 orbit nodes counted.
+          formal theorems, arXiv paper; which sixteen operators each table counts is said under the headline.
           <span style={{ background: "rgba(94,196,122,0.12)", color: C.green, padding: "1px 7px", borderRadius: 3, fontWeight: 700, margin: "0 4px" }}>Layer 2 (23-op)</span>
           library/ML/physics use; extended operators count as {layer2Costs.length === 1 ? `${layer2Costs[0]}n` : "their listed cost"}. Must be labeled.
         </div>
@@ -191,7 +211,35 @@ export default function SuperBESTPage() {
           ))}
         </div>
 
-        <div style={{ marginBottom: 32, fontSize: "0.9rem", fontWeight: 700, color: C.accent }}>{headline}</div>
+        <div style={{ marginBottom: 16, fontSize: "0.9rem", fontWeight: 700, color: C.accent }}>{headline}</div>
+
+        {/* What the core counts are, since monogate.org's F16 recount of
+            2026-09-13. Every count in these two notes is read from the data. */}
+        <p style={{ fontSize: 12, color: C.muted, marginBottom: 14, lineHeight: 1.7 }}>
+          <strong style={{ color: C.text }}>Which F16.</strong> The core table counts nodes in the sixteen operators on{" "}
+          <a href="https://monogate.org/framework" style={{ color: C.accent }}>monogate.org/framework&nbsp;↗</a> and
+          nothing else, since monogate.org recounted it on 2026-09-13. ln x takes {lnPositive} nodes there,
+          LEdiv(0, F13(−1, x)), so the positive-domain total is {pos.total}n / {pos.pct}%. Counting ln x = EXL(0, x) as
+          one node instead, with the census operator EXL, exp(x)·ln y, gives {exl.total}n / {exl.pct}%. Both totals
+          are upper bounds. Each construction is evaluated numerically on its domain by the monogate
+          repository&apos;s <code>python/tests/test_superbest_f16_constructions.py</code>, which this site does not
+          run, and this site gates no Lean theorem that states either total. Before each deploy the totals are compared
+          with python/monogate/superbest.py, and every node count in the table with monogate.org&apos;s copy. The
+          high-impact tables below follow the taxonomy-lock paper, whose &quot;F16 orbit&quot; is a different sixteen
+          that leaves out LEAd (F11 on /framework).
+        </p>
+        <p style={{ fontSize: 12, color: C.muted, marginBottom: 28, lineHeight: 1.7 }}>
+          <strong style={{ color: C.text }}>General domain.</strong> The general basket is exp, neg, add, sub, mul and
+          div, each with one F16 tree valid for every real input where the operation is defined (div needs y ≠ 0).
+          mul takes {mulGeneral} nodes, LEdiv(0, F13(y, DEML(x, 1))), and div takes {divGeneral}. A numerical search
+          over F16 trees with constant leaves 0, 1, −1, 2 and 1/2 finds no smaller signed division
+          (<code>python/benchmarks/superbest_f16/search.py</code> in the monogate repository); a search is not a
+          proof. Before the recount, mul and div counted sign-dispatch case splits, one circuit per sign quadrant, not
+          trees. Two operations left the basket: abs, because no real F16 tree computes |x| (every tree is
+          real-analytic where it is defined, and |x| is not analytic at 0; a paper argument, not a Lean proof), and
+          ln, which has no real value for x ≤ 0. recip has a row-level entry for x ≠ 0; sqrt and pow have none over
+          all reals. The naive costs are the monogate library&apos;s pure-EML figures, not re-derived in the recount.
+        </p>
 
         {/* Core arithmetic */}
         <SectionHead mt={0}>Core Arithmetic Primitives (F16 Layer 1)</SectionHead>
@@ -334,8 +382,9 @@ export default function SuperBESTPage() {
           </table>
         </div>
         <p style={{ fontSize: 12, color: C.muted, marginTop: 10, lineHeight: 1.7 }}>
-          The core-arithmetic row is the positive-domain headline, computed from totals that are checked against the
-          monogate.superbest library before each deploy. The ML, quantum and physics rows are pooled over the SuperBEST
+          The core-arithmetic row&apos;s Layer 1 cell is the positive-domain F16 headline; its Layer 2 cell counts
+          ln x = EXL(0, x) as one node, as monogate.org&apos;s does. Both are computed from totals that are checked
+          against the monogate.superbest library before each deploy. The ML, quantum and physics rows are pooled over the SuperBEST
           taxonomy lock&apos;s own item rows, as monogate.org recomputed them on 2026-09-13 (they were rounded estimates
           before); the aggregate row is still the paper&apos;s rounded estimate, dated 2026-04-21. Nothing on this site
           re-derives them. Before each deploy they are compared with the copy monogate.org shows, so a change there
@@ -378,7 +427,7 @@ export default function SuperBESTPage() {
         <div style={{ marginTop: 48, padding: 24, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8 }}>
           <h2 style={{ fontSize: "1rem", fontWeight: 600, color: C.text, marginBottom: 12 }}>Key results</h2>
           <ul style={{ paddingLeft: 20, color: C.muted, fontSize: 13, lineHeight: 1.9 }}>
-            <li><strong style={{ color: C.text }}>Core table:</strong> {pos.total}n / {pos.pct}% savings vs {pos.naive}n naive (positive domain) — totals checked against the monogate.superbest library before each deploy; unaffected by extended operators</li>
+            <li><strong style={{ color: C.text }}>Core table, recounted in F16 (2026-09-13):</strong> {pos.total}n / {pos.pct}% vs {pos.naive}n naive on the positive domain and {gen.total}n / {gen.pct}% vs {gen.naive}n naive on the 6-op general basket; {exl.total}n / {exl.pct}% when ln counts as one EXL node. Best-known upper bounds, evaluated numerically in the monogate repository; the totals are checked against the monogate.superbest library before each deploy. Extended operators do not change these counts</li>
             <li><strong style={{ color: C.text }}>LSE corrected:</strong> ln(e^x+e^y) = {lse.f16}n in F16 (was 5n); {lse.op23}n in 23-op via EEA+ln</li>
             <li><strong style={{ color: C.text }}>Taxonomy:</strong> {lock.total_operators} operators catalogued. CONJ_NO_OP_24 (no 24th operator) is a conjecture, argued on paper; no Lean proof exists</li>
             <li><strong style={{ color: C.text }}>softplus = {softplus.f16}n</strong> {softplus.f16 === softplus.op23 ? "in both layers" : `in F16 (${softplus.op23}n in 23-op)`} via EML(x,1/e)+ln (Category B: genuine F16)</li>
