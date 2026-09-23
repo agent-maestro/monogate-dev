@@ -512,9 +512,11 @@ hello.c           ← C`}</Code>
 
 /*
  * add
- * Chain order: 0     Cost class: p0-d1-w0-c0
- * EML depth:   1  Drift risk: LOW
+ * Pfaffian chain count (eml-cost pfaffian_r): 0     Cost class: p0-d1-w0-c0
+ * EML depth:   1  Symbolic band: LOW (from pfaffian_r only)
+ * Numerical:   cancellation exposure NONE  (no mixed-sign subtraction)
  * Dynamics:    0 osc, 0 decay  (predicted_r=0)
+ * obligations for add: none declared (this artifact proves well-typedness only)
  * FPGA est:   1 MAC, 0 exp, 0 ln, 0 trig -> 2 cy @ 32-bit
  */
 double add(double a, double b) {
@@ -584,60 +586,78 @@ fn damped_wave(t: Real, decay: Real, freq: Real) -> Real {
 }`}</Code>
 
         <P>The available math functions:</P>
-        <Code>{`FUNCTION       WHAT IT DOES                 CHAIN ORDER
-─────────────────────────────────────────────────────────
-+ - * /        arithmetic                   0
-exp(x)         e to the x                   adds 1
-ln(x)          natural log of x             adds 1
-sin(x)         sine                         adds 2
-cos(x)         cosine                       adds 2
-tan(x)         tangent                      adds 2
-sqrt(x)        square root                  0
-tanh(x)        hyperbolic tangent           adds 2
-arcsin(x)      inverse sine                 adds 2
-arccos(x)      inverse cosine               adds 2
-atan2(y, x)    angle from coordinates       adds 2
-abs(x)         absolute value               0
-clamp(x, l, h) clip to range                0
-min(a, b)      smaller of two               0
-max(a, b)      larger of two                0
-pow(x, y)      x to the y                   0 to 1
-eml(x, y)      exp(x) - ln(y)               adds 1`}</Code>
+        <Code>{`FUNCTION       WHAT IT DOES                 co   pfaffian_r
+──────────────────────────────────────────────────────────────
++ - * /        arithmetic                   0    0
+exp(x)         e to the x                   1    1
+ln(x)          natural log of x             1    1
+sqrt(x)        square root                  1    1
+pow(x, y)      x to the y                   1    1
+pow(x, 2.0)    constant whole exponent      0    1
+tanh(x)        hyperbolic tangent           1    1
+eml(x, y)      exp(x) - ln(y)               1    2
+sin(x)         sine                         2    2
+cos(x)         cosine                       2    2
+tan(x)         tangent                      2    1
+atan2(y, x)    angle from coordinates       2    0
+arcsin(x)      inverse sine                 3    0
+arccos(x)      inverse cosine               3    0
+abs(x)         absolute value               0    0
+clamp(x, l, h) clip to range                0    0
+min(a, b)      smaller of two               0    0
+max(a, b)      larger of two                0    0`}</Code>
+        <P>
+          These are the two numbers <Inline>--profile-only</Inline> prints for
+          a function whose body is one such call: <Inline>co</Inline>, the
+          chain order the language spec defines, and{" "}
+          <Inline>pfaffian_r</Inline>, the Pfaffian chain count{" "}
+          <Inline>eml-cost</Inline> derives. They are not the same number, and
+          nesting is not addition: <Inline>exp(sin(x))</Inline> is{" "}
+          <Inline>co 3</Inline>, but a product of two of them is the larger of
+          the two, not the sum.
+        </P>
 
         <Heading>Compile and read the profile</Heading>
         <Code lang="bash">{`eml-compile transcendental.eml --profile-only`}</Code>
         <P>The compiler tells you about each function (two of the three shown):</P>
-        <Code>{`  exponential_decay
-    status: ok    chain_order: 1    cost_class: p1-d2-w1-c0    eml_depth: 2    drift: MEDIUM
+        <Code>{`# Module: (unnamed)  (3 fn, 0 const, 0 type)
+# Source: transcendental.eml
+# co: chain order (lang/spec/types/chain_order_types.md)    pfaffian_r: eml-cost's Pfaffian chain count
+
+  exponential_decay
+    status: ok    co: 1    pfaffian_r: 1    cost_class: p1-d2-w1-c0    eml_depth: 2    drift: MEDIUM
     dynamics: 0 osc, 1 decay  (predicted_r=1)
     fpga: 2 MAC, 1 exp, 0 ln, 0 trig (4 cy @ 32-bit)
 
   damped_wave
-    status: ok    chain_order: 3    cost_class: p3-d5-w2-c0    eml_depth: 5    drift: HIGH
+    status: ok    co: 2    pfaffian_r: 3    cost_class: p3-d5-w2-c0    eml_depth: 5    drift: HIGH
     dynamics: 1 osc, 1 decay  (predicted_r=3)
     fpga: 5 MAC, 1 exp, 0 ln, 1 trig (10 cy @ 64-bit)`}</Code>
         <P>
           <Inline>exponential_decay</Inline> has one <Inline>exp</Inline>{" "}
-          layer, so chain order 1. <Inline>damped_wave</Inline> stacks{" "}
-          <Inline>exp</Inline> and <Inline>cos</Inline> into chain order 3, and
+          layer, so chain order 1. <Inline>damped_wave</Inline> multiplies an{" "}
+          <Inline>exp</Inline> by a <Inline>cos</Inline>: the chain order is
+          the larger of the two, 2, while the Pfaffian chain count is 3 —
+          the <Inline>cos</Inline> carries its own <Inline>sin</Inline> — and
           the drift flag rises with it.
         </P>
 
         <Heading>What chain order means (plain English)</Heading>
-        <Code>{`Chain 0:   Just arithmetic. x + y, x * y, x^2.
+        <Code>{`Chain 0:   Just arithmetic. x + y, x * y, pow(x, 2.0).
            Usually simplest. Low drift risk on normal ranges.
            Still validate your numeric range.
 
-Chain 1:   One exp or ln involved.
+Chain 1:   One exp, ln, sqrt, pow or tanh layer.
            Like exponential decay, compound interest.
            Often manageable. Check domains and exponent size.
 
-Chain 2:   Trig involved. sin, cos, tanh.
-           Like oscillations, waves, rotations.
+Chain 2:   Trig involved. sin, cos, tan, atan2.
+           Like oscillations, waves, rotations. A damped
+           oscillator (exp times cos) is still chain 2.
            Usually wants float32+ and sample-grid checks.
 
-Chain 3+:  Multiple layers nested.
-           Like exp(sin(x)) or damped oscillators.
+Chain 3+:  Layers nested, or an inverse trig function.
+           Like exp(sin(x)), arcsin(x), arccos(x).
            Often wants float64. FPGA profiles need review.
            The compiler warns you automatically.`}</Code>
 
@@ -673,8 +693,12 @@ fn pid(error: Real, integral: Real, derivative: Real) -> Real {
 eml-compile pid_controller.eml --profile-only`}</Code>
 
         <Heading>What the compiler tells you</Heading>
-        <Code>{`  pid
-    status: ok    chain_order: 0    cost_class: p0-d2-w0-c0    eml_depth: 2    drift: LOW
+        <Code>{`# Module: (unnamed)  (1 fn, 3 const, 0 type)
+# Source: pid_controller.eml
+# co: chain order (lang/spec/types/chain_order_types.md)    pfaffian_r: eml-cost's Pfaffian chain count
+
+  pid
+    status: ok    co: 0    pfaffian_r: 0    cost_class: p0-d2-w0-c0    eml_depth: 2    drift: LOW
     dynamics: 0 osc, 0 decay  (predicted_r=0)
     fpga: 2 MAC, 0 exp, 0 ln, 0 trig (4 cy @ 32-bit)`}</Code>
 
@@ -697,7 +721,7 @@ fn adaptive_pid(error: Real, t: Real) -> Real {
         <P>Profile it again:</P>
         <Code lang="bash">{`eml-compile nonlinear_pid.eml --profile-only`}</Code>
         <Code>{`  adaptive_pid
-    status: ok    chain_order: 3    cost_class: p3-d5-w2-c0    eml_depth: 5    drift: HIGH
+    status: ok    co: 2    pfaffian_r: 3    cost_class: p3-d5-w2-c0    eml_depth: 5    drift: HIGH
     dynamics: 1 osc, 1 decay  (predicted_r=3)
     fpga: 5 MAC, 1 exp, 0 ln, 1 trig (10 cy @ 64-bit)`}</Code>
 
@@ -712,7 +736,7 @@ fn adaptive_pid(error: Real, t: Real) -> Real {
           smoothly). What does the chain order become?
           <span style={{ color: MUTED }}>
             {" "}
-            (Answer: chain 2 — tanh adds 2 to chain 0.)
+            (Answer: co 1 — tanh adds one layer to chain 0.)
           </span>
         </Exercise>
       </Lesson>
@@ -763,7 +787,7 @@ ensures (result <= max_output)
           Open <Inline>safe_pid.lean</Inline> (imports trimmed):
         </P>
         <Code lang="lean">{`noncomputable def safe_pid (error : Real) (integral : Real) : Real :=
-  (min (max ((Kp * error) + (Ki * integral)) (-max_output)) max_output)
+  (max (-max_output) (min ((Kp * error) + (Ki * integral)) max_output))
 
 theorem pid_is_bounded (error : Real) (integral : Real)
     (h1 : ((abs error) < (50.0 : Real)))
@@ -771,12 +795,18 @@ theorem pid_is_bounded (error : Real) (integral : Real)
     (h_clamp1 : (-max_output) ≤ max_output) :
     (((safe_pid error integral) >= (-max_output))) ∧ (((safe_pid error integral) <= max_output)) := by
   unfold safe_pid
-  refine ⟨?_, ?_⟩ <;>
-    first
-    | (apply lo_le_clamp <;> (first | assumption | mach_positivity))
-    | apply clamp_le_hi
-    -- ... 13 more tactics, tried in order ...
-    | sorry  -- out of reach; left for the prover`}</Code>
+  try unfold Kp at *
+  try unfold Ki at *
+  try unfold max_output at *
+  try mach_split_hyps
+  try dsimp only
+  all_goals
+    (try simp only [add_zero, zero_add, mul_zero, zero_mul, mul_one_ax, one_mul_thm, div_one_eq, ofSci_zero]) <;> refine ⟨?_, ?_⟩ <;>
+      first
+      | (apply lo_le_clamp <;> (first | assumption | mach_positivity))
+      | (apply clamp_le_hi <;> (first | assumption | mach_positivity))
+      -- ... 14 more tactics, tried in order ...
+      | sorry  -- out of reach; left for the prover`}</Code>
 
         <P>
           One hypothesis per <Inline>requires</Inline>, one conclusion per{" "}
@@ -798,7 +828,7 @@ lake build          # needs elan; about ten minutes the first time
 echo '#print axioms pid_is_bounded' >> /path/to/safe_pid.lean
 lake env lean /path/to/safe_pid.lean`}</Code>
         <Code>{`'pid_is_bounded' depends on axioms: [propext, Classical.choice, Real, Quot.sound,
- addR, leR, le_iff_lt_or_eq, ltR, lt_total, mulR, negR, realOfScientific, zeroR]`}</Code>
+ addR, leR, le_iff_lt_or_eq, ltR, mulR, negR, realOfScientific, zeroR]`}</Code>
         <P>
           No <Inline>sorryAx</Inline> in the list, so{" "}
           <Inline>pid_is_bounded</Inline> is proved. The list is what the proof
@@ -889,9 +919,9 @@ eml-compile fpga_pid.eml --allocate`}</Code>
           <Inline>--allocate</Inline> prints the plan:
         </P>
         <Code>{`  FPGA allocation plan for Arty A7-100
-  Pipeline depth: 2 stages
+  EML depth:      2 (a resource estimate, not latency)
   Clock target:   100 MHz
-  Throughput:     50.0 Msamples/s
+  Timing:         not modeled here (see the emitted RTL)
 
   Resources:    100 LUTs     2 DSPs      0 KB BRAM
   MAC units:  2
@@ -901,10 +931,17 @@ eml-compile fpga_pid.eml --allocate`}</Code>
           The start of <Inline>pid.v</Inline>:
         </P>
         <Code lang="verilog">{`// Target device: Arty A7-100
-// Pipeline depth: 2 stages
+// EML depth:    2 (a resource estimate, not latency)
 // Estimated:    100 LUTs, 2 DSPs, 0 KB BRAM
-// Throughput:   50.0 Msamples/s @ 100 MHz
+// Clock target: 100 MHz (the plan does not model timing)
 
+\`default_nettype none
+
+// Pipeline: hardware_pid
+// Pfaffian chain count (eml-cost pfaffian_r): 0     Cost class: p0-d2-w0-c0
+// EML depth:   2  Width: 32 bits
+// Total latency: 3 cycles (2 internal + 1 output reg)
+// Throughput:    a new sample on every clock edge (100 Msamples/s at 100 MHz)
 module hardware_pid_pipeline #(
     parameter WIDTH = 32,
     parameter FRAC  = 16
@@ -946,13 +983,14 @@ module hardware_pid_pipeline #(
 DSPs:      Dedicated multiplier blocks. 2 out of 240 available.
            One for each multiplication (Kp*error, Ki*integral).
 
-Pipeline depth, Throughput:
-           The allocator's model, not a measurement: throughput is the
-           clock divided by the depth. Simulated, pid.v takes a new
-           sample on every clock edge and answers 3 cycles later (its
-           header says "Total latency: 3 cycles"), so it runs at the
-           clock rate: 100 Msamples/s at 100 MHz, not 50. Whether a
-           part closes timing at 100 MHz is for synthesis to say.
+EML depth: The allocator's resource estimate, NOT a latency and not a
+           throughput. 0.14.4 called it "Pipeline depth" and divided the
+           clock by it to print "50.0 Msamples/s"; that number was wrong.
+           Simulated, pid.v takes a new sample on every clock edge and
+           answers 3 cycles later, so it runs at the clock rate. 0.15.0
+           and 0.16.0 print "Timing: not modeled here" in the plan and
+           put the real "Total latency: 3 cycles" in the RTL header.
+           Whether a part closes timing at 100 MHz is for synthesis to say.
 
 For comparison:
   Software path: run and test first.
@@ -1041,7 +1079,7 @@ eml-compile my_project.eml --target lean -o my_project.lean
 eml-compile my_project.eml --target verilog -o my_project.v`}</Code>
         <P>
           Then run <Inline>#print axioms force_proportional</Inline> as in
-          Lesson 4. With monogate-forge 0.14.4 it shows{" "}
+          Lesson 4. With monogate-forge 0.16.0 it shows{" "}
           <Inline>sorryAx</Inline>: the bound is true (the output stays under
           1000 + 500) but not proved. Can you rewrite the function so it is?
         </P>
@@ -1126,11 +1164,12 @@ CHECK A PROOF (in machlib/foundations)
   lake env lean /path/to/out.lean    # sorryAx in the list = not proved
 
 PROFILE READING
-  chain_order: 0   polynomial (usually low drift risk)
-  chain_order: 1   exponential (check domains and exponent size)
-  chain_order: 2   trigonometric (sample-grid checks recommended)
-  chain_order: 3+  nested (stronger numeric review recommended)
-  drift_risk: LOW / MEDIUM / HIGH  precision warning`}</Code>
+  co: 0    polynomial (usually low drift risk)
+  co: 1    exponential, sqrt, pow, tanh (check domains and exponent size)
+  co: 2    trigonometric (sample-grid checks recommended)
+  co: 3+   nested, or inverse trig (stronger numeric review recommended)
+  pfaffian_r: N   eml-cost's Pfaffian chain count; not the same as co
+  drift: LOW / MEDIUM / HIGH  precision warning`}</Code>
       </section>
 
       {/* ── Next Steps ─────────────────────────────────── */}

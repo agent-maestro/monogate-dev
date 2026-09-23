@@ -32,6 +32,10 @@ const INSTALL = `python3 -m venv .venv
 pip install monogate-forge
 eml-compile --version`;
 
+// The body is clamp, not min. min has no module in the Verilog backend, so
+// monogate-forge 0.15.0 and 0.16.0 refuse `--target verilog` for a kernel that calls it
+// (0.14.4 wrote an instantiation of a min_pipeline that nothing defines).
+// Forge's own @target(fpga) examples bound with clamp for the same reason.
 const SOURCE = `module clamp_demo;
 
 @verify(lean, theorem = "clamp_demo_bounded")
@@ -40,7 +44,7 @@ fn clamp_demo(request: Real, limit: Real) -> Real
     requires (limit > 0.0)
     ensures (result <= limit)
 {
-    min(request, limit)
+    clamp(request, 0.0, limit)
 }`;
 
 const COMPILE = `eml-compile clamp_demo.eml --profile-only

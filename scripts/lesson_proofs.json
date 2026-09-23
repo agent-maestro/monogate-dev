@@ -59,7 +59,7 @@
       "id": "intro.l6.force_proportional",
       "file": "app/learn/eml/intro/page.tsx",
       "lines": [
-        "Lesson 4. With monogate-forge 0.14.4 it shows",
+        "Lesson 4. With monogate-forge 0.16.0 it shows",
         "1000 + 500) but not proved. Can you rewrite the function so it is?"
       ],
       "source": "my_project.eml",
@@ -72,7 +72,7 @@
       "file": "app/learn/eml/intro/guard/page.tsx",
       "lines": [
         "<Inline>guard_output_bounded</Inline> is proved, resting on Lean&apos;s own axioms and MachLib&apos;s axioms for the real numbers.",
-        "With monogate-forge 0.14.4 and MachLib, guard_output_bounded is proved."
+        "With monogate-forge 0.16.0 and MachLib, guard_output_bounded is proved."
       ],
       "source": "threshold_reflex_v0.eml",
       "command": "eml-compile threshold_reflex_v0.eml --target lean -o threshold_reflex_v0.lean",
@@ -84,7 +84,7 @@
       "id": "engineering.l3.saturated_in_range",
       "file": "app/learn/eml/engineering/EngineeringClient.tsx",
       "lines": [
-        "With monogate-forge 0.14.4, #print axioms shows two proved and one not.",
+        "With monogate-forge 0.16.0, #print axioms shows two proved and one not.",
         "saturated_in_range and safe_output_bounded are proved: no sorryAx."
       ],
       "source": "safe_control.eml",
@@ -96,9 +96,10 @@
       "id": "engineering.l3.safe_output_bounded",
       "file": "app/learn/eml/engineering/EngineeringClient.tsx",
       "lines": [
-        "With monogate-forge 0.14.4, #print axioms shows two proved and one not.",
+        "With monogate-forge 0.16.0, #print axioms shows two proved and one not.",
         "saturated_in_range and safe_output_bounded are proved: no sorryAx.",
-        "no sorryAx for safe_output_bounded, so it is proved."
+        "no sorryAx for safe_output_bounded, so it is proved.",
+        "which is why the system theorem is proved while pid_bounded is not."
       ],
       "source": "safe_control.eml",
       "command": "eml-compile safe_control.eml --target lean -o safe_control.lean",
@@ -106,10 +107,27 @@
       "verdict": "proved"
     },
     {
+      "id": "engineering.l3.safe_output_via_saturate",
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "lines": [
+        "and safe_output_bounded shows sorryAx. 0.14.4 inlined every call and proved that body."
+      ],
+      "source": "safe_control.eml",
+      "edits": [
+        {
+          "find": "clamp(pid(error, integral, 2.5, 0.1), -100.0, 100.0)",
+          "replace": "saturate(pid(error, integral, 2.5, 0.1), -100.0, 100.0)"
+        }
+      ],
+      "command": "eml-compile safe_control.eml --target lean -o safe_control.lean",
+      "theorem": "safe_output_bounded",
+      "verdict": "not_proved"
+    },
+    {
       "id": "engineering.l3.pid_bounded",
       "file": "app/learn/eml/engineering/EngineeringClient.tsx",
       "lines": [
-        "With monogate-forge 0.14.4, #print axioms shows two proved and one not.",
+        "With monogate-forge 0.16.0, #print axioms shows two proved and one not.",
         "but not proved: the tactics Forge tries do not find a proof"
       ],
       "source": "safe_control.eml",

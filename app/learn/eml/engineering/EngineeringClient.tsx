@@ -134,7 +134,7 @@ eml-compile my_function.eml --profile-only
 
 # Output for damped_wave, exp(-decay * t) * cos(freq * t):
 #   damped_wave
-#     status: ok    chain_order: 3    cost_class: p3-d5-w2-c0    eml_depth: 5    drift: HIGH
+#     status: ok    co: 2    pfaffian_r: 3    cost_class: p3-d5-w2-c0    eml_depth: 5    drift: HIGH
 #     dynamics: 1 osc, 1 decay  (predicted_r=3)
 #     fpga: 5 MAC, 1 exp, 0 ln, 1 trig (10 cy @ 64-bit)
 #
@@ -142,11 +142,11 @@ eml-compile my_function.eml --profile-only
 #            │  │  │  └─ c0: no primitive outside EML
 #            │  │  └──── w2: chain order along the deepest single path
 #            │  └─────── d5: eml_depth, the longest root-to-leaf path
-#            └────────── p3: chain order of the whole function`,
+#            └────────── p3: the Pfaffian chain count of the whole function`,
         explanation: [
-          "p = chain order: how many transcendental layers the function stacks. It matches chain_order.",
+          "p = the Pfaffian chain count: it matches the pfaffian_r the profiler prints, NOT co. For damped_wave p is 3 while co is 2, because cos carries its own sin into the chain.",
           "d = eml_depth, the longest path in the EML tree. The FPGA estimate tracks it: 2 cycles per level in these examples.",
-          "w = the chain order along the deepest single path. In damped_wave, exp and cos sit on different branches, so w is 2 while p is 3.",
+          "w = the chain order along the deepest single path. In damped_wave, exp and cos sit on different branches, so w is 2 while p is 3. w is also what co reports here.",
           "c = 1 when the function uses a primitive that is Pfaffian but not expressible in EML (Bessel, Airy, Lambert W); 0 otherwise.",
         ],
       },
@@ -156,18 +156,18 @@ eml-compile my_function.eml --profile-only
 fn damped_wave_v1(t: Real, decay: Real, freq: Real) -> Real {
     exp(-decay * t) * cos(freq * t) * sin(freq * t)
 }
-# chain_order: 3    fpga: 5 MAC, 1 exp, 0 ln, 2 trig
+# co: 2    pfaffian_r: 3    fpga: 5 MAC, 1 exp, 0 ln, 2 trig
 
 # VERSION 2: trig identity (exp, sin)
 fn damped_wave_v2(t: Real, decay: Real, freq: Real) -> Real {
     exp(-decay * t) * sin(2.0 * freq * t) * 0.5
 }
-# chain_order: 3    fpga: 5 MAC, 1 exp, 0 ln, 1 trig
+# co: 2    pfaffian_r: 3    fpga: 5 MAC, 1 exp, 0 ln, 1 trig
 
 # Same output, same chain order. One trig unit fewer.`,
         explanation: [
           "sin(x)·cos(x) = ½ sin(2x) — a trig identity drops one transcendental.",
-          "Chain order does not move here (both are 3). The FPGA estimate does: 2 trig units become 1.",
+          "Neither cost number moves here (both are co 2, pfaffian_r 3). The FPGA estimate does: 2 trig units become 1.",
           "This isn't micro-optimization. trig_units are scarce hardware.",
           "Run --profile-only on both versions to see the cost before you build anything.",
         ],
@@ -210,8 +210,9 @@ fn nested(x: Real) -> Real { exp(sin(x)) }`,
       "Level 1 showed you @verify with simple requires/ensures. Here each "
       + "function in a small system gets its own contract, and so does the "
       + "function that composes them. Forge emits one theorem per @verify and "
-      + "inlines the calls, so the system's theorem is about the composed "
-      + "expression itself: Lean does not cite the smaller theorems to close it.",
+      + "leaves each call as a call, so the system's theorem is about the "
+      + "expression you wrote: Lean does not cite the smaller theorems to close "
+      + "it, and it cannot see inside a callee either.",
     sections: [
       {
         heading: "Compositional contracts",
@@ -244,24 +245,24 @@ fn safe_output(error: Real, integral: Real) -> Real
     ensures  (result >= -100.0)
     ensures  (result <= 100.0)
 {
-    let raw = pid(error, integral, 2.5, 0.1);
-    saturate(raw, -100.0, 100.0)
+    clamp(pid(error, integral, 2.5, 0.1), -100.0, 100.0)
 }`,
         explanation: [
-          "The compiler emits THREE theorems, one per @verify. With monogate-forge 0.14.4, #print axioms shows two proved and one not.",
+          "The compiler emits THREE theorems, one per @verify. With monogate-forge 0.16.0, #print axioms shows two proved and one not.",
           "saturated_in_range and safe_output_bounded are proved: no sorryAx.",
           "pid_bounded is true (the output stays under 10·50 + 1·500 = 1000) but not proved: the tactics Forge tries do not find a proof for a bound that multiplies two bounded inputs, like Kp · error.",
-          "safe_output_bounded does not need pid_bounded. The saturate alone keeps the output in [-100, 100] whatever pid returns, so a clamp at the boundary makes the system property provable while an inner one is still open.",
+          "safe_output_bounded does not need pid_bounded. The clamp alone keeps the output in [-100, 100] whatever pid returns, so a clamp at the boundary makes the system property provable while an inner one is still open.",
+          "Write the clamp here, not a call to saturate. 0.16.0 leaves a call as a call in the emitted Lean, so a body of saturate(pid(error, integral, 2.5, 0.1), -100.0, 100.0) states the theorem about an opaque saturate term the clamp tactics cannot match, and safe_output_bounded shows sorryAx. 0.14.4 inlined every call and proved that body. The bound the theorem needs must be written where the theorem can see it.",
         ],
       },
       {
         heading: "Reading the Lean output",
         code: `$ eml-compile safe_control.eml --target lean -o safe_control.lean
 
--- safe_control.lean from monogate-forge 0.14.4 (excerpt)
+-- safe_control.lean from monogate-forge 0.16.0 (excerpt)
 
 noncomputable def safe_output (error : Real) (integral : Real) : Real :=
-  (min (max (((2.5 : Real) * error) + ((0.1 : Real) * integral)) (-100.0 : Real)) (100.0 : Real))
+  (max (-100.0 : Real) (min (pid error integral (2.5 : Real) (0.1 : Real)) (100.0 : Real)))
 
 theorem safe_output_bounded (error : Real) (integral : Real)
     (h1 : ((abs error) < (50.0 : Real)))
@@ -269,15 +270,18 @@ theorem safe_output_bounded (error : Real) (integral : Real)
     (h_clamp1 : (-100.0 : Real) ≤ (100.0 : Real)) :
     (((safe_output error integral) >= (-(100.0 : Real)))) ∧ (((safe_output error integral) <= (100.0 : Real))) := by
   unfold safe_output
-  refine ⟨?_, ?_⟩ <;>
-    first
-    | (apply lo_le_clamp <;> (first | assumption | mach_positivity))
-    | apply clamp_le_hi
-    -- ... 13 more tactics, tried in order ...
-    | sorry  -- out of reach; left for the prover`,
+  try mach_split_hyps
+  try dsimp only
+  all_goals
+    (try simp only [add_zero, zero_add, mul_zero, zero_mul, mul_one_ax, one_mul_thm, div_one_eq, ofSci_zero]) <;> refine ⟨?_, ?_⟩ <;>
+      first
+      | (apply lo_le_clamp <;> (first | assumption | mach_positivity))
+      | (apply clamp_le_hi <;> (first | assumption | mach_positivity))
+      -- ... 14 more tactics, tried in order ...
+      | sorry  -- out of reach; left for the prover`,
         explanation: [
           "One hypothesis per requires, one conclusion per ensures. Forge adds h_clamp1 itself: a clamp needs lo ≤ hi.",
-          "safe_output's body is pid and saturate inlined. This release proves the composed expression directly, not by citing the first two theorems.",
+          "clamp lowered to max (min ...) — the composition the language defines — and the call to pid stayed a call. The clamp tactics close the bound without ever looking inside pid, which is why the system theorem is proved while pid_bounded is not.",
           "The tactic list ends in sorry as a last resort, present whether or not an earlier tactic worked. The word itself tells you nothing.",
           "#print axioms does: no sorryAx for safe_output_bounded, so it is proved. Level 1, Lesson 4 shows the command.",
         ],
@@ -336,7 +340,7 @@ fn altitude_hold(
       "Level 1 showed @target(fpga) as a one-liner. This lesson reads what the "
       + "compiler does with it: the allocator's resource plan, the fixed-point "
       + "width it picks for a module, and one kernel planned for five parts. "
-      + "Every figure below is output from monogate-forge 0.14.4.",
+      + "Every figure below is output from monogate-forge 0.16.0.",
     sections: [
       {
         heading: "FPGA resource budgets",
@@ -356,9 +360,9 @@ fn pid(error: Real, integral: Real) -> Real {
         code: `$ eml-compile pid_fpga.eml --allocate
 
   FPGA allocation plan for Arty A7-100
-  Pipeline depth: 2 stages
+  EML depth:      2 (a resource estimate, not latency)
   Clock target:   100 MHz
-  Throughput:     50.0 Msamples/s
+  Timing:         not modeled here (see the emitted RTL)
 
   Resources:    100 LUTs     2 DSPs      0 KB BRAM
   MAC units:  2
@@ -366,8 +370,8 @@ fn pid(error: Real, integral: Real) -> Real {
         explanation: [
           "With no --fpga-target, the plan is for the Arty A7-100 board (xilinx.artix7). The allocator's budget for it is 63,400 LUTs and 240 DSP slices; this design uses 100 and 2.",
           "MAC units are multipliers. 2.5 * error and 0.1 * integral are two products, and each gets a DSP slice.",
-          "The plan's throughput is its own formula, clock ÷ pipeline depth: 100 MHz over 2 stages gives 50. The depth comes from the design, and it stays at 2 at clock_mhz = 50, 200 and 500.",
-          "Check the RTL, not the plan. Simulated in Verilator, the emitted pid_pipeline takes a new sample on every clock edge and returns each result 3 cycles later, as its header says (\"Total latency: 3 cycles\"). That is 100 Msamples/s at 100 MHz, twice the plan's figure.",
+          "EML depth is a resource estimate, not a latency. It comes from the design, and it stays at 2 at clock_mhz = 50, 200 and 500.",
+          "0.14.4 called that line \"Pipeline depth: 2 stages\" and divided the clock by it to print \"Throughput: 50.0 Msamples/s\". Simulated in Verilator, the emitted pid_pipeline takes a new sample on every clock edge and returns each result 3 cycles later — 100 Msamples/s at 100 MHz, twice the figure the plan printed. 0.15.0 stopped printing it, and 0.16.0 still does not: the plan says \"Timing: not modeled here\" and the RTL header carries the real \"Total latency: 3 cycles\" and \"a new sample on every clock edge\".",
           "The costs are estimates from a per-part table, not a synthesis report. Synthesize the Verilog before you choose a part.",
         ],
       },
@@ -375,27 +379,27 @@ fn pid(error: Real, integral: Real) -> Real {
         heading: "Who picks the precision",
         code: `module precision_demo;
 
-// chain 0 · drift LOW
+// co 0 · pfaffian_r 0 · drift LOW
 @target(fpga)
 fn gravity(m1: Real, m2: Real, r: Real) -> Real {
     6.674e-11 * m1 * m2 / (r * r)
 }
 
-// chain 2 · drift MEDIUM
+// co 2 · pfaffian_r 2 · drift MEDIUM
 @target(fpga)
 fn oscillator(t: Real, freq: Real) -> Real {
     sin(freq * t)
 }
 
-// chain 3 · drift HIGH
+// co 2 · pfaffian_r 3 · drift HIGH
 @target(fpga)
 fn damped_osc(t: Real, d: Real, f: Real) -> Real {
     exp(-d * t) * sin(f * t)
 }`,
         explanation: [
-          "The comments repeat the chain order and drift flag the profiler prints for each function.",
+          "The comments repeat the two cost numbers and the drift flag the profiler prints for each function. damped_osc is the one that widens the module, and its drift is HIGH on pfaffian_r 3, not on co.",
           "The drift flag describes a single evaluation. Error only piles up when an output feeds back into the next step, so check the loop, not just the function.",
-          "You don't set the width. @target accepts precision = float32 or float64, but in 0.14.4 that changes nothing: the Verilog is byte-identical either way, apart from the module name.",
+          "Leave precision off and the profiler picks the width, as it does here. 0.15.0 and 0.16.0 also honour an explicit precision = float32 or float64 on @target: the same gravity kernel emits WIDTH 32 / FRAC 16 under float32 and WIDTH 64 / FRAC 32 under float64. In 0.14.4 that argument was accepted and ignored for a chain-0 kernel — the Verilog was byte-identical apart from the module name — so a page or a build script written against 0.14.4 now gets a different width.",
         ],
       },
       {
@@ -431,16 +435,16 @@ $ eml-compile pid_fpga.eml --allocate --fpga-target lattice.ecp5
 $ eml-compile pid_fpga.eml --allocate --fpga-target lattice.ice40
 $ eml-compile pid_fpga.eml --allocate --fpga-target asic.sky130
 
-# The Resources line of each plan. All five: 2 stages, 50 Msamples/s.
+# The Resources line of each plan. All five: EML depth 2, timing not modeled.
 #   Arty A7-100                  100 LUTs   2 DSPs
 #   Cyclone 10 LP 10CL025        120 LUTs   2 DSPs
 #   ECP5 LFE5UM-85F              100 LUTs   2 DSPs
 #   iCE40 UltraPlus 5K           160 LUTs   2 DSPs
 #   SkyWater SKY130 (open-PDK)  8000 LUTs   0 DSPs`,
         explanation: [
-          "--fpga-target picks the part. The pipeline stays the same and the cost table changes.",
+          "--fpga-target picks the part. The design stays the same and the cost table changes.",
           "asic.sky130 is a 130 nm ASIC process, not an FPGA. Its plan keeps the FPGA field names, but its LUTs are NAND2-equivalent gates, and with no DSP slices the multipliers are built from standard cells.",
-          "Choose the part on the command line. @target has no working device option in 0.14.4: device = \"zynq_7020\" is accepted and ignored, and the plan is still for the Arty A7-100.",
+          "Choose the part on the command line. @target still has no working device option in 0.16.0: device = \"zynq_7020\" is accepted and ignored, and the plan is still for the Arty A7-100.",
           "A plan does not mean the RTL exists. A function that returns a tuple, (Real, Real), gets a plan from --allocate, but --target verilog stops with an emission-gate error: unsupported construct NodeKind.TUPLE.",
         ],
       },
@@ -448,13 +452,13 @@ $ eml-compile pid_fpga.eml --allocate --fpga-target asic.sky130
     exercise:
       "Take altitude_hold from Lesson 3 and put @target(fpga, clock_mhz = 100) "
       + "above its @verify line. --allocate should report 4 MAC units, 200 LUTs, "
-      + "4 DSPs and 4 stages. Add an input t and multiply the controller's sum by "
+      + "4 DSPs and EML depth 4. Add an input t and multiply the controller's sum by "
       + "exp(-0.5 * t) inside the clamp. What does the plan say the exp unit "
       + "costs on each of the five parts? Then write a kernel that adds three exp "
       + "terms with different decay rates. The Artix-7 plan marks the three exp "
       + "units shared and prices them as one, and the iCE40 plan refuses the "
       + "design. Now emit the Verilog: count the eml_exp instances, and compare "
-      + "the header's Total latency with the plan's pipeline depth. Which numbers "
+      + "the header's Total latency with the plan's EML depth. Which numbers "
       + "describe the hardware?",
   },
   {
@@ -529,7 +533,7 @@ jobs:
       - run: |
           for f in src/*.eml; do
             eml-compile "$f" --profile-only > profile.txt
-            if grep -qE "chain_order: ([4-9]|[1-9][0-9]+)" profile.txt; then
+            if grep -qE "co: ([4-9]|[1-9][0-9]+)" profile.txt; then
               echo "$f is over the chain-order budget"
               exit 1
             fi
@@ -537,7 +541,7 @@ jobs:
         explanation: [
           "Every push emits Python and C for every source file.",
           "One source per eml-compile call, so the workflow loops. A glob passes every file at once and fails.",
-          "The --profile-only pass enforces a complexity budget: a chain-order-4 function fails the build. Intentional.",
+          "The --profile-only pass enforces a complexity budget: a chain-order-4 function fails the build. Intentional. 0.15.0 renamed the profiler's field from chain_order to co and 0.16.0 keeps it, so grep for \"co:\"; a script that still greps chain_order matches nothing and passes everything.",
           "Lean is left out on purpose: checking proofs needs a MachLib build (Step 2), which is a job of its own.",
         ],
       },

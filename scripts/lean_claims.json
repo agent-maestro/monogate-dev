@@ -8,7 +8,7 @@
       "sources": {
         "../machlib/foundations": {
           "repository": "../machlib",
-          "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1"
+          "revision": "9802f19e147b227438e77ddc752f2d9eaff3abb0"
         }
       }
     }
@@ -59,7 +59,7 @@
         }
       ],
       "repository": "../machlib",
-      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "revision": "9802f19e147b227438e77ddc752f2d9eaff3abb0",
       "file": "foundations/MachLib/CostTheory.lean",
       "environment": "machlib",
       "theorems": [
@@ -94,7 +94,7 @@
         }
       ],
       "repository": "../machlib",
-      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "revision": "9802f19e147b227438e77ddc752f2d9eaff3abb0",
       "file": "foundations/MachLib/AcosHardwareForwardError.lean",
       "environment": "machlib",
       "theorems": [
@@ -111,7 +111,7 @@
         }
       ],
       "repository": "../machlib",
-      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "revision": "9802f19e147b227438e77ddc752f2d9eaff3abb0",
       "file": "foundations/MachLib/AsinHardwareForwardError.lean",
       "environment": "machlib",
       "theorems": [
@@ -132,7 +132,7 @@
         }
       ],
       "repository": "../machlib",
-      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "revision": "9802f19e147b227438e77ddc752f2d9eaff3abb0",
       "file": "foundations/MachLib/SinHardwareForwardError.lean",
       "environment": "machlib",
       "theorems": [
@@ -149,7 +149,7 @@
         }
       ],
       "repository": "../machlib",
-      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "revision": "9802f19e147b227438e77ddc752f2d9eaff3abb0",
       "file": "foundations/MachLib/TanHardwareForwardError.lean",
       "environment": "machlib",
       "theorems": [
@@ -166,7 +166,7 @@
         }
       ],
       "repository": "../machlib",
-      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "revision": "9802f19e147b227438e77ddc752f2d9eaff3abb0",
       "file": "foundations/MachLib/TanhHardwareForwardError.lean",
       "environment": "machlib",
       "theorems": [
@@ -187,7 +187,7 @@
         }
       ],
       "repository": "../machlib",
-      "revision": "013ee5c03cef874b2aec33f7556dfbeee5890db1",
+      "revision": "9802f19e147b227438e77ddc752f2d9eaff3abb0",
       "file": "foundations/MachLib/FixedPointCertifier.lean",
       "environment": "machlib",
       "theorems": [
@@ -218,8 +218,8 @@
     },
     {
       "file": "app/learn/eml/intro/guard/page.tsx",
-      "line": "With monogate-forge 0.14.4 and MachLib, guard_output_bounded is proved.",
-      "reason": "the same verdict in the course footer; re-derived by check_lesson_proofs (guard.guard_output_bounded), which also requires 0.14.4 to be the compiler it ran"
+      "line": "With monogate-forge 0.16.0 and MachLib, guard_output_bounded is proved.",
+      "reason": "the same verdict in the course footer; re-derived by check_lesson_proofs (guard.guard_output_bounded), which also requires 0.16.0 to be the compiler it ran"
     },
     {
       "file": "app/learn/eml/engineering/EngineeringClient.tsx",
@@ -230,6 +230,11 @@
       "file": "app/learn/eml/engineering/EngineeringClient.tsx",
       "line": "no sorryAx for safe_output_bounded, so it is proved.",
       "reason": "the same verdict restated under the Lean excerpt; re-derived by check_lesson_proofs (engineering.l3.safe_output_bounded)"
+    },
+    {
+      "file": "app/learn/eml/engineering/EngineeringClient.tsx",
+      "line": "which is why the system theorem is proved while pid_bounded is not.",
+      "reason": "the same verdict again, in the line that reads the emitted clamp term; re-derived by check_lesson_proofs (engineering.l3.safe_output_bounded), whose companion entry engineering.l3.pid_bounded re-derives the other half"
     },
     {
       "file": "app/page.tsx",

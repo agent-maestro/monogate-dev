@@ -366,7 +366,7 @@ const prose = [
   "canary_bounded is not proved.",
   "Return x instead of min(x, limit), and it is not proved.",
   "Write min(x, limit without the parenthesis, and the compiler stops.",
-  "Name it fn guard( and Lean refuses the file.",
+  'Name the theorem theorem = "propext" and Lean refuses the file.',
   "With monogate-forge 0.0.1, canary_bounded is proved.",
   "canary_mul is not proved either.",
   "'canary_bounded' depends on axioms: [propext, Quot.sound]",
@@ -391,7 +391,12 @@ const CANARY_REGISTRY = {
     canary("no-source", { source: "absent.eml" }),
     canary("stale-edit", { edits: [{ find: "max(x, limit)", replace: "x" }] }),
     canary("compile-failed", { edits: [{ find: "min(x, limit)", replace: "min(x, limit" }] }),
-    canary("lean-error", { edits: [{ find: "fn canary_clamp(", replace: "fn guard(" }] }),
+    // Lean must REFUSE the emitted file. Renaming the kernel to `guard` did
+    // that up to monogate-forge 0.14.4 ("already declared"); 0.15.0 escapes a
+    // reserved name to `guard_` and the file compiles, so this canary stopped
+    // firing and took the whole gate down with it. Theorem names are NOT
+    // escaped, so colliding one with a Lean axiom still gets the refusal.
+    canary("lean-error", { edits: [{ find: 'theorem = "canary_bounded"', replace: 'theorem = "propext"' }] }),
   ],
   generic: [{ file: CANARY_FILE, line: "a generic line that has gone", reason: "canary" }],
 };

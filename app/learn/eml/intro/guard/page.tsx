@@ -18,8 +18,11 @@ const BORDER = "#1c1f2e";
 const TEXT = "#d4d4d4";
 const MUTED = "#7f8499";
 
-// Named reflex_guard, not guard: `guard` is already taken in Lean, and a
-// kernel named guard emits Lean that does not compile ("already declared").
+// Named reflex_guard, not guard, because `guard` is taken in Lean. Up to
+// monogate-forge 0.14.4 a kernel named guard emitted Lean that did not compile
+// ("already declared"); 0.15.0 and 0.16.0 escape a reserved name instead and emit
+// `guard_`, so the file compiles but the Lean name no longer matches the EML
+// one. Pick a name that is not reserved and neither happens.
 const emlSource = `module threshold_reflex;
 
 @verify(lean, theorem = "guard_output_bounded")
@@ -33,25 +36,80 @@ fn reflex_guard(request: Real, limit: Real) -> Real
 
 const compileC = `eml-compile threshold_reflex_v0.eml --target c -o threshold_reflex_v0.c`;
 const compileLean = `eml-compile threshold_reflex_v0.eml --target lean -o threshold_reflex_v0.lean`;
-const compileVerilog = `eml-compile threshold_reflex_v0.eml --target verilog -o threshold_reflex_v0.v`;
+// The Verilog target REFUSES this kernel, and the refusal is the lesson. Keep
+// the narration on the line after the command: scripts/check_site_commands.mjs
+// reads a following "compile error" line as "this command must exit non-zero",
+// and requires every other command on the page to exit 0.
+const compileVerilog = `eml-compile threshold_reflex_v0.eml --target verilog -o threshold_reflex_v0.v
+compile error (emission gate): function(s) failed to emit, so the output is a comment rather than a datapath:
+[('reflex_guard', "unsupported construct: 'no hardware realization for min(...), called from
+this kernel(...). Every call needs a resolved module and a resolved latency before any RTL is
+written: a guessed latency latches a register before its operand exists, which synthesises and
+computes nothing.'")]`;
 
-// Real output of monogate-forge 0.14.4 for emlSource, file header trimmed.
+const verilogFix = `@verify(lean, theorem = "guard_output_bounded")
+@target(fpga, clock_mhz = 100)
+fn reflex_guard(request: Real, limit: Real) -> Real
+    requires (limit > 0.0)
+    ensures (result <= limit)
+{
+    clamp(request, 0.0, limit)
+}`;
+
+// Real output of monogate-forge 0.16.0 for emlSource. The file header and the
+// two long rationale comments are trimmed; every line of code is verbatim, and
+// each cut is marked. 0.15.0 emitted no fp-contract pragma at all.
 const generatedC = `#include "libmonogate.h"
 #include <stdint.h>
 #include <math.h>
-#include <assert.h>
+
+/* UNFUSED BY DEFAULT. \`a + b * c\` in EML is an add of a ROUNDED product; the fused operation is
+ * written \`fma(a, b, c)\` and is emitted as a call to \`fma\`, which still contracts. GCC contracts
+ * \`a + b*c\` into one fused multiply-add at -O2 and above [...], which would change this
+ * artifact's last bits. The pragma below turns that off for THIS FILE ONLY [...]
+ * THIS OVERRIDES -ffast-math, ON PURPOSE. [... rationale trimmed ...] */
+#if defined(__clang__)
+#pragma STDC FP_CONTRACT OFF
+#elif defined(__GNUC__)
+#pragma GCC push_options
+#pragma GCC optimize("fp-contract=off")
+#else
+#pragma STDC FP_CONTRACT OFF
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+
+/* Contract checks. NOT assert(): -DNDEBUG would delete them, and a release
+ * build that silently drops every \`requires\` and \`ensures\` is exactly the
+ * obligation attenuation this compiler exists to report. */
+#define EML_CONTRACT(cond, msg) \\
+    do { if (!(cond)) { \\
+        fprintf(stderr, "EML contract violated: %s\\n", (msg)); \\
+        abort(); } } while (0)
+
+static inline double eml_builtin_min(double a, double b) { return isnan(a) ? a : isnan(b) ? b : a == b ? (signbit(a) ? a : b) : fmin(a, b); }
 
 /*
  * reflex_guard
- * Chain order: 0     Cost class: p0-d1-w0-c0
- * EML depth:   1  Drift risk: LOW
+ * Pfaffian chain count (eml-cost pfaffian_r): 0     Cost class: p0-d1-w0-c0
+ * EML depth:   1  Symbolic band: LOW (from pfaffian_r only)
+ * Numerical:   cancellation exposure NONE  (no mixed-sign subtraction)
  * Dynamics:    0 osc, 0 decay  (predicted_r=0)
+ * source obligations for reflex_guard: {O1}
+ *   O1 [b0f58e3d87b2] -> PRESERVED (equivalent)  EML_CONTRACT before return; survives -DNDEBUG
+ *        build: unconditional -- EML_CONTRACT is a self-contained if/abort, NOT assert(), so -DNDEBUG cannot delete it
  * FPGA est:   1 MAC, 0 exp, 0 ln, 0 trig -> 2 cy @ 32-bit
  */
 double reflex_guard(double request, double limit) {
-    assert(((limit > 0.0)) && "reflex_guard: requires ((limit > 0.0))");
-    return min(request, limit);
-}`;
+    EML_CONTRACT(((limit > 0.0)), "reflex_guard: requires ((limit > 0.0))");
+    double result = eml_builtin_min(request, limit);
+    EML_CONTRACT(((result <= limit)), "reflex_guard: ensures violated: (result <= limit)");
+    return result;
+}
+
+#if !defined(__clang__) && defined(__GNUC__)
+#pragma GCC pop_options  /* end of the unfused region: see the note at the top of this file */
+#endif`;
 
 const inoAdapter = `// threshold_reflex_v0.c, libmonogate.h and libmonogate.c sit beside this sketch.
 extern "C" double reflex_guard(double request, double limit);
@@ -73,7 +131,7 @@ void loop() {
     );
 }`;
 
-// Real output of monogate-forge 0.14.4 (excerpt). The axiom report below is
+// Real output of monogate-forge 0.16.0 (excerpt). The axiom report below is
 // re-derived before each deploy by scripts/check_lesson_proofs.mjs, which
 // fails when it stops matching what Lean prints.
 const leanOutput = `import MachLib.EML
@@ -82,6 +140,11 @@ import MachLib.Forge
 import MachLib.Linarith
 import MachLib.FixedPoint
 import MachLib.SignTactic
+import MachLib.Decimal
+
+set_option maxHeartbeats 1000000
+set_option autoImplicit false
+set_option linter.unusedSimpArgs false
 
 open MachLib
 open MachLib.Real
@@ -93,11 +156,15 @@ theorem guard_output_bounded (request : Real) (limit : Real)
     (h1 : (limit > (0 : Real))) :
     ((reflex_guard request limit) <= limit) := by
   unfold reflex_guard
-  first
-  | (apply lo_le_clamp <;> (first | assumption | mach_positivity))
-  | apply clamp_le_hi
-  -- ... 13 more tactics, tried in order ...
-  | sorry  -- out of reach; left for the prover`;
+  try mach_split_hyps
+  try dsimp only
+  all_goals
+    (try simp only [add_zero, zero_add, mul_zero, zero_mul, mul_one_ax, one_mul_thm, div_one_eq, ofSci_zero]) <;>
+      first
+      | (apply lo_le_clamp <;> (first | assumption | mach_positivity))
+      | (apply clamp_le_hi <;> (first | assumption | mach_positivity))
+      -- ... 14 more tactics, tried in order ...
+      | sorry  -- out of reach; left for the prover`;
 
 const checkAxioms = `git clone https://github.com/agent-maestro/machlib
 cd machlib/foundations
@@ -305,7 +372,7 @@ export default function EmlIntroPage() {
         <P>Save this file beside the Reflex Guard lesson files.</P>
         <CodeBlock code={emlSource} lang="eml" filename="threshold_reflex_v0.eml" />
         <P>
-          <Inline>requires</Inline> and <Inline>ensures</Inline> are not comments. <Inline>requires</Inline> becomes a runtime check in C and a hypothesis in Lean; <Inline>ensures</Inline> becomes the theorem. Name the function <Inline>reflex_guard</Inline>, not <Inline>guard</Inline>: <Inline>guard</Inline> is already taken in Lean, and the emitted Lean would not compile.
+          <Inline>requires</Inline> and <Inline>ensures</Inline> are not comments. In C, 0.16.0 turns BOTH into runtime checks: <Inline>requires</Inline> before the body and <Inline>ensures</Inline> on the result, each an <Inline>EML_CONTRACT</Inline> that <Inline>-DNDEBUG</Inline> cannot delete. In Lean, <Inline>requires</Inline> becomes a hypothesis and <Inline>ensures</Inline> becomes the theorem. Name the function <Inline>reflex_guard</Inline>, not <Inline>guard</Inline>: <Inline>guard</Inline> is taken in Lean, and 0.16.0 renames it to <Inline>guard_</Inline> so the emitted name stops matching the one you wrote.
         </P>
       </Section>
 
@@ -342,18 +409,40 @@ export default function EmlIntroPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
           {[
             "Rewrite the body as if request > limit { limit } else { request }. The theorem is just as true. Does #print axioms still say proved?",
-            `Run ${compileVerilog} and compare the hardware-shaped logic.`,
           ].map((item) => (
             <div key={item} style={{ border: `1px solid ${BORDER}`, borderRadius: 6, padding: 14, background: SURFACE_2, color: TEXT, fontSize: 14, lineHeight: 1.55 }}>
               {item}
             </div>
           ))}
         </div>
+
+        <P>
+          Try the hardware target, and read what it says. With monogate-forge
+          0.16.0 this kernel does not emit Verilog:
+        </P>
+        <CodeBlock code={compileVerilog} lang="bash" command />
+        <P>
+          <Inline>min</Inline> has no module in the Verilog backend, so there
+          is no latency to schedule the call against. monogate-forge 0.14.4
+          accepted the same command and wrote{" "}
+          <Inline>min_pipeline #(...) min_pipeline_1 (...)</Inline> into the
+          file — an instantiation of a module the file never defines, which no
+          simulator can elaborate and no tool can synthesize. 0.15.0 and 0.16.0
+          refuse instead, and say which call they could not realize.
+        </P>
+        <P>
+          <Inline>clamp</Inline> does have one. Write the bound as a clamp and
+          the same contract emits real RTL, and{" "}
+          <Inline>#print axioms</Inline> still reports{" "}
+          <Inline>guard_output_bounded</Inline> with no{" "}
+          <Inline>sorryAx</Inline>:
+        </P>
+        <CodeBlock code={verilogFix} lang="eml" />
       </Section>
 
       <footer style={{ marginTop: 24, border: "1px solid rgba(232,160,32,0.28)", borderRadius: 6, background: "rgba(232,160,32,0.07)", padding: 16 }}>
         <p style={{ margin: 0, color: "#fff2a6", fontSize: 13, lineHeight: 1.6 }}>
-          This course shows the EML -&gt; C -&gt; ESP32 path and a checked proof. With monogate-forge 0.14.4 and MachLib, guard_output_bounded is proved. The proof covers the function, not the firmware or the hardware; those need their own evidence.
+          This course shows the EML -&gt; C -&gt; ESP32 path and a checked proof. With monogate-forge 0.16.0 and MachLib, guard_output_bounded is proved. The proof covers the function, not the firmware or the hardware; those need their own evidence.
         </p>
       </footer>
     </Shell>
